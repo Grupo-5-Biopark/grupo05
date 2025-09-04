@@ -18,7 +18,6 @@ export default function HomePage() {
     }
   }, [isAuthenticated, isLoading, router])
 
-  // Mostrar loading enquanto verifica autenticação
   if (isLoading) {
     return (
       <div style={{

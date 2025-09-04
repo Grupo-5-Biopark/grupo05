@@ -111,19 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     
     try {
-      // Simular processo de recuperação de senha
       await new Promise(resolve => setTimeout(resolve, 2500))
       
-      // Simular verificação se email existe no sistema
       const registeredEmails = ['admin@biopark.com', 'viewer@biopark.com', 'editor@biopark.com']
       
       if (registeredEmails.includes(email)) {
-        // Simular envio de email
         console.log('Email de recuperação enviado para:', email)
         return true
       } else {
-        // Email não encontrado, mas por segurança retornamos true
-        // (não queremos revelar quais emails estão cadastrados)
         console.log('Email não encontrado, mas retornando true por segurança:', email)
         return true
       }

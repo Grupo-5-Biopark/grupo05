@@ -35,7 +35,6 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
-  // Mostrar loading se ainda estiver verificando a autenticação
   if (authLoading) {
     return (
       <div style={{ 

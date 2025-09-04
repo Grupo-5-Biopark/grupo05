@@ -358,13 +358,32 @@
   margin-top: 2rem;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/development
 .helpText {
   color: #666;
   font-size: 0.9rem;
   font-weight: 500;
+<<<<<<< HEAD
 }
 
 /* Responsividade */
+=======
+
+.signupLink {
+  color: #EB0644;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.signupLink:hover {
+  text-decoration: underline;
+}
+
+>>>>>>> origin/development
 @media (max-width: 480px) {
   .loginContainer {
     padding: 1rem;
