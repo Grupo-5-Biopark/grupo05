@@ -12,10 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/development
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -37,10 +33,7 @@ export default function LoginPage() {
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       particle.className = styles.particle;
-<<<<<<< HEAD
       
-=======
->>>>>>> origin/development
       particle.style.left = Math.random() * 100 + '%';
       particle.style.animationDelay = Math.random() * 15 + 's';
       particle.style.animationDuration = (15 + Math.random() * 10) + 's';
@@ -85,10 +78,7 @@ export default function LoginPage() {
     }
   };
 
-<<<<<<< HEAD
   // Mostrar loading se ainda estiver verificando a autenticação
-=======
->>>>>>> origin/development
   if (authLoading) {
     return (
       <div className={styles.container}>
@@ -106,32 +96,6 @@ export default function LoginPage() {
     );
   }
 
-<<<<<<< HEAD
-=======
-    setTimeout(async () => {
-      try {
-        if (email === 'admin@biopark.com' && password === '123456') {
-          showSuccessAnimation();
-        } else {
-          setError('Credenciais inválidas. Tente novamente.');
-          setIsLoading(false);
-          
-          const card = document.querySelector(`.${styles.loginCard}`);
-          if (card) {
-            (card as HTMLElement).style.animation = `${styles.shake} 0.5s ease-in-out`;
-            setTimeout(() => {
-              (card as HTMLElement).style.animation = '';
-            }, 500);
-          }
-        }
-      } catch (err) {
-        setError('Erro ao fazer login');
-        setIsLoading(false);
-      }
-    }, 2000);
-  };
-
->>>>>>> origin/development
   if (showSuccess) {
     return (
       <div className={styles.container}>
@@ -203,13 +167,7 @@ export default function LoginPage() {
                 <input type="checkbox" className={styles.rememberCheckbox} />
                 <span>Lembrar-me</span>
               </label>
-<<<<<<< HEAD
               <a href="/forgot-password" className={styles.forgotPassword}>Esqueceu a senha?</a>
-=======
-
-              <a href="/forgot-password" className={styles.forgotPassword}>Esqueceu a senha?</a>
-              
->>>>>>> origin/development
             </div>
 
             <button 
