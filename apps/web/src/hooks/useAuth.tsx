@@ -6,7 +6,7 @@ interface User {
   id: string
   name: string
   email: string
-  role: string
+  role: 'admin' | 'viewer' | 'editor'
 }
 
 interface AuthContextType {
@@ -14,6 +14,7 @@ interface AuthContextType {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<boolean>
+  forgotPassword: (email: string) => Promise<boolean>
   logout: () => void
 }
 
@@ -53,19 +54,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Simular processo de autenticação
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (email === 'admin@biopark.com' && password === '123456') {
-        const mockUser: User = {
-          id: '1',
-          name: 'Administrador BIOPARK',
+      // Usuários de exemplo do sistema
+      const users = [
+        {
           email: 'admin@biopark.com',
-          role: 'admin'
+          password: '123456',
+          user: {
+            id: '1',
+            name: 'Administrador BIOPARK',
+            email: 'admin@biopark.com',
+            role: 'admin' as const
+          }
+        },
+        {
+          email: 'viewer@biopark.com',
+          password: '123456',
+          user: {
+            id: '2',
+            name: 'Visualizador BIOPARK',
+            email: 'viewer@biopark.com',
+            role: 'viewer' as const
+          }
+        },
+        {
+          email: 'editor@biopark.com',
+          password: '123456',
+          user: {
+            id: '3',
+            name: 'Editor BIOPARK',
+            email: 'editor@biopark.com',
+            role: 'editor' as const
+          }
         }
-        
+      ]
+      
+      const foundUser = users.find(u => u.email === email && u.password === password)
+      
+      if (foundUser) {
         const mockToken = 'biopark_jwt_token_' + Date.now()
         
-        setUser(mockUser)
+        setUser(foundUser.user)
         localStorage.setItem('auth_token', mockToken)
-        localStorage.setItem('user_data', JSON.stringify(mockUser))
+        localStorage.setItem('user_data', JSON.stringify(foundUser.user))
         localStorage.setItem('authenticated', 'true')
         
         return true
@@ -74,6 +104,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Erro no login:', error)
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const forgotPassword = async (email: string) => {
+    setIsLoading(true)
+    
+    try {
+      // Simular processo de recuperação de senha
+      await new Promise(resolve => setTimeout(resolve, 2500))
+      
+      // Simular verificação se email existe no sistema
+      const registeredEmails = ['admin@biopark.com', 'viewer@biopark.com', 'editor@biopark.com']
+      
+      if (registeredEmails.includes(email)) {
+        // Simular envio de email
+        console.log('Email de recuperação enviado para:', email)
+        return true
+      } else {
+        // Email não encontrado, mas por segurança retornamos true
+        // (não queremos revelar quais emails estão cadastrados)
+        console.log('Email não encontrado, mas retornando true por segurança:', email)
+        return true
+      }
+    } catch (error) {
+      console.error('Erro na recuperação de senha:', error)
       return false
     } finally {
       setIsLoading(false)
@@ -92,6 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     isAuthenticated: !!user,
     login,
+    forgotPassword,
     logout
   }
 

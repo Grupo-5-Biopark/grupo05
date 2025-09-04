@@ -12,7 +12,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     createParticles();
@@ -22,13 +28,12 @@ export default function LoginPage() {
     const particlesContainer = document.getElementById('particles');
     if (!particlesContainer) return;
     
-    const particleCount = 15;
+    const particleCount = 50;
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       particle.className = styles.particle;
       
-      // Posição aleatória
       particle.style.left = Math.random() * 100 + '%';
       particle.style.animationDelay = Math.random() * 15 + 's';
       particle.style.animationDuration = (15 + Math.random() * 10) + 's';
@@ -49,31 +54,47 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    // Simular processo de login
-    setTimeout(async () => {
-      try {
-        // Validação simples (substitua por sua lógica real)
-        if (email === 'admin@biopark.com' && password === '123456') {
-          showSuccessAnimation();
-        } else {
-          setError('Credenciais inválidas. Tente novamente.');
-          setIsLoading(false);
-          
-          // Fazer o card "balançar"
-          const card = document.querySelector(`.${styles.loginCard}`);
-          if (card) {
-            (card as HTMLElement).style.animation = `${styles.shake} 0.5s ease-in-out`;
-            setTimeout(() => {
-              (card as HTMLElement).style.animation = '';
-            }, 500);
-          }
-        }
-      } catch (err) {
-        setError('Erro ao fazer login');
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
+        showSuccessAnimation();
+      } else {
+        setError('Credenciais inválidas. Tente novamente.');
         setIsLoading(false);
+        
+        // Fazer o card "balançar"
+        const card = document.querySelector(`.${styles.loginCard}`);
+        if (card) {
+          (card as HTMLElement).style.animation = `${styles.shake} 0.5s ease-in-out`;
+          setTimeout(() => {
+            (card as HTMLElement).style.animation = '';
+          }, 500);
+        }
       }
-    }, 2000);
+    } catch (err) {
+      setError('Erro ao fazer login');
+      setIsLoading(false);
+    }
   };
+
+  // Mostrar loading se ainda estiver verificando a autenticação
+  if (authLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.bgDecoration}></div>
+        <div className={styles.particles} id="particles"></div>
+        <div className={styles.loginContainer}>
+          <div className={styles.loginCard}>
+            <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+              <div style={{ fontSize: '2rem', color: '#233444', marginBottom: '1rem' }}>🔄</div>
+              <p style={{ color: '#666' }}>Verificando autenticação...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (showSuccess) {
     return (
@@ -146,7 +167,7 @@ export default function LoginPage() {
                 <input type="checkbox" className={styles.rememberCheckbox} />
                 <span>Lembrar-me</span>
               </label>
-              <a href="#" className={styles.forgotPassword}>Esqueceu a senha?</a>
+              <a href="/forgot-password" className={styles.forgotPassword}>Esqueceu a senha?</a>
             </div>
 
             <button 
@@ -159,8 +180,9 @@ export default function LoginPage() {
           </form>
 
           <div className={styles.loginFooter}>
-            Não tem uma conta?
-            <a href="#" className={styles.signupLink}>Cadastre-se</a>
+            <div className={styles.helpText}>
+              Sistema de Controle de Salas BIOPARK
+            </div>
           </div>
         </div>
       </div>
