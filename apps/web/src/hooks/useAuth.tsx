@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Verificar se existe um token válido no localStorage
     const checkAuth = () => {
       const token = localStorage.getItem('auth_token')
       const userData = localStorage.getItem('user_data')
@@ -51,10 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     
     try {
-      // Simular processo de autenticação
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Usuários de exemplo do sistema
       const users = [
         {
           email: 'admin@biopark.com',
@@ -114,19 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     
     try {
-      // Simular processo de recuperação de senha
       await new Promise(resolve => setTimeout(resolve, 2500))
       
-      // Simular verificação se email existe no sistema
       const registeredEmails = ['admin@biopark.com', 'viewer@biopark.com', 'editor@biopark.com']
       
       if (registeredEmails.includes(email)) {
-        // Simular envio de email
         console.log('Email de recuperação enviado para:', email)
         return true
       } else {
-        // Email não encontrado, mas por segurança retornamos true
-        // (não queremos revelar quais emails estão cadastrados)
         console.log('Email não encontrado, mas retornando true por segurança:', email)
         return true
       }
