@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Verificar se existe um token válido no localStorage
     const checkAuth = () => {
       const token = localStorage.getItem('auth_token')
       const userData = localStorage.getItem('user_data')
@@ -51,10 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     
     try {
-      // Simular processo de autenticação
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Usuários de exemplo do sistema
       const users = [
         {
           email: 'admin@biopark.com',
