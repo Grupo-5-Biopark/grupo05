@@ -10,13 +10,21 @@
     "packages/*"
   ],
   "scripts": {
+    "// Full-stack Development Environment": "",
+    "dev": "docker compose up --build -d",
+    "stop": "docker compose down",
+    "// Focused Development Environments": "",
+    "dev:server": "docker compose up server --build -d",
+    "dev:web": "docker compose up web --build -d",
+    "// Production-like Environment": "",
+    "start:prod": "docker compose -f docker-compose.yml up --build -d",
+    "stop:prod": "docker compose -f docker-compose.yml down",
+    "// Repository Tooling": "",
     "build": "npm run build --workspaces --if-present",
-    "dev:server": "npm run start:dev --workspace=server",
-    "dev:web": "npm run dev --workspace=web",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "test": "npm test --workspaces --if-present",
-    "prepare": "husky"
+    "prepare": "npx husky"
   },
   "repository": {
     "type": "git",
@@ -39,7 +47,7 @@
     "@types/react-dom": "^19",
     "@types/supertest": "^6.0.3",
     "eslint": "^9.35.0",
-    "eslint-config-next": "15.5.2",
+    "eslint-config-next": "^15.5.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",

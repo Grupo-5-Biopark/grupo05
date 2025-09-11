@@ -30,23 +30,27 @@ apps/web/
 ## 🎨 Design System
 
 ### Cores Principais
+
 - **Azul Escuro:** `#233444` (Primary Dark)
-- **Vermelho:** `#EB0644` (Primary Red)  
+- **Vermelho:** `#EB0644` (Primary Red)
 - **Branco:** `#FBFBFB` (Primary Light)
 - **Azul Secundário:** `#1a2935` (Secondary Dark)
 - **Vermelho Claro:** `#ff4d7a` (Accent Red)
 
 ### Tipografia
+
 - **Fonte Principal:** Segoe UI, Tahoma, Geneva, Verdana, sans-serif
 
 ## � Como Executar
 
 1. **Instalar dependências:**
+
    ```bash
    npm install
    ```
 
 2. **Executar em modo de desenvolvimento:**
+
    ```bash
    npm run dev
    ```
@@ -59,6 +63,7 @@ apps/web/
 Esta é a estrutura inicial do projeto. As seguintes funcionalidades serão desenvolvidas:
 
 ### Funcionalidades Planejadas
+
 - [ ] Sistema de autenticação
 - [ ] Dashboard com estatísticas
 - [ ] Gerenciamento de cursos e turmas
@@ -67,6 +72,7 @@ Esta é a estrutura inicial do projeto. As seguintes funcionalidades serão dese
 - [ ] Relatórios e exportação
 
 ### Critérios de Sucesso
+
 - [ ] Lançamento no prazo (Banca Final)
 - [ ] Aprovação da Kelli e agregados (Adesão)
 - [ ] Avaliação positiva da Kelli (Satisfação)
@@ -75,9 +81,11 @@ Esta é a estrutura inicial do projeto. As seguintes funcionalidades serão dese
 ## � Público-Alvo
 
 ### Primários
+
 - Kelli e ajudante
 
-### Secundários  
+### Secundários
+
 - Diretores
 - Coordenadores
 - Funcionários das Faculdades Donaduzzi e Luiz Donadozzi
