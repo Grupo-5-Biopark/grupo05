@@ -1,13 +1,17 @@
-import { ReactNode } from 'react'
-import styles from './Header.module.css'
+import { ReactNode } from 'react';
+import styles from './Header.module.css';
 
 interface HeaderProps {
-  title?: string
-  children?: ReactNode
-  onMenuToggle?: () => void
+  title?: string;
+  children?: ReactNode;
+  onMenuToggle?: () => void;
 }
 
-export default function Header({ title = 'BIOPARK', children, onMenuToggle }: HeaderProps) {
+export default function Header({
+  title = 'BIOPARK',
+  children,
+  onMenuToggle,
+}: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
@@ -18,10 +22,8 @@ export default function Header({ title = 'BIOPARK', children, onMenuToggle }: He
         )}
         <h1 className={styles.title}>{title}</h1>
       </div>
-      
-      <div className={styles.right}>
-        {children}
-      </div>
+
+      <div className={styles.right}>{children}</div>
     </header>
-  )
+  );
 }

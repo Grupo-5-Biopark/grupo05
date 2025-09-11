@@ -6,10 +6,16 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   line-height: 1.6;
   color: #233444;
-  background: #FBFBFB;
+  background: #fbfbfb;
 }
 
 /* Layout do Dashboard */
@@ -17,8 +23,8 @@ body {
   min-height: 100vh;
   display: grid;
   grid-template-areas:
-    "header header"
-    "sidebar main";
+    'header header'
+    'sidebar main';
   grid-template-columns: auto 1fr;
   grid-template-rows: 60px 1fr;
 }
@@ -27,7 +33,7 @@ body {
 .header {
   grid-area: header;
   background: #233444;
-  border-bottom: 1px solid #EB0644;
+  border-bottom: 1px solid #eb0644;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,7 +45,7 @@ body {
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #FBFBFB;
+  color: #fbfbfb;
   letter-spacing: -0.5px;
 }
 
@@ -61,14 +67,14 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: #FBFBFB;
+  color: #fbfbfb;
 }
 
 .user-avatar {
   width: 32px;
   height: 32px;
-  background: #EB0644;
-  color: #FBFBFB;
+  background: #eb0644;
+  color: #fbfbfb;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -81,7 +87,7 @@ body {
 .sidebar {
   grid-area: sidebar;
   background: #233444;
-  border-right: 1px solid #EB0644;
+  border-right: 1px solid #eb0644;
   width: 250px;
   padding: 1rem 0;
   transform: translateX(-100%);
@@ -109,7 +115,7 @@ body {
   border: none;
   padding: 0.75rem 1.5rem;
   text-align: left;
-  color: #FBFBFB;
+  color: #fbfbfb;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
@@ -120,12 +126,12 @@ body {
 
 .nav-link:hover {
   background: rgba(235, 6, 68, 0.1);
-  color: #FBFBFB;
+  color: #fbfbfb;
 }
 
 .nav-link.active {
-  background: #EB0644;
-  color: #FBFBFB;
+  background: #eb0644;
+  color: #fbfbfb;
   font-weight: 600;
 }
 
@@ -147,8 +153,14 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .page-header {
@@ -163,7 +175,7 @@ body {
 }
 
 .page-subtitle {
-  color: #EB0644;
+  color: #eb0644;
   font-size: 1rem;
 }
 
@@ -181,7 +193,9 @@ body {
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .stat-card:hover {
@@ -192,7 +206,7 @@ body {
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #EB0644;
+  color: #eb0644;
   margin-bottom: 0.5rem;
 }
 
@@ -246,7 +260,7 @@ body {
 }
 
 .content-placeholder h3 {
-  color: #EB0644;
+  color: #eb0644;
   margin-bottom: 1rem;
   font-size: 1.5rem;
 }
@@ -275,8 +289,8 @@ body {
 }
 
 .btn-primary {
-  background: #EB0644;
-  color: #FBFBFB;
+  background: #eb0644;
+  color: #fbfbfb;
 }
 
 .btn-primary:hover {
@@ -303,11 +317,11 @@ body {
 @media (max-width: 768px) {
   .dashboard-layout {
     grid-template-areas:
-      "header"
-      "main";
+      'header'
+      'main';
     grid-template-columns: 1fr;
   }
-  
+
   .sidebar {
     position: fixed;
     top: 60px;
@@ -315,15 +329,15 @@ body {
     height: calc(100vh - 60px);
     z-index: 999;
   }
-  
+
   .main-content {
     padding: 1rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .page-title {
     font-size: 1.5rem;
   }
