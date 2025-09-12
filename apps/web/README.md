@@ -1,31 +1,15 @@
-# BIOPARK - Sistema de Controle de Salas
+# Frontend Web App (`/apps/web`)
 
-Sistema de gerenciamento de crescimento da faculdade para estruturação e organização de salas baseado no número de alunos.
+Este diretório contém a aplicação frontend para o projeto **Controle de Salas Biopark**, desenvolvida com **Next.js**. Ele é responsável por fornecer a interface do usuário para interagir com a API do backend.
 
-## 🎯 Propósito Principal
+---
 
-Gerar relatórios de tamanho/quantidade de salas baseado em turmas e quantidade de alunos, proporcionando uma previsão de estrutura para a universidade.
+## 🛠️ Tecnologias e Padrões
 
-## 🏗️ Estrutura Inicial do Projeto
-
-```
-apps/web/
-├── src/
-│   ├── app/
-│   │   ├── globals.css      # Estilos globais e variáveis CSS
-│   │   ├── layout.tsx       # Layout principal da aplicação
-│   │   └── page.tsx         # Página inicial
-├── package.json             # Dependências e scripts
-├── next.config.js           # Configuração do Next.js
-├── tsconfig.json            # Configuração do TypeScript
-└── README.md                # Documentação
-```
-
-## 🛠️ Tecnologias Base
-
-- **Next.js 14** - Framework React para produção
-- **TypeScript** - Linguagem com tipagem estática
-- **CSS Variables** - Sistema de cores e design tokens
+* **Framework**: `Next.js 15` (com App Router)
+* **Linguagem**: `TypeScript`
+* **Estilização**: `CSS Modules` e `CSS Variables`
+* **Testes**: `Jest` com `React Testing Library`
 
 ## 🎨 Design System
 
@@ -39,57 +23,24 @@ apps/web/
 
 ### Tipografia
 
-- **Fonte Principal:** Segoe UI, Tahoma, Geneva, Verdana, sans-serif
+- **Fonte Principal:** `Segoe UI`, `Tahoma`, `Geneva`, `Verdana`, `sans-serif`
 
-## � Como Executar
+---
 
-1. **Instalar dependências:**
+## 🚀 Como Executar (Desenvolvimento)
 
-   ```bash
-   npm install
-   ```
+Para rodar **apenas a aplicação web** em modo de desenvolvimento (com hot-reload), execute o seguinte comando a partir do **diretório raiz do monorepo**:
 
-2. **Executar em modo de desenvolvimento:**
+```bash
+npm run dev:web
+```
 
-   ```bash
-   npm run dev
-   ```
+A aplicação estará disponível em `http://localhost:3000`.
 
-3. **Acessar o sistema:**
-   - Abrir http://localhost:3000
+## 🧪 Como Executar os Testes
 
-## 📋 Próximos Passos
+Para rodar os testes específicos do frontend, execute o seguinte comando a partir do **diretório raiz do monorepo**:
 
-Esta é a estrutura inicial do projeto. As seguintes funcionalidades serão desenvolvidas:
-
-### Funcionalidades Planejadas
-
-- [ ] Sistema de autenticação
-- [ ] Dashboard com estatísticas
-- [ ] Gerenciamento de cursos e turmas
-- [ ] Controle de salas por tamanho
-- [ ] Cálculos de evasão e previsões
-- [ ] Relatórios e exportação
-
-### Critérios de Sucesso
-
-- [ ] Lançamento no prazo (Banca Final)
-- [ ] Aprovação da Kelli e agregados (Adesão)
-- [ ] Avaliação positiva da Kelli (Satisfação)
-- [ ] Entrega da funcionalidade principal: controle de quantidade de salas por tamanho
-
-## � Público-Alvo
-
-### Primários
-
-- Kelli e ajudante
-
-### Secundários
-
-- Diretores
-- Coordenadores
-- Funcionários das Faculdades Donaduzzi e Luiz Donadozzi
-
-## 📄 Licença
-
-Este projeto é propriedade da BIOPARK e destina-se exclusivamente ao uso interno da instituição.
+```bash
+npm test --workspace=web
+```
