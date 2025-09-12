@@ -3,5 +3,8 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/server"
   },
-  "include": ["src/**/*", "test/**/*"]
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ]
 }

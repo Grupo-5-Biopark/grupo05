@@ -19,10 +19,11 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/server/*": ["apps/server/src/*"],
-      "@/domain/*": ["apps/server/src/domain/*"],
-      "@/application/*": ["apps/server/src/application/*"],
+      "@/modules/*": ["apps/server/src/modules/*"],
       "@/infrastructure/*": ["apps/server/src/infrastructure/*"],
-      "@/web/*": ["apps/web/src/*"]
+      "@/web/*": ["apps/web/src/*"],
+      "shared-types": ["packages/shared-types/src"],
+      "shared-types/*": ["packages/shared-types/src/*"]
     }
   }
 }
