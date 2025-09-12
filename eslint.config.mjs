@@ -12,6 +12,7 @@ export default [
       '**/.next',
       'apps/web/next-env.d.ts',
       'apps/web/next.config.js',
+      'scripts/',
       '*.log',
       'package-lock.json',
     ],
@@ -30,7 +31,11 @@ export default [
       },
       sourceType: 'commonjs',
       parserOptions: {
-        projectService: true,
+        project: [
+          './apps/server/tsconfig.json',
+          './apps/web/tsconfig.json',
+          './packages/shared-types/tsconfig.json'
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -40,6 +45,8 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
     },
   },
 ];
