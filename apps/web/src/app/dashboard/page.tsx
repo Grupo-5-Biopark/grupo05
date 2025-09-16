@@ -1,50 +1,47 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '../../hooks/useAuth'
-import './dashboard.css'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
+import './dashboard.css';
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading, logout, user } = useAuth()
-  const [currentPage, setCurrentPage] = useState('dashboard')
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading, logout, user } = useAuth();
+  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login')
+      router.push('/login');
     }
-  }, [isAuthenticated, authLoading, router])
+  }, [isAuthenticated, authLoading, router]);
 
   const showPage = (pageId: string) => {
-    setCurrentPage(pageId)
-  }
+    setCurrentPage(pageId);
+  };
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
-
-  const showNotification = (message: string, type = 'success') => {
-    // Simple notification implementation
-    alert(message)
-  }
+    setSidebarOpen(!sidebarOpen);
+  };
 
   const handleLogout = () => {
-    logout()
-    router.push('/login')
-  }
+    logout();
+    router.push('/login');
+  };
 
   if (authLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '1.2rem',
-        color: '#233444'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          fontSize: '1.2rem',
+          color: '#233444',
+        }}
+      >
         <div>🔄 Carregando...</div>
       </div>
     );
@@ -67,7 +64,10 @@ export default function DashboardPage() {
         <div className="user-info">
           <span>{user?.name || 'Usuário'}</span>
           <div className="user-avatar">{user?.name?.charAt(0) || 'U'}</div>
-          <button onClick={handleLogout} className="btn btn-secondary btn-small">
+          <button
+            onClick={handleLogout}
+            className="btn btn-secondary btn-small"
+          >
             Sair
           </button>
         </div>
@@ -76,7 +76,7 @@ export default function DashboardPage() {
       <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <ul className="nav-menu">
           <li className="nav-item">
-            <button 
+            <button
               className={`nav-link ${currentPage === 'dashboard' ? 'active' : ''}`}
               onClick={() => showPage('dashboard')}
             >
@@ -84,7 +84,7 @@ export default function DashboardPage() {
             </button>
           </li>
           <li className="nav-item">
-            <button 
+            <button
               className={`nav-link ${currentPage === 'cursos' ? 'active' : ''}`}
               onClick={() => showPage('cursos')}
             >
@@ -92,7 +92,7 @@ export default function DashboardPage() {
             </button>
           </li>
           <li className="nav-item">
-            <button 
+            <button
               className={`nav-link ${currentPage === 'salas' ? 'active' : ''}`}
               onClick={() => showPage('salas')}
             >
@@ -100,7 +100,7 @@ export default function DashboardPage() {
             </button>
           </li>
           <li className="nav-item">
-            <button 
+            <button
               className={`nav-link ${currentPage === 'configuracoes' ? 'active' : ''}`}
               onClick={() => showPage('configuracoes')}
             >
@@ -108,7 +108,7 @@ export default function DashboardPage() {
             </button>
           </li>
           <li className="nav-item">
-            <button 
+            <button
               className={`nav-link ${currentPage === 'relatorios' ? 'active' : ''}`}
               onClick={() => showPage('relatorios')}
             >
@@ -123,7 +123,9 @@ export default function DashboardPage() {
         <div className={`page ${currentPage === 'dashboard' ? 'active' : ''}`}>
           <div className="page-header">
             <h1 className="page-title">Dashboard</h1>
-            <p className="page-subtitle">Visão geral do sistema de controle de salas</p>
+            <p className="page-subtitle">
+              Visão geral do sistema de controle de salas
+            </p>
           </div>
 
           <div className="stats-grid">
@@ -161,10 +163,13 @@ export default function DashboardPage() {
             <h1 className="page-title">Gerenciamento de Cursos</h1>
             <p className="page-subtitle">Controle de cursos e suas turmas</p>
           </div>
-          
+
           <div className="content-placeholder">
             <h3>🚧 Em Desenvolvimento</h3>
-            <p>Esta seção será desenvolvida para gerenciar cursos, turmas e cálculos de evasão.</p>
+            <p>
+              Esta seção será desenvolvida para gerenciar cursos, turmas e
+              cálculos de evasão.
+            </p>
           </div>
         </div>
 
@@ -172,25 +177,35 @@ export default function DashboardPage() {
         <div className={`page ${currentPage === 'salas' ? 'active' : ''}`}>
           <div className="page-header">
             <h1 className="page-title">Controle de Salas</h1>
-            <p className="page-subtitle">Gerenciamento de salas por tamanho e ocupação</p>
+            <p className="page-subtitle">
+              Gerenciamento de salas por tamanho e ocupação
+            </p>
           </div>
-          
+
           <div className="content-placeholder">
             <h3>🚧 Em Desenvolvimento</h3>
-            <p>Esta seção será desenvolvida para controlar a quantidade e tamanho das salas baseado na quantidade de alunos.</p>
+            <p>
+              Esta seção será desenvolvida para controlar a quantidade e tamanho
+              das salas baseado na quantidade de alunos.
+            </p>
           </div>
         </div>
 
         {/* CONFIGURAÇÕES PAGE */}
-        <div className={`page ${currentPage === 'configuracoes' ? 'active' : ''}`}>
+        <div
+          className={`page ${currentPage === 'configuracoes' ? 'active' : ''}`}
+        >
           <div className="page-header">
             <h1 className="page-title">Configurações</h1>
             <p className="page-subtitle">Valores configuráveis do sistema</p>
           </div>
-          
+
           <div className="content-placeholder">
             <h3>🚧 Em Desenvolvimento</h3>
-            <p>Esta seção permitirá configurar valores de cálculo como taxa de evasão, capacidade das salas, etc.</p>
+            <p>
+              Esta seção permitirá configurar valores de cálculo como taxa de
+              evasão, capacidade das salas, etc.
+            </p>
           </div>
         </div>
 
@@ -200,13 +215,16 @@ export default function DashboardPage() {
             <h1 className="page-title">Relatórios</h1>
             <p className="page-subtitle">Relatórios e previsões semestrais</p>
           </div>
-          
+
           <div className="content-placeholder">
             <h3>🚧 Em Desenvolvimento</h3>
-            <p>Esta seção gerará relatórios de quantidade de salas por tamanho e previsões semestrais.</p>
+            <p>
+              Esta seção gerará relatórios de quantidade de salas por tamanho e
+              previsões semestrais.
+            </p>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }

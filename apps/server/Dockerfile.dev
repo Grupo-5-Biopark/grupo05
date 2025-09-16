@@ -1,0 +1,14 @@
+FROM node:24.7.0-alpine
+
+WORKDIR /usr/src/app
+
+# First, copy all package.json files and the lock file
+COPY package*.json ./
+COPY apps/server/package.json ./apps/server/
+COPY apps/web/package.json ./apps/web/
+
+# Use 'npm ci' but explicitly ignore scripts to prevent husky from running
+RUN npm ci --ignore-scripts
+
+# Copy the rest of the source code
+COPY . .

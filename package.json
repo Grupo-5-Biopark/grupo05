@@ -1,0 +1,77 @@
+{
+  "name": "controle-de-salas-monorepo",
+  "version": "1.0.0",
+  "description": "A system to manage and forecast classroom and lab needs based on student projections.",
+  "author": "Grupo 5",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "// Full-stack Development Environment": "",
+    "dev": "docker compose up --build -d",
+    "stop": "docker compose down",
+    "// Focused Development Environments": "",
+    "dev:server": "docker compose up server --build -d",
+    "dev:web": "docker compose up web --build -d",
+    "// Production-like Environment": "",
+    "start:prod": "docker compose -f docker-compose.yml up --build -d",
+    "stop:prod": "docker compose -f docker-compose.yml down",
+    "// Repository Tooling": "",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint . --fix",
+    "format": "prettier --write .",
+    "test": "npm test --workspace=server && npm test --workspace=web",
+    "prepare": "npx husky",
+    "// Server scaffolding script": "",
+    "g:feature": "node scripts/generate-feature.js",
+    "g:help": "echo 'Usage: npm run g:feature -- <feature-name>' && echo 'Example: npm run g:feature -- course' && echo 'See scripts/README.md for more details'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grupo-5-Biopark/grupo05.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Grupo-5-Biopark/grupo05/issues"
+  },
+  "homepage": "https://github.com/Grupo-5-Biopark/grupo05#readme",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.35.0",
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/schematics": "^11.0.7",
+    "@nestjs/testing": "^11.1.6",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/supertest": "^6.0.3",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "^15.5.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.4.0",
+    "jest": "^30.1.3",
+    "jest-environment-jsdom": "^30.1.2",
+    "prettier": "^3.6.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.1",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

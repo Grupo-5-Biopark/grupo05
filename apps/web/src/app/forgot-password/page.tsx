@@ -28,18 +28,18 @@ export default function ForgotPasswordPage() {
   const createParticles = () => {
     const particlesContainer = document.getElementById('particles');
     if (!particlesContainer) return;
-    
+
     const particleCount = 50;
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       particle.className = styles.particle;
-      
+
       // Posição aleatória
       particle.style.left = Math.random() * 100 + '%';
       particle.style.animationDelay = Math.random() * 20 + 's';
-      particle.style.animationDuration = (10 + Math.random() * 15) + 's';
-      
+      particle.style.animationDuration = 10 + Math.random() * 15 + 's';
+
       particlesContainer.appendChild(particle);
     }
   };
@@ -61,7 +61,8 @@ export default function ForgotPasswordPage() {
       setError('E-mail é obrigatório');
       const card = document.querySelector(`.${styles.forgotCard}`);
       if (card) {
-        (card as HTMLElement).style.animation = `${styles.shake} 0.5s ease-in-out`;
+        (card as HTMLElement).style.animation =
+          `${styles.shake} 0.5s ease-in-out`;
         setTimeout(() => {
           (card as HTMLElement).style.animation = '';
         }, 500);
@@ -73,7 +74,8 @@ export default function ForgotPasswordPage() {
       setError('E-mail inválido');
       const card = document.querySelector(`.${styles.forgotCard}`);
       if (card) {
-        (card as HTMLElement).style.animation = `${styles.shake} 0.5s ease-in-out`;
+        (card as HTMLElement).style.animation =
+          `${styles.shake} 0.5s ease-in-out`;
         setTimeout(() => {
           (card as HTMLElement).style.animation = '';
         }, 500);
@@ -86,7 +88,7 @@ export default function ForgotPasswordPage() {
     try {
       // Usar o hook de recuperação de senha
       const success = await forgotPassword(email);
-      
+
       if (success) {
         showSuccessStep();
       } else {
@@ -94,6 +96,7 @@ export default function ForgotPasswordPage() {
         setIsLoading(false);
       }
     } catch (err) {
+      console.error(err);
       setError('Erro ao enviar email de recuperação. Tente novamente.');
       setIsLoading(false);
     }
@@ -112,7 +115,15 @@ export default function ForgotPasswordPage() {
         <div className={styles.forgotContainer}>
           <div className={styles.forgotCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-              <div style={{ fontSize: '2rem', color: '#233444', marginBottom: '1rem' }}>🔄</div>
+              <div
+                style={{
+                  fontSize: '2rem',
+                  color: '#233444',
+                  marginBottom: '1rem',
+                }}
+              >
+                🔄
+              </div>
               <p style={{ color: '#666' }}>Verificando autenticação...</p>
             </div>
           </div>
@@ -129,22 +140,55 @@ export default function ForgotPasswordPage() {
         <div className={styles.forgotContainer}>
           <div className={styles.forgotCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-              <div style={{ fontSize: '4rem', color: '#28a745', marginBottom: '1rem', animation: `${styles.pulse} 1s ease-in-out infinite` }}>✉️</div>
-              <h3 style={{ color: '#233444', fontSize: '1.5rem', marginBottom: '1rem' }}>E-mail enviado com sucesso!</h3>
-              <p style={{ color: '#666', marginBottom: '0.5rem', lineHeight: '1.5' }}>
+              <div
+                style={{
+                  fontSize: '4rem',
+                  color: '#28a745',
+                  marginBottom: '1rem',
+                  animation: `${styles.pulse} 1s ease-in-out infinite`,
+                }}
+              >
+                ✉️
+              </div>
+              <h3
+                style={{
+                  color: '#233444',
+                  fontSize: '1.5rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                E-mail enviado com sucesso!
+              </h3>
+              <p
+                style={{
+                  color: '#666',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.5',
+                }}
+              >
                 Enviamos um link de recuperação para:
               </p>
-              <p style={{ color: '#EB0644', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+              <p
+                style={{
+                  color: '#EB0644',
+                  fontWeight: 'bold',
+                  marginBottom: '1.5rem',
+                }}
+              >
                 {email}
               </p>
-              <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.4' }}>
-                Verifique sua caixa de entrada e clique no link para redefinir sua senha.
-                Não se esqueça de verificar a pasta de spam!
-              </p>
-              <button 
-                onClick={handleBackToLogin}
-                className={styles.backBtn}
+              <p
+                style={{
+                  color: '#666',
+                  fontSize: '0.9rem',
+                  marginBottom: '2rem',
+                  lineHeight: '1.4',
+                }}
               >
+                Verifique sua caixa de entrada e clique no link para redefinir
+                sua senha. Não se esqueça de verificar a pasta de spam!
+              </p>
+              <button onClick={handleBackToLogin} className={styles.backBtn}>
                 Voltar ao Login
               </button>
             </div>
@@ -173,12 +217,20 @@ export default function ForgotPasswordPage() {
           </div>
 
           {error && (
-            <div className={`${styles.errorMessage} ${error ? styles.show : ''}`}>
+            <div
+              className={`${styles.errorMessage} ${error ? styles.show : ''}`}
+            >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className={styles.forgotForm}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleSubmit(e);
+            }}
+            className={styles.forgotForm}
+          >
             <div className={styles.formGroup}>
               <input
                 type="email"
@@ -192,9 +244,9 @@ export default function ForgotPasswordPage() {
               <label className={styles.formLabel}>E-mail</label>
             </div>
 
-            <button 
-              type="submit" 
-              className={`${styles.forgotBtn} ${isLoading ? styles.loading : ''}`} 
+            <button
+              type="submit"
+              className={`${styles.forgotBtn} ${isLoading ? styles.loading : ''}`}
               disabled={isLoading}
             >
               {isLoading ? '' : 'Enviar Link de Recuperação'}
@@ -202,7 +254,7 @@ export default function ForgotPasswordPage() {
           </form>
 
           <div className={styles.forgotFooter}>
-            <button 
+            <button
               onClick={handleBackToLogin}
               className={styles.backToLoginBtn}
             >

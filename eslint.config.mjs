@@ -4,7 +4,19 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default [
+  {
+    ignores: [
+      '**/node_modules',
+      '**/dist',
+      '**/.next',
+      'apps/web/next-env.d.ts',
+      'apps/web/next.config.js',
+      'scripts/',
+      '*.log',
+      'package-lock.json',
+    ],
+  },
   {
     ignores: ['eslint.config.mjs'],
   },
@@ -19,7 +31,11 @@ export default tseslint.config(
       },
       sourceType: 'commonjs',
       parserOptions: {
-        projectService: true,
+        project: [
+          './apps/server/tsconfig.json',
+          './apps/web/tsconfig.json',
+          './packages/shared-types/tsconfig.json'
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -28,7 +44,9 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
     },
   },
-);
+];

@@ -27,17 +27,17 @@ export default function LoginPage() {
   const createParticles = () => {
     const particlesContainer = document.getElementById('particles');
     if (!particlesContainer) return;
-    
+
     const particleCount = 50;
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       particle.className = styles.particle;
-      
+
       particle.style.left = Math.random() * 100 + '%';
       particle.style.animationDelay = Math.random() * 15 + 's';
-      particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-      
+      particle.style.animationDuration = 15 + Math.random() * 10 + 's';
+
       particlesContainer.appendChild(particle);
     }
   };
@@ -56,23 +56,25 @@ export default function LoginPage() {
 
     try {
       const success = await login(email, password);
-      
+
       if (success) {
         showSuccessAnimation();
       } else {
         setError('Credenciais inválidas. Tente novamente.');
         setIsLoading(false);
-        
+
         // Fazer o card "balançar"
         const card = document.querySelector(`.${styles.loginCard}`);
         if (card) {
-          (card as HTMLElement).style.animation = `${styles.shake} 0.5s ease-in-out`;
+          (card as HTMLElement).style.animation =
+            `${styles.shake} 0.5s ease-in-out`;
           setTimeout(() => {
             (card as HTMLElement).style.animation = '';
           }, 500);
         }
       }
     } catch (err) {
+      console.error(err);
       setError('Erro ao fazer login');
       setIsLoading(false);
     }
@@ -87,7 +89,15 @@ export default function LoginPage() {
         <div className={styles.loginContainer}>
           <div className={styles.loginCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-              <div style={{ fontSize: '2rem', color: '#233444', marginBottom: '1rem' }}>🔄</div>
+              <div
+                style={{
+                  fontSize: '2rem',
+                  color: '#233444',
+                  marginBottom: '1rem',
+                }}
+              >
+                🔄
+              </div>
               <p style={{ color: '#666' }}>Verificando autenticação...</p>
             </div>
           </div>
@@ -104,9 +114,28 @@ export default function LoginPage() {
         <div className={styles.loginContainer}>
           <div className={styles.loginCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-              <div style={{ fontSize: '4rem', color: '#28a745', marginBottom: '1rem', animation: `${styles.pulse} 1s ease-in-out infinite` }}>✅</div>
-              <h3 style={{ color: '#233444', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Login realizado com sucesso!</h3>
-              <p style={{ color: '#666' }}>Redirecionando para o dashboard...</p>
+              <div
+                style={{
+                  fontSize: '4rem',
+                  color: '#28a745',
+                  marginBottom: '1rem',
+                  animation: `${styles.pulse} 1s ease-in-out infinite`,
+                }}
+              >
+                ✅
+              </div>
+              <h3
+                style={{
+                  color: '#233444',
+                  fontSize: '1.5rem',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Login realizado com sucesso!
+              </h3>
+              <p style={{ color: '#666' }}>
+                Redirecionando para o dashboard...
+              </p>
             </div>
           </div>
         </div>
@@ -130,12 +159,20 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className={`${styles.errorMessage} ${error ? styles.show : ''}`}>
+            <div
+              className={`${styles.errorMessage} ${error ? styles.show : ''}`}
+            >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className={styles.loginForm}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleSubmit(e);
+            }}
+            className={styles.loginForm}
+          >
             <div className={styles.formGroup}>
               <input
                 type="email"
@@ -167,12 +204,14 @@ export default function LoginPage() {
                 <input type="checkbox" className={styles.rememberCheckbox} />
                 <span>Lembrar-me</span>
               </label>
-              <a href="/forgot-password" className={styles.forgotPassword}>Esqueceu a senha?</a>
+              <a href="/forgot-password" className={styles.forgotPassword}>
+                Esqueceu a senha?
+              </a>
             </div>
 
-            <button 
-              type="submit" 
-              className={`${styles.loginBtn} ${isLoading ? styles.loading : ''}`} 
+            <button
+              type="submit"
+              className={`${styles.loginBtn} ${isLoading ? styles.loading : ''}`}
               disabled={isLoading}
             >
               {isLoading ? '' : 'Entrar no Sistema'}
