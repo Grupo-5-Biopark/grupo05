@@ -37,7 +37,7 @@ import {
 } from '@/infrastructure/decorators';
 import { Create${capitalizedName}Dto, Update${capitalizedName}Dto } from './dtos/${lowerCaseName}.dto';
 
-@ApiTags('${lowerCaseName}')
+@ApiTags('${capitalizedName}')
 @ApiBearerAuth()
 @Controller('${lowerCaseName}')
 export class ${capitalizedName}Controller {

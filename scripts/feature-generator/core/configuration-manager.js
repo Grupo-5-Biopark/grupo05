@@ -82,6 +82,7 @@ class ConfigurationManager extends IConfigurationManager {
         'application',
         `${featureName}.controller.ts`,
       ),
+      module: path.join(basePath, `${featureName}.module.ts`),
       entity: path.join(
         basePath,
         'domain',

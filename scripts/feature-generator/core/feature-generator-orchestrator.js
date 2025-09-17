@@ -11,6 +11,9 @@ const {
 const {
   ControllerTemplateGenerator,
 } = require('../templates/controller-template-generator');
+const {
+  ModuleTemplateGenerator,
+} = require('../templates/module-template-generator');
 const { FileSystemManager } = require('./file-system-manager');
 const { CommandExecutor } = require('./command-executor');
 const { ConfigurationManager } = require('./configuration-manager');
@@ -30,6 +33,7 @@ class FeatureGeneratorOrchestrator {
     this.repositoryGenerator = new RepositoryTemplateGenerator();
     this.useCaseGenerator = new UseCaseTemplateGenerator();
     this.controllerGenerator = new ControllerTemplateGenerator();
+    this.moduleGenerator = new ModuleTemplateGenerator();
     this.fileSystemManager = new FileSystemManager();
     this.commandExecutor = new CommandExecutor();
     this.configurationManager = new ConfigurationManager();
@@ -44,13 +48,13 @@ class FeatureGeneratorOrchestrator {
     try {
       console.log(`🚀 Generating feature: ${featureName}`);
 
-      // Step 1: Generate NestJS module (skip controller, we'll generate custom one with Swagger)
+      // Step 1: Generate NestJS module (basic version)
       await this.generateNestJSModule(featureName);
 
       // Step 2: Create DDD directory structure
       this.createDDDStructure(featureName);
 
-      // Step 3: Generate and create template files (including Swagger controller)
+      // Step 3: Generate and create template files (including Swagger controller and updated module)
       await this.generateTemplateFiles(featureName);
 
       // Step 4: Update barrel files
@@ -108,10 +112,12 @@ class FeatureGeneratorOrchestrator {
     const repositoryTemplates = this.repositoryGenerator.generate(featureName);
     const useCaseTemplate = this.useCaseGenerator.generate(featureName);
     const controllerTemplate = this.controllerGenerator.generate(featureName);
+    const moduleTemplate = this.moduleGenerator.generate(featureName);
 
     console.log('🎮 Creating Swagger-enabled controller...');
+    console.log('📦 Updating module with controller registration...');
 
-    // Create file definitions
+    // Create file definitions (excluding module which we'll overwrite)
     const filesToCreate = [
       {
         path: filePaths.sharedDto,
@@ -145,6 +151,9 @@ class FeatureGeneratorOrchestrator {
 
     // Create all files
     this.fileSystemManager.createFiles(filesToCreate);
+
+    // Overwrite the module file with our custom template
+    this.fileSystemManager.overwriteFile(filePaths.module, moduleTemplate);
   }
 
   /**
