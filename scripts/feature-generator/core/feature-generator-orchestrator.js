@@ -8,6 +8,9 @@ const {
 const {
   UseCaseTemplateGenerator,
 } = require('../templates/usecase-template-generator');
+const {
+  ControllerTemplateGenerator,
+} = require('../templates/controller-template-generator');
 const { FileSystemManager } = require('./file-system-manager');
 const { CommandExecutor } = require('./command-executor');
 const { ConfigurationManager } = require('./configuration-manager');
@@ -26,6 +29,7 @@ class FeatureGeneratorOrchestrator {
     this.entityGenerator = new EntityTemplateGenerator();
     this.repositoryGenerator = new RepositoryTemplateGenerator();
     this.useCaseGenerator = new UseCaseTemplateGenerator();
+    this.controllerGenerator = new ControllerTemplateGenerator();
     this.fileSystemManager = new FileSystemManager();
     this.commandExecutor = new CommandExecutor();
     this.configurationManager = new ConfigurationManager();
@@ -40,13 +44,13 @@ class FeatureGeneratorOrchestrator {
     try {
       console.log(`🚀 Generating feature: ${featureName}`);
 
-      // Step 1: Generate NestJS boilerplate
-      await this.generateNestJSBoilerplate(featureName);
+      // Step 1: Generate NestJS module (skip controller, we'll generate custom one with Swagger)
+      await this.generateNestJSModule(featureName);
 
       // Step 2: Create DDD directory structure
       this.createDDDStructure(featureName);
 
-      // Step 3: Generate and create template files
+      // Step 3: Generate and create template files (including Swagger controller)
       await this.generateTemplateFiles(featureName);
 
       // Step 4: Update barrel files
@@ -61,23 +65,17 @@ class FeatureGeneratorOrchestrator {
   }
 
   /**
-   * Generate NestJS boilerplate (module and controller)
+   * Generate NestJS module only (controller will be generated with Swagger)
    * @param {string} featureName - Feature name
    * @returns {Promise<void>}
    */
-  async generateNestJSBoilerplate(featureName) {
+  async generateNestJSModule(featureName) {
     const nestPaths = this.configurationManager.getNestJSPaths(featureName);
     const config = this.configurationManager.getProjectConfig();
 
     console.log('📁 Generating NestJS module...');
     await this.commandExecutor.generateModule(
       nestPaths.module,
-      config.defaultProject,
-    );
-
-    console.log('🎮 Generating NestJS controller...');
-    await this.commandExecutor.generateController(
-      nestPaths.controller,
       config.defaultProject,
     );
   }
@@ -109,6 +107,9 @@ class FeatureGeneratorOrchestrator {
     const entityTemplate = this.entityGenerator.generate(featureName);
     const repositoryTemplates = this.repositoryGenerator.generate(featureName);
     const useCaseTemplate = this.useCaseGenerator.generate(featureName);
+    const controllerTemplate = this.controllerGenerator.generate(featureName);
+
+    console.log('🎮 Creating Swagger-enabled controller...');
 
     // Create file definitions
     const filesToCreate = [
@@ -119,6 +120,10 @@ class FeatureGeneratorOrchestrator {
       {
         path: filePaths.backendDto,
         content: dtoTemplates.backend,
+      },
+      {
+        path: filePaths.controller,
+        content: controllerTemplate,
       },
       {
         path: filePaths.entity,
@@ -177,7 +182,28 @@ class FeatureGeneratorOrchestrator {
       `4. Implement the repository methods in 'apps/server/src/modules/${featureName}/infrastructure/repositories/'`,
     );
     console.log(
-      `5. Provide and inject the repository in '${featureName}.module.ts'`,
+      `5. Implement use cases in 'apps/server/src/modules/${featureName}/application/use-cases/'`,
+    );
+    console.log(
+      `6. Inject use cases into the Swagger controller at 'apps/server/src/modules/${featureName}/application/${featureName}.controller.ts'`,
+    );
+    console.log(
+      `7. Provide and inject the repository in '${featureName}.module.ts'`,
+    );
+    console.log(`8. Register the controller in '${featureName}.module.ts'`);
+
+    console.log('\n📚 Swagger Documentation:');
+    console.log(
+      `- The controller uses simplified Swagger decorators from infrastructure/decorators`,
+    );
+    console.log(
+      `- All CRUD operations use standardized decorators with consistent schemas`,
+    );
+    console.log(
+      `- Decorators are reusable across all features following DDD principles`,
+    );
+    console.log(
+      `- Access the API documentation at http://localhost:3000/api when the server is running`,
     );
   }
 }
