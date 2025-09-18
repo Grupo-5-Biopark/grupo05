@@ -25,7 +25,7 @@ Este projeto utiliza uma arquitetura de monorepo para abrigar tanto o backend qu
 ## 🛠️ Tecnologias Utilizadas
 
 * **Monorepo**: `npm Workspaces`
-* **Backend**: `NestJS`, `TypeORM`, `PostgreSQL`
+* **Backend**: `NestJS`, `TypeORM`, `PostgreSQL`, `Swagger`
 * **Frontend**: `Next.js`, `React`, `TypeScript`
 * **Containerização**: `Docker`, `Docker Compose`
 * **Qualidade de Código**: `ESLint`, `Prettier`, `Husky`
@@ -124,4 +124,5 @@ Este monorepo está organizado da seguinte forma:
 
 ## 📚 Documentação Adicional
 
-Para mais detalhes sobre as regras de negócio (Linguagem Ubíqua), arquitetura e Histórias de Usuário, consulte a nossa **[Wiki do Projeto](https://github.com/Grupo-5-Biopark/grupo05/wiki)**.
+* Para mais detalhes sobre as regras de negócio e arquitetura, consulte a nossa **[Wiki do Projeto](https://github.com/Grupo-5-Biopark/grupo05/wiki)**.
+* A documentação interativa da API (Swagger/OpenAPI) está disponível em **[http://localhost:3001/api-docs](http://localhost:3001/api-docs)** quando o ambiente de desenvolvimento está em execução.
