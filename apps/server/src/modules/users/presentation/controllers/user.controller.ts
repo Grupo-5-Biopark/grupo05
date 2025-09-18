@@ -7,7 +7,9 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../../auth/infrastructure/guards/jwt-auth.guard';
 import { CreateUserUseCase } from '../../application/use-cases/create-user.usecase';
 import { FindAllUsersUseCase } from '../../application/use-cases/find-all-users.usecase';
 import { FindUserByIdUseCase } from '../../application/use-cases/find-user-by-id.usecase';
@@ -18,6 +20,7 @@ import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,

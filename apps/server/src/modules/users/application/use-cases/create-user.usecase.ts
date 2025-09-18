@@ -1,10 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
 import { CreateUserDto } from '../../presentation/dtos/create-user.dto';
 import { User } from '../../domain/entities/user.entity';
-import { IHashingService } from '../../domain/services/hashing.service';
-import { HASHING_SERVICE } from '../../domain/constants/tokens';
 import { DuplicateEmailException } from '../../domain/exceptions/duplicate-email.exception';
+import { UserPasswordService } from '../../domain/services/user-password.service';
 
 interface PostgresError {
   code: string;
@@ -26,8 +25,7 @@ function isPostgresError(error: unknown): error is PostgresError {
 export class CreateUserUseCase {
   constructor(
     private readonly userRepository: UserRepository,
-    @Inject(HASHING_SERVICE)
-    private readonly hashingService: IHashingService,
+    private readonly userPasswordService: UserPasswordService,
   ) {}
 
   async execute(data: CreateUserDto): Promise<User> {
@@ -37,11 +35,15 @@ export class CreateUserUseCase {
       throw new DuplicateEmailException(data.email);
     }
 
-    const user = new User(this.hashingService);
+    const user = new User();
     user.name = data.name;
     user.email = data.email;
     user.role = data.role;
-    await user.setPassword(data.password);
+
+    const hashedPassword = await this.userPasswordService.hashPassword(
+      data.password,
+    );
+    user.setPassword(hashedPassword);
 
     try {
       return await this.userRepository.create(user);
@@ -58,7 +60,3 @@ export class CreateUserUseCase {
     }
   }
 }
-
-// TODO Token JWT
-// TODO API de login
-// TODO role deve ser hardcoded temporariamente
