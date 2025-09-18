@@ -8,7 +8,8 @@ import { FindAllUsersUseCase } from './application/use-cases/find-all-users.usec
 import { FindUserByIdUseCase } from './application/use-cases/find-user-by-id.usecase';
 import { UpdateUserUseCase } from './application/use-cases/update-user.usecase';
 import { DeleteUserUseCase } from './application/use-cases/delete-user.usecase';
-// Import other use cases
+import { BcryptHashingService } from './infrastructure/services/bcrypt-hashing.service';
+import { HASHING_SERVICE } from './domain/constants/tokens';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -20,6 +21,10 @@ import { DeleteUserUseCase } from './application/use-cases/delete-user.usecase';
     FindUserByIdUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
+    {
+      provide: HASHING_SERVICE,
+      useClass: BcryptHashingService,
+    },
   ],
 })
 export class UsersModule {}
