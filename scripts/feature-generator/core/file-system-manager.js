@@ -45,6 +45,18 @@ class FileSystemManager extends IFileSystemManager {
   }
 
   /**
+   * Overwrite a file with content (creates if doesn't exist)
+   * @param {string} filePath - Path to the file
+   * @param {string} content - Content to write
+   */
+  overwriteFile(filePath, content) {
+    fs.writeFileSync(filePath, content);
+    const action = fs.existsSync(filePath) ? 'Updated' : 'Created';
+    console.log(`✅ ${action}: ${path.relative(process.cwd(), filePath)}`);
+    return true;
+  }
+
+  /**
    * Append content to a file
    * @param {string} filePath - Path to the file
    * @param {string} content - Content to append

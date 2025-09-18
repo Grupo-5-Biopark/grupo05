@@ -27,6 +27,14 @@ class ConfigurationManager extends IConfigurationManager {
         'src',
       ),
       modules: path.join(this.projectRoot, 'apps', 'server', 'src', 'modules'),
+      sharedDecorators: path.join(
+        this.projectRoot,
+        'apps',
+        'server',
+        'src',
+        'shared',
+        'decorators',
+      ),
     };
   }
 
@@ -69,6 +77,12 @@ class ConfigurationManager extends IConfigurationManager {
         'dtos',
         `${featureName}.dto.ts`,
       ),
+      controller: path.join(
+        basePath,
+        'application',
+        `${featureName}.controller.ts`,
+      ),
+      module: path.join(basePath, `${featureName}.module.ts`),
       entity: path.join(
         basePath,
         'domain',
@@ -94,6 +108,25 @@ class ConfigurationManager extends IConfigurationManager {
         `${featureName}.use-cases.ts`,
       ),
       barrelFile: path.join(paths.sharedTypes, 'index.ts'),
+      swaggerDecorators: path.join(
+        paths.sharedDecorators,
+        'swagger.decorators.ts',
+      ),
+    };
+  }
+
+  /**
+   * Get shared file paths
+   * @returns {Object} Object with shared file paths
+   */
+  getSharedFilePaths() {
+    const paths = this.getProjectPaths();
+
+    return {
+      swaggerDecorators: path.join(
+        paths.sharedDecorators,
+        'swagger.decorators.ts',
+      ),
     };
   }
 
