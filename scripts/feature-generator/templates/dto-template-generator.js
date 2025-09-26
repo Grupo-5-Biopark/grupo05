@@ -14,8 +14,7 @@ class DTOTemplateGenerator extends BaseTemplateGenerator {
   generateSharedDTO(featureName, options = {}) {
     const capitalizedName = this.capitalize(featureName);
 
-    return `// Defines the data contract between frontend and backend
-export interface Create${capitalizedName}Dto {
+    return `export interface Create${capitalizedName}Dto {
   name: string;
 }
 export type Update${capitalizedName}Dto = Partial<Create${capitalizedName}Dto>;
