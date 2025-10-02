@@ -9,7 +9,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "test": "jest --passWithNoTests && jest --config ./test/jest-e2e.json",
+    "test": "jest --passWithNoTests --forceExit && jest --config ./test/jest-e2e.json --forceExit",
     "test:watch": "jest --watch --passWithNoTests",
     "test:cov": "jest --coverage --passWithNoTests",
     "test:e2e": "jest --config ./test/jest-e2e.json"
