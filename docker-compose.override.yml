@@ -8,6 +8,9 @@ services:
 
     command: npx nest start server --watch
 
+    environment:
+      - NODE_ENV=development
+
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
