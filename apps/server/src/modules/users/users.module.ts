@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './domain/entities/user.entity';
 import { UserRepository } from './infrastructure/repositories/user.repository';
+import { MasterUserBootstrap } from './infrastructure/bootstrap/master-user.bootstrap';
 import { UserController } from './presentation/controllers/user.controller';
 import { CreateUserUseCase } from './application/use-cases/create-user.usecase';
 import { FindAllUsersUseCase } from './application/use-cases/find-all-users.usecase';
@@ -28,6 +29,7 @@ import { UserPasswordService } from './domain/services/user-password.service';
       provide: HASHING_SERVICE,
       useClass: BcryptHashingService,
     },
+    MasterUserBootstrap,
     UserPasswordService,
   ],
   exports: [
