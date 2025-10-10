@@ -21,7 +21,6 @@ describe('App (e2e)', () => {
     await app.close();
   });
 
-  // This is the updated test case for your health check.
   it('/health (GET)', () => {
     return request(app.getHttpServer() as Server)
       .get('/health') // 1. Call the /health endpoint

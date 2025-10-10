@@ -20,12 +20,6 @@ class ConfigurationManager extends IConfigurationManager {
     return {
       root: this.projectRoot,
       server: path.join(this.projectRoot, 'apps', 'server', 'src'),
-      sharedTypes: path.join(
-        this.projectRoot,
-        'packages',
-        'shared-types',
-        'src',
-      ),
       modules: path.join(this.projectRoot, 'apps', 'server', 'src', 'modules'),
       sharedDecorators: path.join(
         this.projectRoot,
@@ -56,7 +50,6 @@ class ConfigurationManager extends IConfigurationManager {
       path.join(basePath, 'infrastructure', 'adapters'),
       path.join(basePath, 'application', 'dtos'),
       path.join(basePath, 'application', 'use-cases'),
-      paths.sharedTypes,
     ];
   }
 
@@ -70,7 +63,6 @@ class ConfigurationManager extends IConfigurationManager {
     const basePath = path.join(paths.modules, featureName);
 
     return {
-      sharedDto: path.join(paths.sharedTypes, `${featureName}.dto.ts`),
       backendDto: path.join(
         basePath,
         'application',
@@ -107,7 +99,6 @@ class ConfigurationManager extends IConfigurationManager {
         'use-cases',
         `${featureName}.use-cases.ts`,
       ),
-      barrelFile: path.join(paths.sharedTypes, 'index.ts'),
       swaggerDecorators: path.join(
         paths.sharedDecorators,
         'swagger.decorators.ts',

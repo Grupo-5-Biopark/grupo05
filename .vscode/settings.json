@@ -9,4 +9,18 @@
         "**/.idea/**",
         "**/scripts/feature-generator/templates/**"
     ],
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "database": "mydatabase",
+            "username": "myuser",
+            "password": "mypassword",
+            "name": "Projeto Integrador",
+            "group": "Biopark"
+        }
+    ],
 }

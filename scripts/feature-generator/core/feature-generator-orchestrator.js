@@ -57,10 +57,7 @@ class FeatureGeneratorOrchestrator {
       // Step 3: Generate and create template files (including Swagger controller and updated module)
       await this.generateTemplateFiles(featureName);
 
-      // Step 4: Update barrel files
-      this.updateBarrelFiles(featureName);
-
-      // Step 5: Show completion message and next steps
+      // Step 4: Show completion message and next steps
       this.showCompletionMessage(featureName);
     } catch (error) {
       console.error('❌ Error generating feature:', error.message);
@@ -157,20 +154,6 @@ class FeatureGeneratorOrchestrator {
   }
 
   /**
-   * Update barrel files (index.ts files for exports)
-   * @param {string} featureName - Feature name
-   */
-  updateBarrelFiles(featureName) {
-    console.log(`✍️  Updating shared-types barrel file...`);
-
-    const filePaths =
-      this.configurationManager.getFeatureFilePaths(featureName);
-    const exportStatement = `export * from './${featureName}.dto';\n`;
-
-    this.fileSystemManager.appendToFile(filePaths.barrelFile, exportStatement);
-  }
-
-  /**
    * Show completion message and next steps
    * @param {string} featureName - Feature name
    */
@@ -179,40 +162,16 @@ class FeatureGeneratorOrchestrator {
 
     console.log('\n💡 Next steps:');
     console.log(
-      `1. Update the DTO interface in 'packages/shared-types/src/${featureName}.dto.ts'`,
+      `1. Update the DTO class validation in 'apps/server/src/modules/${featureName}/presentation/dtos/'`,
     );
     console.log(
-      `2. Update the DTO class validation in 'apps/server/src/modules/${featureName}/application/dtos/'`,
+      `2. Implement business logic in the entity at 'apps/server/src/modules/${featureName}/domain/entities/'`,
     );
     console.log(
-      `3. Implement business logic in the aggregate at 'apps/server/src/modules/${featureName}/domain/entities/'`,
+      `3. Implement use cases in 'apps/server/src/modules/${featureName}/application/use-cases/'`,
     );
     console.log(
-      `4. Implement the repository methods in 'apps/server/src/modules/${featureName}/infrastructure/repositories/'`,
-    );
-    console.log(
-      `5. Implement use cases in 'apps/server/src/modules/${featureName}/application/use-cases/'`,
-    );
-    console.log(
-      `6. Inject use cases into the Swagger controller at 'apps/server/src/modules/${featureName}/application/${featureName}.controller.ts'`,
-    );
-    console.log(
-      `7. Provide and inject the repository in '${featureName}.module.ts'`,
-    );
-    console.log(`8. Register the controller in '${featureName}.module.ts'`);
-
-    console.log('\n📚 Swagger Documentation:');
-    console.log(
-      `- The controller uses simplified Swagger decorators from infrastructure/decorators`,
-    );
-    console.log(
-      `- All CRUD operations use standardized decorators with consistent schemas`,
-    );
-    console.log(
-      `- Decorators are reusable across all features following DDD principles`,
-    );
-    console.log(
-      `- Access the API documentation at http://localhost:3000/api when the server is running`,
+      `4. Expose endpoints in the controller at 'apps/server/src/modules/${featureName}/presentation/controllers/'`,
     );
   }
 }
