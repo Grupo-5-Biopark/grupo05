@@ -31,14 +31,14 @@ export type Update${capitalizedName}Dto = Partial<Create${capitalizedName}Dto>;
     const capitalizedName = this.capitalize(featureName);
 
     return `import { IsString, IsNotEmpty } from 'class-validator';
-import { Create${capitalizedName}Dto as ICreate${capitalizedName}Dto } from 'shared-types';
 import { PartialType } from '@nestjs/mapped-types';
 
-export class Create${capitalizedName}Dto implements ICreate${capitalizedName}Dto {
+export class Create${capitalizedName}Dto {
   @IsString()
   @IsNotEmpty()
   name: string;
 }
+
 export class Update${capitalizedName}Dto extends PartialType(Create${capitalizedName}Dto) {}
 `;
   }
