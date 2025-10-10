@@ -34,7 +34,6 @@ export default [
         project: [
           './apps/server/tsconfig.json',
           './apps/web/tsconfig.json',
-          './packages/shared-types/tsconfig.json'
         ],
         tsconfigRootDir: import.meta.dirname,
       },

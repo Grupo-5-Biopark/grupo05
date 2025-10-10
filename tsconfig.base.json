@@ -22,9 +22,7 @@
       "@/server/*": ["apps/server/src/*"],
       "@/modules/*": ["apps/server/src/modules/*"],
       "@/infrastructure/*": ["apps/server/src/infrastructure/*"],
-      "@/web/*": ["apps/web/src/*"],
-      "shared-types": ["packages/shared-types/src"],
-      "shared-types/*": ["packages/shared-types/src/*"]
+      "@/web/*": ["apps/web/src/*"]
     }
   }
 }

@@ -15,9 +15,9 @@ function isPostgresError(error: unknown): error is PostgresError {
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
-    typeof (error as any).code === 'string' &&
+    typeof (error as { code?: string }).code === 'string' &&
     'detail' in error &&
-    typeof (error as any).detail === 'string'
+    typeof (error as { detail?: string }).detail === 'string'
   );
 }
 
