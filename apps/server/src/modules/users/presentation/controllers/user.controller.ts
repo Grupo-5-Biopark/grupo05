@@ -9,12 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../auth/infrastructure/guards/jwt-auth.guard';
 import { CreateUserUseCase } from '../../application/use-cases/create-user.usecase';
 import { FindAllUsersUseCase } from '../../application/use-cases/find-all-users.usecase';
@@ -40,22 +35,6 @@ export class UserController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({
-    status: 201,
-    description: 'The user has been successfully created.',
-    type: UserResponseDto,
-    content: {
-      'application/json': {
-        example: {
-          name: 'Admin',
-          email: 'admin@admin.com',
-          password: 'admin',
-          role: 'ADMIN',
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.createUserUseCase.execute(createUserDto);
     return {
@@ -68,23 +47,6 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all users.',
-    type: [UserResponseDto],
-    content: {
-      'application/json': {
-        example: [
-          {
-            id: 1,
-            name: 'Admin',
-            email: 'admin@admin.com',
-            role: 'ADMIN',
-          },
-        ],
-      },
-    },
-  })
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.findAllUsersUseCase.execute();
     return users.map((user) => ({
@@ -96,23 +58,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'The user details.',
-    type: UserResponseDto,
-    content: {
-      'application/json': {
-        example: {
-          id: 1,
-          name: 'Admin',
-          email: 'admin@admin.com',
-          role: 'ADMIN',
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiOperation({ summary: 'Get user by ID' })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UserResponseDto> {
@@ -126,22 +72,7 @@ export class UserController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update a user' })
-  @ApiResponse({
-    status: 200,
-    description: 'The user has been successfully updated.',
-    content: {
-      'application/json': {
-        example: {
-          name: 'Admin',
-          email: 'admin@admin.com',
-          password: 'admin',
-          role: 'ADMIN',
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiOperation({ summary: 'Update user' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -150,12 +81,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user' })
-  @ApiResponse({
-    status: 200,
-    description: 'The user has been successfully deleted.',
-  })
-  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiOperation({ summary: 'Delete user' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.deleteUserUseCase.execute(id);
   }
