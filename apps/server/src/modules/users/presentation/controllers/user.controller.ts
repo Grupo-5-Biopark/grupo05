@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../auth/infrastructure/guards/jwt-auth.guard';
 import { CreateUserUseCase } from '../../application/use-cases/create-user.usecase';
 import { FindAllUsersUseCase } from '../../application/use-cases/find-all-users.usecase';
@@ -19,6 +20,8 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UserController {
@@ -31,6 +34,7 @@ export class UserController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new user' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.createUserUseCase.execute(createUserDto);
     return {
@@ -42,6 +46,7 @@ export class UserController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all users' })
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.findAllUsersUseCase.execute();
     return users.map((user) => ({
@@ -53,6 +58,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get user by ID' })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UserResponseDto> {
@@ -66,6 +72,7 @@ export class UserController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update user' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -74,6 +81,7 @@ export class UserController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete user' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.deleteUserUseCase.execute(id);
   }

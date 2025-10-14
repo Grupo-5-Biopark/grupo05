@@ -15,6 +15,7 @@ async function bootstrap() {
       'API documentation for the room control and forecasting system.',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

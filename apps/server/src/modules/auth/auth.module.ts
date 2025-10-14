@@ -14,7 +14,15 @@ import { AuthController } from './presentation/controllers/auth.controller';
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET') || 'your-secret-key',
-        signOptions: { expiresIn: '1h' },
+        // Support an env variable that defines token expiry. Common formats are:
+        // - a string like '1h', '30m', '7d' (compatible with jsonwebtoken)
+        // - a numeric seconds value in JWT_TTL_SECONDS
+        signOptions: {
+          expiresIn:
+            configService.get<string>('JWT_EXPIRES_IN') ||
+            configService.get<number>('JWT_TTL_SECONDS') ||
+            '1h',
+        },
       }),
       inject: [ConfigService],
     }),
