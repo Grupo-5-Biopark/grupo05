@@ -23,19 +23,8 @@ export class CreateClassDto {
   @Max(2, { message: 'must be between 1 and 2' })
   semester: number;
 
-  @ApiProperty({ example: 30 })
-  @IsNumber({}, { message: 'must be a number' })
-  @Min(1, { message: 'must be at least 1' })
-  expectedStudents: number;
-
   @ApiProperty({ example: 25 })
   @IsNumber({}, { message: 'must be a number' })
   @Min(0, { message: 'must be at least 0' })
   currentStudents: number;
-
-  @ApiProperty({ example: 10.5 })
-  @IsNumber({}, { message: 'must be a number' })
-  @Min(0, { message: 'must be at least 0' })
-  @Max(100, { message: 'must be at most 100' })
-  dropoutRate: number;
 }

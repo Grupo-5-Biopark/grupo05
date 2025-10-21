@@ -16,12 +16,6 @@ export class ClassResponseDto {
   @ApiProperty({ example: 1 })
   semester: number;
 
-  @ApiProperty({ example: 30 })
-  expectedStudents: number;
-
   @ApiProperty({ example: 25 })
   currentStudents: number;
-
-  @ApiProperty({ example: 10.5 })
-  dropoutRate: number;
 }

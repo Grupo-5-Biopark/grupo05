@@ -23,20 +23,6 @@ export class ClassRepository {
     return await this.repository.findOneBy({ id });
   }
 
-  async findByCourseAndShift(
-    courseId: number,
-    shiftId: number,
-    year: number,
-    semester: number,
-  ): Promise<Class | null> {
-    return await this.repository.findOneBy({
-      courseId,
-      shiftId,
-      year,
-      semester,
-    });
-  }
-
   async update(id: number, classData: Partial<Class>): Promise<void> {
     await this.repository.update(id, classData);
   }

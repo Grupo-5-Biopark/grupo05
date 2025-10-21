@@ -45,9 +45,7 @@ export class ClassController {
       shiftId: classEntity.shiftId,
       year: classEntity.year,
       semester: classEntity.semester,
-      expectedStudents: classEntity.expectedStudents,
       currentStudents: classEntity.currentStudents,
-      dropoutRate: classEntity.dropoutRate,
     };
   }
 
@@ -61,9 +59,7 @@ export class ClassController {
       shiftId: classEntity.shiftId,
       year: classEntity.year,
       semester: classEntity.semester,
-      expectedStudents: classEntity.expectedStudents,
       currentStudents: classEntity.currentStudents,
-      dropoutRate: classEntity.dropoutRate,
     }));
   }
 
@@ -79,9 +75,7 @@ export class ClassController {
       shiftId: classEntity.shiftId,
       year: classEntity.year,
       semester: classEntity.semester,
-      expectedStudents: classEntity.expectedStudents,
       currentStudents: classEntity.currentStudents,
-      dropoutRate: classEntity.dropoutRate,
     };
   }
 

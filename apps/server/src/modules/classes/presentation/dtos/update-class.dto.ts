@@ -27,22 +27,9 @@ export class UpdateClassDto {
   @IsOptional()
   semester?: number;
 
-  @ApiPropertyOptional({ example: 30 })
-  @IsNumber({}, { message: 'must be a number' })
-  @Min(1, { message: 'must be at least 1' })
-  @IsOptional()
-  expectedStudents?: number;
-
   @ApiPropertyOptional({ example: 25 })
   @IsNumber({}, { message: 'must be a number' })
   @Min(0, { message: 'must be at least 0' })
   @IsOptional()
   currentStudents?: number;
-
-  @ApiPropertyOptional({ example: 10.5 })
-  @IsNumber({}, { message: 'must be a number' })
-  @Min(0, { message: 'must be at least 0' })
-  @Max(100, { message: 'must be at most 100' })
-  @IsOptional()
-  dropoutRate?: number;
 }

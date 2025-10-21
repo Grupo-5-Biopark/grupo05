@@ -16,4 +16,7 @@ export class Course {
 
   @Column({ default: 'active' })
   status: string;
+
+  @Column({ default: 30 })
+  expectedStudents: number;
 }

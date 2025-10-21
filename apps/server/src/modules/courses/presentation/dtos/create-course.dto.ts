@@ -21,4 +21,9 @@ export class CreateCourseDto {
   @IsString({ message: 'must be a string' })
   @IsNotEmpty({ message: 'cannot be empty' })
   status: string;
+
+  @ApiProperty({ example: 30 })
+  @IsNumber({}, { message: 'must be a number' })
+  @Min(1, { message: 'must be at least 1' })
+  expectedStudents: number;
 }

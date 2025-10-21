@@ -18,11 +18,5 @@ export class Class {
   semester: number;
 
   @Column()
-  expectedStudents: number;
-
-  @Column()
   currentStudents: number;
-
-  @Column('decimal', { precision: 5, scale: 2 })
-  dropoutRate: number;
 }
