@@ -15,4 +15,7 @@ export class CourseResponseDto {
 
   @ApiProperty({ example: 'active' })
   status: string;
+
+  @ApiProperty({ example: 30 })
+  expectedStudents: number;
 }
