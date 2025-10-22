@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import './dashboard.css';
+import UsersPage from '../users/usersPage';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -115,6 +116,14 @@ export default function DashboardPage() {
               📈 Relatórios
             </button>
           </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link ${currentPage === 'usuarios' ? 'active' : ''}`}
+              onClick={() => showPage('usuarios')}
+            >
+              👥 Usuários
+            </button>
+          </li>
         </ul>
       </nav>
 
@@ -223,6 +232,17 @@ export default function DashboardPage() {
               previsões semestrais.
             </p>
           </div>
+        </div>
+
+        {/* USUÁRIOS PAGE */}
+        <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
+          <div className="page-header">
+            <h1 className="page-title">Gerenciamento de Usuários</h1>
+            <p className="page-subtitle">
+              Administração de contas de usuário e permissões
+            </p>
+          </div>
+          <UsersPage />
         </div>
       </main>
     </div>
