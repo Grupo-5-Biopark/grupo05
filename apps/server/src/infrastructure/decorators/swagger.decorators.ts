@@ -11,11 +11,6 @@ import {
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 
-/**
- * Swagger decorators for standardized API documentation
- * Following DDD principles - these are infrastructure concerns
- */
-
 interface CrudOperation {
   summary: string;
   description: string;
@@ -27,9 +22,6 @@ interface ResponseSchema {
   properties: Record<string, any>;
 }
 
-/**
- * Standard error response schemas
- */
 const ERROR_SCHEMAS = {
   badRequest: {
     type: 'object' as const,
@@ -57,9 +49,6 @@ const ERROR_SCHEMAS = {
   },
 };
 
-/**
- * Generates a standard entity response schema
- */
 function createEntitySchema(entityName: string): ResponseSchema {
   return {
     type: 'object',
@@ -72,9 +61,6 @@ function createEntitySchema(entityName: string): ResponseSchema {
   };
 }
 
-/**
- * Generates a paginated response schema
- */
 function createPaginatedSchema(entityName: string): ResponseSchema {
   return {
     type: 'object',
@@ -96,9 +82,6 @@ function createPaginatedSchema(entityName: string): ResponseSchema {
   };
 }
 
-/**
- * Create operation decorator
- */
 export function ApiCreateOperation(operation: CrudOperation, dtoClass: any) {
   return applyDecorators(
     ApiOperation({
@@ -106,7 +89,6 @@ export function ApiCreateOperation(operation: CrudOperation, dtoClass: any) {
       description: operation.description,
     }),
     ApiBody({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       type: dtoClass,
       description: `The ${operation.entityName.toLowerCase()} data to create`,
     }),
@@ -125,9 +107,6 @@ export function ApiCreateOperation(operation: CrudOperation, dtoClass: any) {
   );
 }
 
-/**
- * Find all operation decorator
- */
 export function ApiFindAllOperation(operation: CrudOperation) {
   return applyDecorators(
     ApiOperation({
@@ -165,9 +144,6 @@ export function ApiFindAllOperation(operation: CrudOperation) {
   );
 }
 
-/**
- * Find one operation decorator
- */
 export function ApiFindOneOperation(operation: CrudOperation) {
   return applyDecorators(
     ApiOperation({
@@ -195,9 +171,6 @@ export function ApiFindOneOperation(operation: CrudOperation) {
   );
 }
 
-/**
- * Update operation decorator
- */
 export function ApiUpdateOperation(operation: CrudOperation, dtoClass: any) {
   return applyDecorators(
     ApiOperation({
@@ -211,7 +184,6 @@ export function ApiUpdateOperation(operation: CrudOperation, dtoClass: any) {
       example: 'uuid-here',
     }),
     ApiBody({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       type: dtoClass,
       description: `The ${operation.entityName.toLowerCase()} data to update`,
     }),
@@ -234,9 +206,6 @@ export function ApiUpdateOperation(operation: CrudOperation, dtoClass: any) {
   );
 }
 
-/**
- * Delete operation decorator
- */
 export function ApiDeleteOperation(operation: CrudOperation) {
   return applyDecorators(
     ApiOperation({

@@ -45,6 +45,7 @@ export class CourseController {
       knowledgeArea: course.knowledgeArea,
       announcement: course.announcement,
       status: course.status,
+      expectedStudents: course.expectedStudents,
     };
   }
 
@@ -58,6 +59,7 @@ export class CourseController {
       knowledgeArea: course.knowledgeArea,
       announcement: course.announcement,
       status: course.status,
+      expectedStudents: course.expectedStudents,
     }));
   }
 
@@ -73,6 +75,7 @@ export class CourseController {
       knowledgeArea: course.knowledgeArea,
       announcement: course.announcement,
       status: course.status,
+      expectedStudents: course.expectedStudents,
     };
   }
 
