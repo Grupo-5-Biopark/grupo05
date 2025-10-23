@@ -22,4 +22,10 @@ export class UpdateCourseDto {
   @IsString({ message: 'must be a string' })
   @IsOptional()
   status?: string;
+
+  @ApiPropertyOptional({ example: 30 })
+  @IsNumber({}, { message: 'must be a number' })
+  @Min(1, { message: 'must be at least 1' })
+  @IsOptional()
+  expectedStudents?: number;
 }
