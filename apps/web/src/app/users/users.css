@@ -223,6 +223,32 @@
   color: white;
 }
 
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background-color: #27ae60;
+  color: white;
+}
+
+.status-inactive {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Date Cell */
+.date-cell {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
 /* Action Buttons */
 .actions-cell {
   display: flex;
@@ -238,10 +264,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.btn-edit,
-.btn-view {
   background-color: #34495e;
   color: white;
 }

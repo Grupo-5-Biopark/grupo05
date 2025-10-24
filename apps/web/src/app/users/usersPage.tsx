@@ -9,6 +9,8 @@ interface User {
   name: string;
   email: string;
   role: string;
+  status?: string;
+  createdAt?: string;
 }
 
 interface UserStats {
@@ -31,6 +33,7 @@ export default function UsersPage() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('Todos os Cargos');
+  const [statusFilter, setStatusFilter] = useState('Ativo');
 
   useEffect(() => {
     loadUsers();
@@ -38,7 +41,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, roleFilter]);
+  }, [users, searchTerm, roleFilter, statusFilter]);
 
   async function loadUsers() {
     try {
@@ -112,6 +115,18 @@ export default function UsersPage() {
       default:
         return role.toUpperCase();
     }
+  };
+
+  const getStatusBadgeClass = () => {
+    return 'status-active';
+  };
+
+  const getStatusLabel = () => {
+    return 'Ativo';
+  };
+
+  const formatDate = () => {
+    return '10/10/2025';
   };
 
   const getInitials = (name: string) => {
@@ -202,6 +217,18 @@ export default function UsersPage() {
             <option>User</option>
           </select>
         </div>
+        <div className="filter-group">
+          <label>Status:</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="filter-select"
+          >
+            {/* <option>Todos</option> */}
+            <option>Ativo</option>
+            {/* <option>Inativo</option> */}
+          </select>
+        </div>
         <button className="btn-new-user" onClick={handleNewUser}>
           + NOVO USUÁRIO
         </button>
@@ -218,6 +245,8 @@ export default function UsersPage() {
               <tr>
                 <th>USUÁRIO</th>
                 <th>CARGO</th>
+                <th>STATUS</th>
+                <th>DATA CRIAÇÃO</th>
                 <th>AÇÕES</th>
               </tr>
             </thead>
@@ -242,6 +271,12 @@ export default function UsersPage() {
                       {getRoleLabel(user.role)}
                     </span>
                   </td>
+                  <td>
+                    <span className={`status-badge ${getStatusBadgeClass()}`}>
+                      {getStatusLabel()}
+                    </span>
+                  </td>
+                  <td className="date-cell">{formatDate()}</td>
                   <td>
                     <div className="actions-cell">
                       <button
