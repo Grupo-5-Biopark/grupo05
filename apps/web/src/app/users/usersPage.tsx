@@ -9,7 +9,7 @@ interface User {
   name: string;
   email: string;
   role: string;
-  status?: string;
+  phone: string;
   createdAt?: string;
 }
 
@@ -33,7 +33,6 @@ export default function UsersPage() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('Todos os Cargos');
-  const [statusFilter, setStatusFilter] = useState('Ativo');
 
   useEffect(() => {
     loadUsers();
@@ -41,7 +40,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, roleFilter, statusFilter]);
+  }, [users, searchTerm, roleFilter]);
 
   async function loadUsers() {
     try {
@@ -117,12 +116,8 @@ export default function UsersPage() {
     }
   };
 
-  const getStatusBadgeClass = () => {
-    return 'status-active';
-  };
-
-  const getStatusLabel = () => {
-    return 'Ativo';
+  const formatPhone = () => {
+    return '45911223344';
   };
 
   const formatDate = () => {
@@ -142,9 +137,9 @@ export default function UsersPage() {
     console.log('Editar usuário:', userId);
   };
 
-  const handleView = (userId: number) => {
-    // TODO: Implementar visualização
-    console.log('Ver usuário:', userId);
+  const handleDelete = (userId: number) => {
+    // TODO: Implementar excluir
+    console.log('Deletar usuário', userId);
   };
 
   const handleNewUser = () => {
@@ -217,18 +212,6 @@ export default function UsersPage() {
             <option>User</option>
           </select>
         </div>
-        <div className="filter-group">
-          <label>Status:</label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            {/* <option>Todos</option> */}
-            <option>Ativo</option>
-            {/* <option>Inativo</option> */}
-          </select>
-        </div>
         <button className="btn-new-user" onClick={handleNewUser}>
           + NOVO USUÁRIO
         </button>
@@ -245,7 +228,7 @@ export default function UsersPage() {
               <tr>
                 <th>USUÁRIO</th>
                 <th>CARGO</th>
-                <th>STATUS</th>
+                <th>TELEFONE</th>
                 <th>DATA CRIAÇÃO</th>
                 <th>AÇÕES</th>
               </tr>
@@ -271,11 +254,7 @@ export default function UsersPage() {
                       {getRoleLabel(user.role)}
                     </span>
                   </td>
-                  <td>
-                    <span className={`status-badge ${getStatusBadgeClass()}`}>
-                      {getStatusLabel()}
-                    </span>
-                  </td>
+                  <td className="phone-cell">{formatPhone()}</td>
                   <td className="date-cell">{formatDate()}</td>
                   <td>
                     <div className="actions-cell">
@@ -286,10 +265,10 @@ export default function UsersPage() {
                         EDITAR
                       </button>
                       <button
-                        className="btn-view"
-                        onClick={() => handleView(user.id)}
+                        className="btn-delete"
+                        onClick={() => handleDelete(user.id)}
                       >
-                        VER
+                        EXCLUIR
                       </button>
                     </div>
                   </td>
