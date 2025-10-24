@@ -241,7 +241,7 @@ export default function UsersPage() {
                       <div className="user-avatar">
                         {getInitials(user.name)}
                       </div>
-                      <div className="user-info">
+                      <div className="users-info">
                         <div className="user-name">{user.name}</div>
                         <div className="user-email">{user.email}</div>
                       </div>
