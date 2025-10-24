@@ -23,4 +23,8 @@ export class CreateUserDto {
   @IsString({ message: 'must be a string' })
   @IsNotEmpty({ message: 'cannot be empty' })
   role: string;
+
+  @ApiProperty({ example: '(44) 99999-9999', required: false })
+  @IsString({ message: 'must be a string' })
+  phone?: string;
 }
