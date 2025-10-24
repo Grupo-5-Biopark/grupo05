@@ -236,12 +236,6 @@ export default function DashboardPage() {
 
         {/* USUÁRIOS PAGE */}
         <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
-          <div className="page-header">
-            <h1 className="page-title">Gerenciamento de Usuários</h1>
-            <p className="page-subtitle">
-              Administração de contas de usuário e permissões
-            </p>
-          </div>
           <UsersPage />
         </div>
       </main>

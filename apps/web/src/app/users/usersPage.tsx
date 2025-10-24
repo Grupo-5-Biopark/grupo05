@@ -157,6 +157,13 @@ export default function UsersPage() {
 
   return (
     <div className="users-page">
+      <div className="users-header">
+        <h1>Gerenciamento de Usuários</h1>
+        <p className="subtitle">
+          Administração de contas de usuário e permissões
+        </p>
+      </div>
+
       <div className="stats-container">
         <div className="stat-card">
           <div className="stat-number">{stats.total}</div>
