@@ -39,6 +39,7 @@ export class CreateUserUseCase {
     user.name = data.name;
     user.email = data.email;
     user.role = data.role;
+    user.phone = data.phone;
 
     const hashedPassword = await this.userPasswordService.hashPassword(
       data.password,
