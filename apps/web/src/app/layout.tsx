@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'BIOPARK - Sistema de Controle de Salas',
   description:
     'Sistema de gerenciamento de crescimento da faculdade para estruturação e organização de salas',
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
