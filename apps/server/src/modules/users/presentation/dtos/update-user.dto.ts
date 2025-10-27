@@ -23,4 +23,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString({ message: 'must be a string' })
   role?: string;
+
+  @ApiPropertyOptional({ example: '(44) 99999-9999' })
+  @IsOptional()
+  @IsString({ message: 'must be a string' })
+  phone?: string;
 }

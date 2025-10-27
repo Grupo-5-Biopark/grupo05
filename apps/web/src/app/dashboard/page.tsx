@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import Header from '../../components/ui/Header';
 import Sidebar from '../../components/ui/Sidebar';
 import './dashboard.css';
+import UsersPage from '../users/usersPage';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -44,7 +45,6 @@ export default function DashboardPage() {
     );
   }
 
-  // Se não estiver autenticado, não renderizar nada (será redirecionado)
   if (!isAuthenticated) {
     return null;
   }
@@ -159,6 +159,11 @@ export default function DashboardPage() {
               previsões semestrais.
             </p>
           </div>
+        </div>
+
+        {/* USUÁRIOS PAGE */}
+        <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
+          <UsersPage />
         </div>
       </main>
     </div>
