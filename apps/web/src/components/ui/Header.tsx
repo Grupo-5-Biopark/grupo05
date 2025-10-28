@@ -4,7 +4,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'viewer' | 'editor';
+  role: 'admin' | 'user';
 }
 
 interface HeaderProps {
@@ -17,12 +17,10 @@ export default function Header({ user, onLogout }: HeaderProps) {
     switch (role) {
       case 'admin':
         return { text: 'ADMIN', color: 'admin' };
-      case 'editor':
-        return { text: 'EDITOR', color: 'editor' };
-      case 'viewer':
-        return { text: 'VIEWER', color: 'viewer' };
+      case 'user':
+        return { text: 'USUÁRIO', color: 'user' };
       default:
-        return { text: 'USER', color: 'default' };
+        return { text: 'USUÁRIO', color: 'user' };
     }
   };
 

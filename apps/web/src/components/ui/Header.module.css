@@ -67,20 +67,11 @@
 
 .userBadgeAdmin {
   background: #ffd700;
+  color: #2d3748;
 }
 
-.userBadgeEditor {
-  background: #48bb78;
-  color: #ffffff;
-}
-
-.userBadgeViewer {
+.userBadgeUser {
   background: #4299e1;
-  color: #ffffff;
-}
-
-.userBadgeDefault {
-  background: #a0aec0;
   color: #ffffff;
 }
 

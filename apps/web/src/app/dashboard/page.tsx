@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import Header from '../../components/ui/Header';
 import Sidebar from '../../components/ui/Sidebar';
 import './dashboard.css';
-import UsersPage from '../users/usersPage';
+import UsersPage from '../users/page';
 
 export default function DashboardPage() {
   const router = useRouter();
