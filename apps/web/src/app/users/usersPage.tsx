@@ -10,7 +10,7 @@ interface User {
   email: string;
   role: string;
   phone: string;
-  createdAt?: string;
+  createdAt: string;
 }
 
 interface UserStats {
@@ -116,12 +116,36 @@ export default function UsersPage() {
     }
   };
 
-  const formatPhone = () => {
-    return '45911223344';
+  const formatPhone = (phone: string) => {
+    if (!phone) return '-';
+    const cleaned = phone.replace(/\D/g, '');
+
+    if (cleaned.length === 11) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    }
+
+    return phone;
   };
 
-  const formatDate = () => {
-    return '10/10/2025';
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+
+    try {
+      const date = new Date(dateString);
+
+      if (isNaN(date.getTime())) return '-';
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return '-';
+    }
   };
 
   const getInitials = (name: string) => {
@@ -254,8 +278,8 @@ export default function UsersPage() {
                       {getRoleLabel(user.role)}
                     </span>
                   </td>
-                  <td className="phone-cell">{formatPhone()}</td>
-                  <td className="date-cell">{formatDate()}</td>
+                  <td className="phone-cell">{formatPhone(user.phone)}</td>
+                  <td className="date-cell">{formatDate(user.createdAt)}</td>
                   <td>
                     <div className="actions-cell">
                       <button
