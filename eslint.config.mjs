@@ -31,10 +31,7 @@ export default [
       },
       sourceType: 'commonjs',
       parserOptions: {
-        project: [
-          './apps/server/tsconfig.json',
-          './apps/web/tsconfig.json',
-        ],
+        project: ['./apps/server/tsconfig.json', './apps/web/tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },

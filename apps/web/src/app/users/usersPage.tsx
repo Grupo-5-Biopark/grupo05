@@ -35,7 +35,7 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState('Todos os Cargos');
 
   useEffect(() => {
-    loadUsers();
+    void loadUsers();
   }, []);
 
   useEffect(() => {
