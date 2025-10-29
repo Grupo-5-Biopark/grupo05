@@ -124,5 +124,6 @@ Este monorepo está organizado da seguinte forma:
 
 ## 📚 Documentação Adicional
 
-* Para mais detalhes sobre as regras de negócio e arquitetura, consulte a nossa **[Wiki do Projeto](https://github.com/Grupo-5-Biopark/grupo05/wiki)**.
-* A documentação interativa da API (Swagger/OpenAPI) está disponível em **[http://localhost:3001/api-docs](http://localhost:3001/api-docs)** quando o ambiente de desenvolvimento está em execução.
+* **[Guia de Contribuição](CONTRIBUTING.md)**: Aprenda como contribuir com o projeto, incluindo padrões de commit e fluxo de desenvolvimento.
+* **[Wiki do Projeto](https://github.com/Grupo-5-Biopark/grupo05/wiki)**: Detalhes sobre regras de negócio e arquitetura.
+* **[Documentação da API (Swagger)](http://localhost:3001/api-docs)**: Disponível quando o ambiente de desenvolvimento está em execução.
