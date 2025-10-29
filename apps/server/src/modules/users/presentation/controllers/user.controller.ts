@@ -42,6 +42,8 @@ export class UserController {
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
+      createdAt: user.createdAt,
     };
   }
 
@@ -54,6 +56,8 @@ export class UserController {
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
+      createdAt: user.createdAt,
     }));
   }
 
@@ -68,6 +72,8 @@ export class UserController {
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
+      createdAt: user.createdAt,
     };
   }
 

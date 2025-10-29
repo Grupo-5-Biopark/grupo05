@@ -1,3 +1,28 @@
+/* Layout do Dashboard */
+.dashboard-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-areas:
+    'header header'
+    'sidebar main';
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 60px 1fr;
+}
+
+.dashboard-layout > * {
+  grid-area: header;
+}
+
+.dashboard-layout > nav {
+  grid-area: sidebar;
+}
+.main-content {
+  grid-area: main;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
 .users-header {
   margin-bottom: 2rem;
   text-align: center;

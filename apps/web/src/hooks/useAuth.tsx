@@ -13,7 +13,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'viewer' | 'editor';
+  role: 'admin' | 'user';
 }
 
 interface AuthContextType {
