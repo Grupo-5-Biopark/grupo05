@@ -12,7 +12,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'viewer' | 'editor';
+  role: 'admin' | 'user';
 }
 
 interface AuthContextType {
@@ -70,23 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           },
         },
         {
-          email: 'viewer@biopark.com',
+          email: 'user@biopark.com',
           password: '123456',
           user: {
             id: '2',
-            name: 'Visualizador BIOPARK',
-            email: 'viewer@biopark.com',
-            role: 'viewer' as const,
-          },
-        },
-        {
-          email: 'editor@biopark.com',
-          password: '123456',
-          user: {
-            id: '3',
-            name: 'Editor BIOPARK',
-            email: 'editor@biopark.com',
-            role: 'editor' as const,
+            name: 'Usuário BIOPARK',
+            email: 'user@biopark.com',
+            role: 'user' as const,
           },
         },
       ];
@@ -121,11 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2500));
 
-      const registeredEmails = [
-        'admin@biopark.com',
-        'viewer@biopark.com',
-        'editor@biopark.com',
-      ];
+      const registeredEmails = ['admin@biopark.com', 'user@biopark.com'];
 
       if (registeredEmails.includes(email)) {
         console.log('Email de recuperação enviado para:', email);

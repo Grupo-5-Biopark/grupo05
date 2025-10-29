@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
+import Header from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Sidebar';
 import './dashboard.css';
-import UsersPage from '../users/usersPage';
+import UsersPage from '../users/page';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, logout, user } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -20,10 +21,6 @@ export default function DashboardPage() {
 
   const showPage = (pageId: string) => {
     setCurrentPage(pageId);
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
   };
 
   const handleLogout = () => {
@@ -48,84 +45,14 @@ export default function DashboardPage() {
     );
   }
 
-  // Se não estiver autenticado, não renderizar nada (será redirecionado)
   if (!isAuthenticated) {
     return null;
   }
 
   return (
     <div className="dashboard-layout">
-      <header className="header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={toggleSidebar} className="sidebar-toggle">
-            ☰
-          </button>
-          <div className="logo">BIOPARK</div>
-        </div>
-        <div className="user-info">
-          <span>{user?.name || 'Usuário'}</span>
-          <div className="user-avatar">{user?.name?.charAt(0) || 'U'}</div>
-          <button
-            onClick={handleLogout}
-            className="btn btn-secondary btn-small"
-          >
-            Sair
-          </button>
-        </div>
-      </header>
-
-      <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <ul className="nav-menu">
-          <li className="nav-item">
-            <button
-              className={`nav-link ${currentPage === 'dashboard' ? 'active' : ''}`}
-              onClick={() => showPage('dashboard')}
-            >
-              📊 Dashboard
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${currentPage === 'cursos' ? 'active' : ''}`}
-              onClick={() => showPage('cursos')}
-            >
-              🎓 Cursos
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${currentPage === 'salas' ? 'active' : ''}`}
-              onClick={() => showPage('salas')}
-            >
-              🏢 Salas
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${currentPage === 'configuracoes' ? 'active' : ''}`}
-              onClick={() => showPage('configuracoes')}
-            >
-              ⚙️ Configurações
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${currentPage === 'relatorios' ? 'active' : ''}`}
-              onClick={() => showPage('relatorios')}
-            >
-              📈 Relatórios
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link ${currentPage === 'usuarios' ? 'active' : ''}`}
-              onClick={() => showPage('usuarios')}
-            >
-              👥 Usuários
-            </button>
-          </li>
-        </ul>
-      </nav>
+      <Header user={user} onLogout={handleLogout} />
+      <Sidebar currentPage={currentPage} onPageChange={showPage} />
 
       <main className="main-content">
         {/* DASHBOARD PAGE */}
