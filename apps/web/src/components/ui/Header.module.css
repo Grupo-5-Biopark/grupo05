@@ -4,9 +4,10 @@
   justify-content: space-between;
   padding: 0 1.5rem;
   height: 60px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: #233444;
+  border-bottom: 1px solid #eb0644;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .left {
@@ -21,25 +22,107 @@
   gap: 1rem;
 }
 
-.title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2d3748;
-  letter-spacing: -0.5px;
-  margin: 0;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.menuToggle {
-  background: none;
+.logoImage {
+  height: 35px;
+  width: auto;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fbfbfb;
+  letter-spacing: -0.5px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fbfbfb;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #fbfbfb;
+}
+
+.userBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #2d3748;
+}
+
+.userBadgeAdmin {
+  background: #ffd700;
+  color: #2d3748;
+}
+
+.userBadgeUser {
+  background: #4299e1;
+  color: #ffffff;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  background: #eb0644;
+  color: #fbfbfb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  border: 2px solid rgba(251, 251, 251, 0.2);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.userAvatar:hover {
+  border-color: rgba(251, 251, 251, 0.4);
+  transform: scale(1.05);
+}
+
+.btn {
+  padding: 0.5rem 1rem;
   border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0.5rem;
   border-radius: 6px;
-  transition: background-color 0.2s;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btnSecondary {
+  background: #e2e8f0;
   color: #4a5568;
 }
 
-.menuToggle:hover {
-  background: #f7fafc;
+.btnSecondary:hover {
+  background: #cbd5e0;
+}
+
+.btnSmall {
+  padding: 0.375rem 0.75rem;
+  font-size: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 4px;
 }

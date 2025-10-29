@@ -15,7 +15,6 @@ export default function ForgotPasswordPage() {
   const { isAuthenticated, isLoading: authLoading, forgotPassword } = useAuth();
 
   useEffect(() => {
-    // Se já estiver autenticado, redirecionar para o dashboard
     if (isAuthenticated && !authLoading) {
       router.push('/dashboard');
     }
