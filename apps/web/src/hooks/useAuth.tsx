@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: decodedPayload.sub.toString(), // 'sub' é o ID
         email: decodedPayload.email,
         name: decodedPayload.email, // Usando email como nome, já que não temos o nome
-        role: 'viewer', // Usando 'viewer' como role padrão
+        role: 'admin', // Usando 'admin' como role padrão
       };
 
       // ETAPA 4: Salvar dados do usuário e atualizar estado
