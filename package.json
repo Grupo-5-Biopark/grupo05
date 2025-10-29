@@ -23,10 +23,16 @@
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "test": "npm test --workspace=server && npm test --workspace=web",
+    "commit": "cz",
     "prepare": "npx husky",
     "// Server scaffolding script": "",
     "g:feature": "node scripts/generate-feature.js",
     "g:help": "echo 'Usage: npm run g:feature -- <feature-name>' && echo 'Example: npm run g:feature -- course' && echo 'See scripts/README.md for more details'"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   },
   "repository": {
     "type": "git",
@@ -37,6 +43,8 @@
   },
   "homepage": "https://github.com/Grupo-5-Biopark/grupo05#readme",
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.35.0",
     "@nestjs/cli": "^11.0.10",
@@ -50,11 +58,14 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/supertest": "^6.0.3",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.35.0",
     "eslint-config-next": "^15.5.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",
+    "husky": "^9.1.7",
     "jest": "^30.1.3",
     "jest-environment-jsdom": "^30.1.2",
     "prettier": "^3.6.2",
