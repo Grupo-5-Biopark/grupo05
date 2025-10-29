@@ -73,6 +73,10 @@
     "*.{js,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
+    ],
+    "apps/server/src/modules/*/domain/entities/*.ts": [
+      "node scripts/run-plantuml-generation.js",
+      "git add docs/uml/*.puml"
     ]
   },
   "dependencies": {

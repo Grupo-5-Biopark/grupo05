@@ -12,7 +12,11 @@
     "test": "jest --passWithNoTests && jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch --passWithNoTests",
     "test:cov": "jest --coverage --passWithNoTests",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "plantuml:gen": "node ../../scripts/generate-plantuml.js",
+    "plantuml:gen:combined": "node ../../scripts/generate-plantuml-combined.js",
+    "plantuml:gen:all": "npm run plantuml:gen && npm run plantuml:gen:combined",
+    "plantuml:watch": "onchange src/modules/*/domain/entities/*.ts -- npm run plantuml:gen"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",

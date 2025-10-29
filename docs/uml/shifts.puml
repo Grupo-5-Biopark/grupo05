@@ -1,0 +1,26 @@
+@startuml
+class Course {
+    +id: number
+    +name: string
+    +knowledgeArea: string
+    +announcement: number
+    +status: string
+    +expectedStudents: number
+    +classes: Class[]
+}
+class Class {
+    +id: number
+    +courseId: number
+    +course: Course
+    +shiftId: number
+    +shift: Shift
+    +year: number
+    +semester: number
+    +currentStudents: number
+}
+class Shift {
+    +id: number
+    +name: string
+    +classes: Class[]
+}
+@enduml
