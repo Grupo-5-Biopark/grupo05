@@ -17,7 +17,6 @@ body {
   background: #fbfbfb;
 }
 
-/* Layout do Dashboard */
 .dashboard-layout {
   min-height: 100vh;
   display: grid;

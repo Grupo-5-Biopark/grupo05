@@ -9,7 +9,13 @@
   grid-template-rows: 60px 1fr;
 }
 
-/* Main Content */
+.dashboard-layout > * {
+  grid-area: header;
+}
+
+.dashboard-layout > nav {
+  grid-area: sidebar;
+}
 .main-content {
   grid-area: main;
   padding: 2rem;
