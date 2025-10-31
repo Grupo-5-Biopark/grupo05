@@ -13,7 +13,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'viewer' | 'editor';
+  role: 'admin' | 'user';
 }
 
 interface AuthContextType {
@@ -27,9 +27,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Função auxiliar para decodificar o payload do JWT
-// (Não verifica a assinatura, apenas lê os dados)
-function decodeJwt(token: string): { email: string; sub: number } | null {
+// Função auxiliar para normalizar o role
+function normalizeRole(role: string): 'admin' | 'user' {
+  const normalizedRole = role.toLowerCase();
+  return normalizedRole === 'admin' ? 'admin' : 'user';
+}
+
+function decodeJwt(token: string): {
+  email: string;
+  sub: number;
+  name: string;
+  role: 'admin' | 'user';
+} | null {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -41,7 +50,18 @@ function decodeJwt(token: string): { email: string; sub: number } | null {
         })
         .join(''),
     );
-    const parsed = JSON.parse(jsonPayload) as { email: string; sub: number };
+    const rawParsed = JSON.parse(jsonPayload) as {
+      email: string;
+      sub: number;
+      name: string;
+      role: string;
+    };
+
+    // Normaliza o role antes de retornar
+    const parsed = {
+      ...rawParsed,
+      role: normalizeRole(rawParsed.role),
+    };
     return parsed;
   } catch (e) {
     console.error('Erro ao decodificar JWT:', e);
@@ -80,7 +100,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // FUNÇÃO LOGIN ATUALIZADA (SEM CHAMADA /auth/me)
   const login = async (email: string, password: string) => {
     setIsLoading(true);
 
@@ -93,7 +112,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password,
         },
       );
-
       const { access_token } = loginResponse.data;
 
       if (!access_token) {
@@ -107,23 +125,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // ETAPA 2: Decodificar o token para obter dados do usuário
       const decodedPayload = decodeJwt(access_token);
 
-      if (!decodedPayload || !decodedPayload.sub || !decodedPayload.email) {
-        console.error('Payload do JWT inválido ou não contém sub/email');
+      if (
+        !decodedPayload ||
+        !decodedPayload.sub ||
+        !decodedPayload.email ||
+        !decodedPayload.name ||
+        !decodedPayload.role
+      ) {
+        console.error(
+          'Payload do JWT inválido ou não contém as informações necessárias',
+        );
         localStorage.removeItem('auth_token'); // Limpa token inválido
         return false;
       }
-
-      // ETAPA 3: Criar objeto User parcial
-      // ATENÇÃO: 'name' e 'role' não vêm no token,
-      // então usamos valores padrão para a lógica funcionar.
       const partialUser: User = {
-        id: decodedPayload.sub.toString(), // 'sub' é o ID
+        id: decodedPayload.sub.toString(),
         email: decodedPayload.email,
-        name: decodedPayload.email, // Usando email como nome, já que não temos o nome
-        role: 'viewer', // Usando 'viewer' como role padrão
+        name: decodedPayload.name,
+        role: decodedPayload.role,
       };
 
-      // ETAPA 4: Salvar dados do usuário e atualizar estado
       setUser(partialUser);
       localStorage.setItem('user_data', JSON.stringify(partialUser));
       localStorage.setItem('authenticated', 'true');

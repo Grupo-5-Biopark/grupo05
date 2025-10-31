@@ -1,4 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -16,6 +21,12 @@ export class User {
 
   @Column()
   role: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   setPassword(hashedPassword: string): void {
     this.password = hashedPassword;
