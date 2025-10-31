@@ -1,5 +1,5 @@
 /* Layout do Dashboard */
-.dashboard-layout {
+.user-layout {
   min-height: 100vh;
   display: grid;
   grid-template-areas:
@@ -9,11 +9,11 @@
   grid-template-rows: 60px 1fr;
 }
 
-.dashboard-layout > * {
+.user-layout > * {
   grid-area: header;
 }
 
-.dashboard-layout > nav {
+.user-layout > nav {
   grid-area: sidebar;
 }
 .main-content {
