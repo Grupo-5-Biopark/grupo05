@@ -137,9 +137,9 @@
   margin-right: 15px;
 }
 
-/* 🟢 Classe para ADMIN (Cor de Destaque/Sucesso) */
+/* Classe para ADMIN (Cor de Destaque/Sucesso) */
 .userBadgeAdmin {
-  background-color: #28a745; /* Verde vibrante */
+  background-color: #ffd93d; /* Verde vibrante */
 }
 
 /* 🔵 Classe para USUÁRIO Padrão (Cor Informativa/Neutro) */
