@@ -1,6 +1,8 @@
+// components/ui/UsersPage.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // <-- Importado
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/ui/Header';
@@ -23,14 +25,21 @@ interface UserStats {
 }
 
 export default function UsersPage() {
+  const router = useRouter(); // <-- Inicializado
   const { get, isLoading, error } = useApi({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   });
 
   const { user, logout } = useAuth();
 
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  // ... (restante dos estados e funções)
   const [stats, setStats] = useState<UserStats>({
     total: 0,
     admins: 0,
@@ -196,7 +205,7 @@ export default function UsersPage() {
 
   return (
     <div className="dashboard-layout">
-      <Header user={user} onLogout={logout} />
+      <Header user={user} onLogout={handleLogout} />
       <Sidebar currentPage="usuarios" onPageChange={() => {}} />
       <main className="main-content">
         <div className="users-page">

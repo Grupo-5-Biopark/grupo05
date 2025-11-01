@@ -1,3 +1,4 @@
+// components/ui/Header.tsx
 import styles from './Header.module.css';
 
 interface User {
@@ -24,6 +25,13 @@ export default function Header({ user, onLogout }: HeaderProps) {
     }
   };
 
+  const badgeInfo = getRoleBadge(user?.role || 'user');
+
+  // 💡 CORREÇÃO AQUI: Calcula apenas o nome da classe que define a cor (ex: 'userBadgeAdmin')
+  const roleClassName = `userBadge${
+    badgeInfo.color.charAt(0).toUpperCase() + badgeInfo.color.slice(1)
+  }`;
+
   return (
     <header className={styles.header}>
       <div className={styles.left}>
@@ -36,26 +44,20 @@ export default function Header({ user, onLogout }: HeaderProps) {
       <div className={styles.right}>
         <div className={styles.userInfo}>
           <span className={styles.userName}>{user?.name || 'Usuário'}</span>
-          <div
-            className={`${styles.userBadge} ${
-              styles[
-                `userBadge${
-                  getRoleBadge(user?.role || 'default')
-                    .color.charAt(0)
-                    .toUpperCase() +
-                  getRoleBadge(user?.role || 'default').color.slice(1)
-                }`
-              ]
-            }`}
-          >
-            {getRoleBadge(user?.role || 'default').text}
+
+          {/* 💡 CORREÇÃO AQUI: Acessa a classe hashada usando colchetes (styles[roleClassName]) */}
+          <div className={`${styles.userBadge} ${styles[roleClassName]}`}>
+            {badgeInfo.text}
           </div>
+
           <div className={styles.userAvatar}>
-            {user?.name?.charAt(0) || 'U'}
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
           </div>
+
           <button
             onClick={onLogout}
             className={`${styles.btn} ${styles.btnSecondary} ${styles.btnSmall}`}
+            aria-label="Sair da aplicação"
           >
             Sair
           </button>
