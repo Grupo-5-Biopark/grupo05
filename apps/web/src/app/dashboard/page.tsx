@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
+
 import Header from '../../components/ui/Header';
 import Sidebar from '../../components/ui/Sidebar';
 import './dashboard.css';
-import UsersPage from '../users/page';
 
 export default function DashboardPage() {
   const router = useRouter();
+
   const { isAuthenticated, isLoading: authLoading, logout, user } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
 
@@ -51,6 +52,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-layout">
+      {/* 💡 Uso do novo componente importado */}
       <Header user={user} onLogout={handleLogout} />
       <Sidebar currentPage={currentPage} onPageChange={showPage} />
 
@@ -159,11 +161,6 @@ export default function DashboardPage() {
               previsões semestrais.
             </p>
           </div>
-        </div>
-
-        {/* USUÁRIOS PAGE */}
-        <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
-          <UsersPage />
         </div>
       </main>
     </div>

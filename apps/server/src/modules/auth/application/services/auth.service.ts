@@ -36,7 +36,12 @@ export class AuthService {
     password: string,
   ): Promise<{ access_token: string; expires_in?: number }> {
     const user = await this.validateUser(email, password);
-    const payload = { email: user.email, sub: user.id };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
 
     const token = this.jwtService.sign(payload);
 
