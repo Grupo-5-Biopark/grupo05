@@ -89,6 +89,7 @@ export function ApiCreateOperation(operation: CrudOperation, dtoClass: any) {
       description: operation.description,
     }),
     ApiBody({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       type: dtoClass,
       description: `The ${operation.entityName.toLowerCase()} data to create`,
     }),
@@ -184,6 +185,7 @@ export function ApiUpdateOperation(operation: CrudOperation, dtoClass: any) {
       example: 'uuid-here',
     }),
     ApiBody({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       type: dtoClass,
       description: `The ${operation.entityName.toLowerCase()} data to update`,
     }),
