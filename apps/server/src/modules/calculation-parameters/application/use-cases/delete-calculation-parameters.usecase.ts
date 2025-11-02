@@ -5,10 +5,11 @@ import { CalculationParametersRepository } from '../../infrastructure/repositori
 export class DeleteCalculationParametersUseCase {
   constructor(private readonly repository: CalculationParametersRepository) {}
 
-  async execute(id: number): Promise<void> {
-    const existing = await this.repository.findById(id);
-    if (!existing)
+  async execute(): Promise<void> {
+    const all = await this.repository.findAll();
+    if (!all || all.length === 0)
       throw new NotFoundException('Calculation parameters not found');
+    const id = all[0].id;
     await this.repository.delete(id);
   }
 }

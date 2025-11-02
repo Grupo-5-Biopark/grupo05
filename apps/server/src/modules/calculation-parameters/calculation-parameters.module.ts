@@ -8,7 +8,6 @@ import { FindAllCalculationParametersUseCase } from './application/use-cases/fin
 import { FindCalculationParametersByIdUseCase } from './application/use-cases/find-calculation-parameters-by-id.usecase';
 import { UpdateCalculationParametersUseCase } from './application/use-cases/update-calculation-parameters.usecase';
 import { DeleteCalculationParametersUseCase } from './application/use-cases/delete-calculation-parameters.usecase';
-import { FindCurrentCalculationParametersUseCase } from './application/use-cases/find-current-calculation-parameters.usecase';
 import { CalculationParametersSeeder } from './infrastructure/seeder/calculation-parameters.seeder';
 
 @Module({
@@ -18,7 +17,6 @@ import { CalculationParametersSeeder } from './infrastructure/seeder/calculation
     CalculationParametersRepository,
     CreateCalculationParametersUseCase,
     FindAllCalculationParametersUseCase,
-    FindCurrentCalculationParametersUseCase,
     FindCalculationParametersByIdUseCase,
     UpdateCalculationParametersUseCase,
     DeleteCalculationParametersUseCase,

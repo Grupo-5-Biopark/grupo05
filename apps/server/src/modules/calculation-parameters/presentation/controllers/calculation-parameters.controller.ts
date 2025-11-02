@@ -5,18 +5,14 @@ import {
   Put,
   Delete,
   Body,
-  Param,
-  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../auth/infrastructure/guards/jwt-auth.guard';
 import { CreateCalculationParametersUseCase } from '../../application/use-cases/create-calculation-parameters.usecase';
 import { FindAllCalculationParametersUseCase } from '../../application/use-cases/find-all-calculation-parameters.usecase';
-import { FindCalculationParametersByIdUseCase } from '../../application/use-cases/find-calculation-parameters-by-id.usecase';
 import { UpdateCalculationParametersUseCase } from '../../application/use-cases/update-calculation-parameters.usecase';
 import { DeleteCalculationParametersUseCase } from '../../application/use-cases/delete-calculation-parameters.usecase';
-import { FindCurrentCalculationParametersUseCase } from '../../application/use-cases/find-current-calculation-parameters.usecase';
 import { CreateCalculationParametersDto } from '../dtos/create-calculation-parameters.dto';
 import { UpdateCalculationParametersDto } from '../dtos/update-calculation-parameters.dto';
 import { CalculationParametersResponseDto } from '../dtos/calculation-parameters-response.dto';
@@ -29,8 +25,6 @@ export class CalculationParametersController {
   constructor(
     private readonly createUseCase: CreateCalculationParametersUseCase,
     private readonly findAllUseCase: FindAllCalculationParametersUseCase,
-    private readonly findByIdUseCase: FindCalculationParametersByIdUseCase,
-    private readonly findCurrentUseCase: FindCurrentCalculationParametersUseCase,
     private readonly updateUseCase: UpdateCalculationParametersUseCase,
     private readonly deleteUseCase: DeleteCalculationParametersUseCase,
   ) {}
@@ -63,46 +57,15 @@ export class CalculationParametersController {
     }));
   }
 
-  @Get('current')
-  @ApiOperation({ summary: 'Get current calculation parameters' })
-  async findCurrent(): Promise<CalculationParametersResponseDto> {
-    const p = await this.findCurrentUseCase.execute();
-    return {
-      id: p.id,
-      dropoutPercentage: Number(p.dropoutPercentage),
-      studentsPerSmallRoom: p.studentsPerSmallRoom,
-      studentsPerMediumRoom: p.studentsPerMediumRoom,
-      studentsPerBigRoom: p.studentsPerBigRoom,
-    };
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get calculation parameters by id' })
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<CalculationParametersResponseDto> {
-    const p = await this.findByIdUseCase.execute(id);
-    return {
-      id: p.id,
-      dropoutPercentage: Number(p.dropoutPercentage),
-      studentsPerSmallRoom: p.studentsPerSmallRoom,
-      studentsPerMediumRoom: p.studentsPerMediumRoom,
-      studentsPerBigRoom: p.studentsPerBigRoom,
-    };
-  }
-
-  @Put(':id')
+  @Put()
   @ApiOperation({ summary: 'Update calculation parameters' })
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCalculationParametersDto,
-  ): Promise<void> {
-    await this.updateUseCase.execute(id, dto);
+  async update(@Body() dto: UpdateCalculationParametersDto): Promise<void> {
+    await this.updateUseCase.execute(dto);
   }
 
-  @Delete(':id')
+  @Delete()
   @ApiOperation({ summary: 'Delete calculation parameters' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.deleteUseCase.execute(id);
+  async remove(): Promise<void> {
+    await this.deleteUseCase.execute();
   }
 }

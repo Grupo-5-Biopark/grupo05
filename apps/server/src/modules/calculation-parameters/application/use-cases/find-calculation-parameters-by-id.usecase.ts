@@ -6,10 +6,10 @@ import { CalculationParameters } from '../../domain/entities/calculation-paramet
 export class FindCalculationParametersByIdUseCase {
   constructor(private readonly repository: CalculationParametersRepository) {}
 
-  async execute(id: number): Promise<CalculationParameters> {
-    const params = await this.repository.findById(id);
-    if (!params)
+  async execute(): Promise<CalculationParameters> {
+    const all = await this.repository.findAll();
+    if (!all || all.length === 0)
       throw new NotFoundException('Calculation parameters not found');
-    return params;
+    return all[0];
   }
 }
