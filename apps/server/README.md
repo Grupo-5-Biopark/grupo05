@@ -6,11 +6,11 @@ Este diretório contém a aplicação backend para o projeto **Controle de Salas
 
 ## 🛠️ Tecnologias e Padrões
 
-* **Framework**: `NestJS`
-* **Arquitetura**: `Domain-Driven Design (DDD)`, `Arquitetura Limpa`
-* **Banco de Dados**: `TypeORM`, `PostgreSQL`
-* **Documentação da API**: `Swagger (OpenAPI)`
-* **Testes**: `Jest`
+- **Framework**: `NestJS`
+- **Arquitetura**: `Domain-Driven Design (DDD)`, `Arquitetura Limpa`
+- **Banco de Dados**: `TypeORM`, `PostgreSQL`
+- **Documentação da API**: `Swagger (OpenAPI)`
+- **Testes**: `Jest`
 
 ---
 
@@ -18,7 +18,7 @@ Este diretório contém a aplicação backend para o projeto **Controle de Salas
 
 Este projeto utiliza Swagger para gerar uma documentação interativa da API. Quando o servidor está em execução, você pode acessar a interface do Swagger para visualizar todos os endpoints, seus parâmetros, e testá-los diretamente no navegador.
 
-* **URL**: **[http://localhost:3001/api-docs](http://localhost:3001/api-docs)**
+- **URL**: **[http://localhost:3001/api-docs](http://localhost:3001/api-docs)**
 
 Para garantir que a documentação permaneça atualizada, utilize os decoradores do pacote `@nestjs/swagger` (ex: `@ApiOperation`, `@ApiResponse`, `@ApiProperty`) em todos os novos controllers e DTOs.
 

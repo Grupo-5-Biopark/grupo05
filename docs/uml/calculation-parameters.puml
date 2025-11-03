@@ -1,0 +1,9 @@
+@startuml
+class CalculationParameters {
+    +id: number
+    +dropoutPercentage: number
+    +studentsPerSmallRoom: number
+    +studentsPerMediumRoom: number
+    +studentsPerBigRoom: number
+}
+@enduml

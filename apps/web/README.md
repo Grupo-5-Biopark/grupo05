@@ -6,10 +6,10 @@ Este diretório contém a aplicação frontend para o projeto **Controle de Sala
 
 ## 🛠️ Tecnologias e Padrões
 
-* **Framework**: `Next.js 15` (com App Router)
-* **Linguagem**: `TypeScript`
-* **Estilização**: `CSS Modules` e `CSS Variables`
-* **Testes**: `Jest` com `React Testing Library`
+- **Framework**: `Next.js 15` (com App Router)
+- **Linguagem**: `TypeScript`
+- **Estilização**: `CSS Modules` e `CSS Variables`
+- **Testes**: `Jest` com `React Testing Library`
 
 ## 🎨 Design System
 

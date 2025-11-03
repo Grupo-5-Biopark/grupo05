@@ -1,0 +1,53 @@
+@startuml
+' Combined Domain Model
+' Generated: 2025-11-03T19:17:55.268Z
+' Modules: calculation-parameters, classes, courses, shifts, users
+
+
+class CalculationParameters {
+    +id: number
+    +dropoutPercentage: number
+    +studentsPerSmallRoom: number
+    +studentsPerMediumRoom: number
+    +studentsPerBigRoom: number
+}
+class Course {
+    +id: number
+    +name: string
+    +knowledgeArea: string
+    +announcement: number
+    +status: string
+    +expectedStudents: number
+    +classes: Class[]
+}
+class Shift {
+    +id: number
+    +name: string
+    +classes: Class[]
+}
+class Class {
+    +id: number
+    +courseId: number
+    +course: Course
+    +shiftId: number
+    +shift: Shift
+    +year: number
+    +semester: number
+    +currentStudents: number
+}
+class User {
+    +id: number
+    +name: string
+    +email: string
+    -password: string
+    +role: string
+    +phone: string
+    +createdAt: Date
+    +setPassword(hashedPassword: string): void
+    +getPassword(): string
+}
+
+' Relationships
+Class "*" }o-- "1" Course
+Class "*" }o-- "1" Shift
+@enduml
