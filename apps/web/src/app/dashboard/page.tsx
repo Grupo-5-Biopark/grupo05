@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
-
 import Header from '../../components/ui/Header';
 import Sidebar from '../../components/ui/Sidebar';
 import './dashboard.css';

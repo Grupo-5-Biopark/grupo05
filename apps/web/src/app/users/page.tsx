@@ -25,8 +25,8 @@ interface UserStats {
 }
 
 export default function UsersPage() {
-  const router = useRouter(); // <-- Inicializado
-  const { get, isLoading, error } = useApi({
+  const router = useRouter();
+  const { get, error } = useApi({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   });
 
@@ -39,7 +39,6 @@ export default function UsersPage() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  // ... (restante dos estados e funções)
   const [stats, setStats] = useState<UserStats>({
     total: 0,
     admins: 0,
@@ -185,13 +184,13 @@ export default function UsersPage() {
     console.log('Novo usuário');
   };
 
-  if (isLoading) {
-    return (
-      <div className="users-page">
-        <div className="loading">🔄 Carregando usuários...</div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="users-page">
+  //       <div className="loading">🔄 Carregando usuários...</div>
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return (
@@ -204,7 +203,7 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="dashboard-layout">
+    <div className="user-layout">
       <Header user={user} onLogout={handleLogout} />
       <Sidebar currentPage="usuarios" onPageChange={() => {}} />
       <main className="main-content">
