@@ -15,6 +15,7 @@ export default [
       'scripts/',
       '*.log',
       'package-lock.json',
+      'commitlint.config.js',
     ],
   },
   {

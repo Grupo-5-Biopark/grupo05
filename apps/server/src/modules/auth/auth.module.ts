@@ -18,10 +18,7 @@ import { AuthController } from './presentation/controllers/auth.controller';
         // - a string like '1h', '30m', '7d' (compatible with jsonwebtoken)
         // - a numeric seconds value in JWT_TTL_SECONDS
         signOptions: {
-          expiresIn:
-            configService.get<string>('JWT_EXPIRES_IN') ||
-            configService.get<number>('JWT_TTL_SECONDS') ||
-            '1h',
+          expiresIn: configService.get<number>('JWT_EXPIRES_IN') || 3600,
         },
       }),
       inject: [ConfigService],
