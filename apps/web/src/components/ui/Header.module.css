@@ -127,22 +127,4 @@
   border-radius: 4px;
 }
 
-.userBadge {
-  /* Estilos base da badge (tamanho, fonte, margem) */
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: white; /* Cor do texto em branco */
-  margin-right: 15px;
-}
 
-/* Classe para ADMIN (Cor de Destaque/Sucesso) */
-.userBadgeAdmin {
-  background-color: #ffd93d; /* Verde vibrante */
-}
-
-/* 🔵 Classe para USUÁRIO Padrão (Cor Informativa/Neutro) */
-.userBadgeUser {
-  background-color: #007bff; /* Azul padrão */
-}
