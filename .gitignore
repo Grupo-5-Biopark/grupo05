@@ -93,3 +93,7 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# SonarQube
+.scannerwork/
+.sonar/

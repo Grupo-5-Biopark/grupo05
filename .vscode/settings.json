@@ -22,5 +22,9 @@
       "name": "Projeto Integrador",
       "group": "Biopark"
     }
-  ]
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "http-localhost-9000",
+    "projectKey": "biopark-classroom-management"
+  }
 }

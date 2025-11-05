@@ -29,7 +29,7 @@ Este projeto utiliza uma arquitetura de monorepo para abrigar tanto o backend qu
 - **Backend**: `NestJS`, `TypeORM`, `PostgreSQL`, `Swagger`
 - **Frontend**: `Next.js`, `React`, `TypeScript`
 - **Containerização**: `Docker`, `Docker Compose`
-- **Qualidade de Código**: `ESLint`, `Prettier`, `Husky`
+- **Qualidade de Código**: `ESLint`, `Prettier`, `Husky`, `SonarQube`
 - **CI/CD**: `GitHub Actions`
 
 ---
@@ -123,9 +123,49 @@ Este monorepo está organizado da seguinte forma:
 | `npm run lint`       | Executa o linter para verificar e corrigir a qualidade do código.      |
 | `npm run format`     | Formata todo o código do projeto com o Prettier.                       |
 | `npm run test`       | Executa todos os testes (unitários e e2e) de todas as aplicações.      |
+| `npm run test:cov`   | Executa todos os testes com relatório de cobertura.                    |
 | `npm run build`      | Executa o build de produção para todas as aplicações.                  |
+| `npm run sonar:start`| Inicia o servidor SonarQube para análise de código (porta 9000).       |
+| `npm run sonar:scan` | Executa testes com cobertura e envia análise para o SonarQube.         |
+| `npm run sonar:stop` | Para o servidor SonarQube.                                              |
 
 </details>
+
+### 🔍 Análise de Código com SonarQube
+
+O SonarQube analisa a qualidade do código, cobertura de testes e vulnerabilidades de segurança. Ele usa **Docker Compose profiles** para rodar apenas quando necessário.
+
+#### Primeiro uso:
+
+1. Inicie o servidor SonarQube:
+   ```bash
+   npm run sonar:start
+   ```
+   - Aguarde aproximadamente 90 segundos para inicialização completa
+
+2. Configure o acesso:
+   - Acesse http://localhost:9000
+   - Login padrão: `admin` / `admin`
+   - Navegue até: **My Account** → **Security** → **Generate Tokens**
+   - Adicione o token gerado ao arquivo `.env`: `SONAR_TOKEN=seu_token_aqui`
+
+#### Analisar código:
+
+```bash
+npm run sonar:scan
+```
+- Executa todos os testes com cobertura
+- Envia a análise para o SonarQube
+- Visualize os resultados em http://localhost:9000
+
+#### Parar SonarQube:
+
+```bash
+npm run sonar:stop
+```
+- Para o servidor e libera aproximadamente 2GB de RAM
+
+> **⚠️ Importante:** O SonarQube NÃO inicia automaticamente com `npm run dev` e NÃO roda em produção. Ele só é executado quando você solicita explicitamente através dos comandos acima.
 
 ---
 

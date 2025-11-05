@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: biopark-db
+    profiles: ['app']
     ports:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
     environment:
@@ -21,6 +22,7 @@ services:
 
   server:
     container_name: biopark-server
+    profiles: ['app']
     build:
       context: .
       dockerfile: apps/server/Dockerfile
@@ -30,16 +32,19 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      ENVIRONMENT: ${ENVIRONMENT}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600}
     restart: unless-stopped
 
   web:
     container_name: biopark-web
+    profiles: ['app']
     build:
       context: .
       dockerfile: apps/web/Dockerfile
@@ -47,5 +52,51 @@ services:
       - '3000:3000'
     restart: unless-stopped
 
+  sonarqube-db:
+    image: postgres:15-alpine
+    container_name: biopark-sonarqube-db
+    profiles: ['sonar']
+    environment:
+      POSTGRES_USER: ${SONAR_DB_USER:-sonar}
+      POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD:-sonar}
+      POSTGRES_DB: ${SONAR_DB_NAME:-sonarqube}
+    volumes:
+      - sonarqube-db:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${SONAR_DB_USER:-sonar}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: biopark-sonarqube
+    profiles: ['sonar']
+    depends_on:
+      sonarqube-db:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/${SONAR_DB_NAME:-sonarqube}
+      SONAR_JDBC_USERNAME: ${SONAR_DB_USER:-sonar}
+      SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD:-sonar}
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-logs:/opt/sonarqube/logs
+    ports:
+      - '9000:9000'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://localhost:9000/api/system/status || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 80s
+
 volumes:
   pgdata:
+  sonarqube-db:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-logs:

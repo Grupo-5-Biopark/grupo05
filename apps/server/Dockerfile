@@ -24,5 +24,5 @@ FROM base AS production
 ENV NODE_ENV production
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist/apps/server ./dist/apps/server
-EXPOSE 3000
+EXPOSE 3001
 CMD [ "node", "dist/apps/server/main" ]

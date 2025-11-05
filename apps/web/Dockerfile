@@ -26,5 +26,5 @@ COPY --from=builder /usr/src/app/apps/web/public ./apps/web/public
 COPY --from=builder /usr/src/app/apps/web/package.json ./apps/web/
 COPY --from=builder /usr/src/app/package.json ./
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
-EXPOSE 3001
+EXPOSE 3000
 CMD ["npm", "start", "--workspace=web"]
