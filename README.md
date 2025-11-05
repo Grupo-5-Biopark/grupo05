@@ -135,26 +135,37 @@ Este monorepo está organizado da seguinte forma:
 
 O SonarQube analisa a qualidade do código, cobertura de testes e vulnerabilidades de segurança. Ele usa **Docker Compose profiles** para rodar apenas quando necessário.
 
-**Primeiro uso:**
-```bash
-npm run sonar:start        # Aguarde ~90 segundos
-# Acesse http://localhost:9000 (login: admin/admin)
-# Gere um token em: My Account → Security → Generate Tokens
-# Adicione ao .env: SONAR_TOKEN=seu_token_aqui
-```
+#### Primeiro uso:
 
-**Analisar código:**
-```bash
-npm run sonar:scan         # Roda testes + análise
-# Veja resultados em http://localhost:9000
-```
+1. Inicie o servidor SonarQube:
+   ```bash
+   npm run sonar:start
+   ```
+   - Aguarde aproximadamente 90 segundos para inicialização completa
 
-**Parar SonarQube:**
-```bash
-npm run sonar:stop         # Libera ~2GB de RAM
-```
+2. Configure o acesso:
+   - Acesse http://localhost:9000
+   - Login padrão: `admin` / `admin`
+   - Navegue até: **My Account** → **Security** → **Generate Tokens**
+   - Adicione o token gerado ao arquivo `.env`: `SONAR_TOKEN=seu_token_aqui`
 
-> **Nota:** SonarQube NÃO inicia automaticamente com `npm run dev` e NÃO roda em produção. Ele só é executado quando você solicita explicitamente.
+#### Analisar código:
+
+```bash
+npm run sonar:scan
+```
+- Executa todos os testes com cobertura
+- Envia a análise para o SonarQube
+- Visualize os resultados em http://localhost:9000
+
+#### Parar SonarQube:
+
+```bash
+npm run sonar:stop
+```
+- Para o servidor e libera aproximadamente 2GB de RAM
+
+> **⚠️ Importante:** O SonarQube NÃO inicia automaticamente com `npm run dev` e NÃO roda em produção. Ele só é executado quando você solicita explicitamente através dos comandos acima.
 
 ---
 
