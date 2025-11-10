@@ -102,11 +102,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção será desenvolvida para gerenciar cursos, turmas e
-              cálculos de evasão.
-            </p>
+            <h3>🔗 Abrindo página de Cursos...</h3>
           </div>
         </div>
 
@@ -159,6 +155,28 @@ export default function DashboardPage() {
               Esta seção gerará relatórios de quantidade de salas por tamanho e
               previsões semestrais.
             </p>
+          </div>
+        </div>
+
+        {/* USUÁRIOS PAGE */}
+        <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
+          <div className="page-header">
+            <h1 className="page-title">Gerenciamento de Usuários</h1>
+            <p className="page-subtitle">Abra a página completa de usuários</p>
+          </div>
+
+          <div className="content-placeholder">
+            <h3>🔗 Abrir página de Usuários</h3>
+            <p>
+              Para gerenciar usuários, clique no botão abaixo para abrir a
+              página dedicada.
+            </p>
+            <button
+              className="btn-open-users"
+              onClick={() => router.push('/users')}
+            >
+              Abrir Usuários
+            </button>
           </div>
         </div>
       </main>

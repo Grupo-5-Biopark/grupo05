@@ -7,25 +7,26 @@ export class UpdateCourseDto {
   @IsOptional()
   name?: string;
 
-  @ApiPropertyOptional({ example: 'Tecnologia' })
+  @ApiPropertyOptional({ example: 'Computação' })
   @IsString({ message: 'must be a string' })
   @IsOptional()
-  knowledgeArea?: string;
+  knowledge_area?: string;
 
-  @ApiPropertyOptional({ example: 2024 })
+  @ApiPropertyOptional({ example: 40 })
   @IsNumber({}, { message: 'must be a number' })
   @Min(1, { message: 'must be at least 1' })
   @IsOptional()
-  announcement?: number;
+  vacancies?: number;
 
-  @ApiPropertyOptional({ example: 'active' })
-  @IsString({ message: 'must be a string' })
-  @IsOptional()
-  status?: string;
-
-  @ApiPropertyOptional({ example: 30 })
+  @ApiPropertyOptional({ example: 4 })
   @IsNumber({}, { message: 'must be a number' })
   @Min(1, { message: 'must be at least 1' })
   @IsOptional()
-  expectedStudents?: number;
+  period_quantities?: number;
+
+  @ApiPropertyOptional({ example: 2025 })
+  @IsNumber({}, { message: 'must be a number' })
+  @Min(1990, { message: 'must be at least 1990' })
+  @IsOptional()
+  opening_year?: number;
 }

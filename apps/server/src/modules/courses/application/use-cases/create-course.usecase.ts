@@ -34,8 +34,9 @@ export class CreateCourseUseCase {
     const course = new Course();
     course.name = data.name;
     course.knowledgeArea = data.knowledgeArea;
-    course.announcement = data.announcement;
-    course.status = data.status;
+    course.vacancies = data.vacancies;
+    course.periodQuantities = data.periodQuantities;
+    course.openingYear = data.openingYear;
 
     try {
       return await this.courseRepository.create(course);

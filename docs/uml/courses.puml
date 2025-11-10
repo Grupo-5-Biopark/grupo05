@@ -18,9 +18,9 @@ class Course {
     +id: number
     +name: string
     +knowledgeArea: string
-    +announcement: number
-    +status: string
-    +expectedStudents: number
+    +vacancies: number
+    +periodQuantities: number
+    +openingYear: number
     +classes: Class[]
 }
 @enduml
