@@ -152,18 +152,6 @@ function CoursesDataPanel() {
     }
   };
 
-  const handleEditCourse = (course: Course) => {
-    setEditingCourseId(course.id);
-    setFormData({
-      name: course.name,
-      knowledgeArea: course.knowledgeArea,
-      vacancies: course.vacancies.toString(),
-      periodQuantities: course.periodQuantities.toString(),
-      openingYear: course.openingYear.toString(),
-    });
-    setShowNewCourseModal(true);
-  };
-
   const handleViewDetails = (courseId: number) => {
     console.log('Visualizando detalhes do curso:', courseId);
     // TODO: Implementar visualização de detalhes em modal
@@ -219,74 +207,62 @@ function CoursesDataPanel() {
         </div>
         <div className="button-group">
           <button
-            className="btn btn-primary"
+            className="btn btn-primary btn-new-course"
             onClick={() => setShowNewCourseModal(true)}
           >
-            ➕ Novo Curso
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => void loadCourses()}
-          >
-            🔄 Atualizar
+            <span className="btn-plus">+</span> Novo Curso
           </button>
         </div>
       </div>
 
-      {filteredCourses.length === 0 ? (
-        <div className="no-results">Nenhum curso encontrado</div>
-      ) : (
-        filteredCourses.map((course) => (
-          <div key={course.id} className="course-card">
-            <div className="course-name">{course.name}</div>
-            <div className="course-code">Área: {course.knowledgeArea}</div>
-
-            <div className="course-info">
-              <div className="course-stats">
-                <div className="course-stat">
-                  <div className="course-stat-value">{course.vacancies}</div>
-                  <div className="course-stat-label">Vagas</div>
-                </div>
-                <div className="course-stat">
-                  <div className="course-stat-value">
-                    {course.periodQuantities}
+      <div className="courses-list">
+        {filteredCourses.length === 0 ? (
+          <div className="no-results">Nenhum curso encontrado</div>
+        ) : (
+          filteredCourses.map((course) => (
+            <div key={course.id} className="course-card">
+              <div className="course-header">
+                <h3 className="course-name">{course.name}</h3>
+              </div>
+              <div className="course-body">
+                <div className="course-code">Área: {course.knowledgeArea}</div>
+                <div className="course-stats">
+                  <div className="course-stat">
+                    <div className="course-stat-value">{course.vacancies}</div>
+                    <div className="course-stat-label">Vagas</div>
                   </div>
-                  <div className="course-stat-label">Períodos</div>
-                </div>
-                <div className="course-stat">
-                  <div className="course-stat-value">{course.openingYear}</div>
-                  <div className="course-stat-label">Ano Abertura</div>
+                  <div className="course-stat">
+                    <div className="course-stat-value">
+                      {course.periodQuantities}
+                    </div>
+                    <div className="course-stat-label">Períodos</div>
+                  </div>
+                  <div className="course-stat">
+                    <div className="course-stat-value">
+                      {course.openingYear}
+                    </div>
+                    <div className="course-stat-label">Ano Abertura</div>
+                  </div>
                 </div>
               </div>
-
-              <div className="course-meta">
-                <span className="course-type">{course.knowledgeArea}</span>
+              <div className="course-footer">
+                <button
+                  className="btn btn-primary btn-small"
+                  onClick={() => handleViewDetails(course.id)}
+                >
+                  Detalhes
+                </button>
+                <button
+                  className="btn btn-danger btn-small"
+                  onClick={() => void handleDeleteCourse(course.id)}
+                >
+                  Deletar
+                </button>
               </div>
             </div>
-
-            <div className="course-actions">
-              <button
-                className="btn btn-secondary btn-small"
-                onClick={() => handleEditCourse(course)}
-              >
-                ✏️ Editar
-              </button>
-              <button
-                className="btn btn-primary btn-small"
-                onClick={() => handleViewDetails(course.id)}
-              >
-                👁️ Detalhes
-              </button>
-              <button
-                className="btn btn-danger btn-small"
-                onClick={() => void handleDeleteCourse(course.id)}
-              >
-                🗑️ Deletar
-              </button>
-            </div>
-          </div>
-        ))
-      )}
+          ))
+        )}
+      </div>
 
       {/* Modal Novo/Editar Curso */}
       {showNewCourseModal && (
