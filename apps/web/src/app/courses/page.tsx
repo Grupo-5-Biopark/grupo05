@@ -51,12 +51,10 @@ function CoursesDataPanel() {
     openingYear: new Date().getFullYear().toString(),
   });
 
-  // Load courses on mount
   useEffect(() => {
     void loadCourses();
   }, []);
 
-  // Filter courses when search term changes
   useEffect(() => {
     filterCourses();
   }, [courses, searchTerm]);
@@ -113,7 +111,7 @@ function CoursesDataPanel() {
 
   const handleSaveCourse = async () => {
     if (!formData.name || !formData.knowledgeArea) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
+      showToast('error', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -126,14 +124,12 @@ function CoursesDataPanel() {
         openingYear: parseInt(formData.openingYear),
       };
 
-      if (editingCourseId) {
-        // Editar curso existente
+      if (editingCourseId !== null) {
         await put(`/api/courses/${editingCourseId}`, courseData);
-        alert('Curso atualizado com sucesso!');
+        showToast('success', 'Curso atualizado com sucesso!');
       } else {
-        // Criar novo curso
         await post('/api/courses', courseData);
-        alert('Curso criado com sucesso!');
+        showToast('success', 'Curso criado com sucesso!');
       }
 
       setShowNewCourseModal(false);
@@ -148,26 +144,76 @@ function CoursesDataPanel() {
       await loadCourses();
     } catch (err) {
       console.error('Erro ao salvar curso:', err);
-      alert('Erro ao salvar curso. Tente novamente.');
+      let serverMessage = 'Erro ao salvar curso. Tente novamente.';
+      if (err instanceof Error) serverMessage = err.message;
+      else if (err && typeof err === 'object') {
+        const anyErr = err as any;
+        if (anyErr.response?.data?.message)
+          serverMessage = anyErr.response.data.message;
+        else if (anyErr.response?.data) serverMessage = anyErr.response.data;
+      }
+      showToast('error', serverMessage);
     }
   };
 
   const handleViewDetails = (courseId: number) => {
-    console.log('Visualizando detalhes do curso:', courseId);
-    // TODO: Implementar visualização de detalhes em modal
+    const course = courses.find((c) => c.id === courseId);
+    if (!course) return;
+    setDetailsCourse(course);
+    setShowDetailsModal(true);
   };
 
-  const handleDeleteCourse = async (courseId: number) => {
-    if (confirm('Tem certeza que deseja excluir este curso?')) {
-      try {
-        await del(`/api/courses/${courseId}`);
-        alert('Curso deletado com sucesso!');
-        await loadCourses();
-      } catch (err) {
-        console.error('Erro ao deletar curso:', err);
-        alert('Erro ao deletar curso. Tente novamente.');
-      }
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsCourse, setDetailsCourse] = useState<Course | null>(null);
+
+  const openEditFromDetails = () => {
+    if (!detailsCourse) return;
+    setEditingCourseId(detailsCourse.id);
+    setFormData({
+      name: detailsCourse.name,
+      knowledgeArea: detailsCourse.knowledgeArea,
+      vacancies: detailsCourse.vacancies.toString(),
+      periodQuantities: detailsCourse.periodQuantities.toString(),
+      openingYear: detailsCourse.openingYear.toString(),
+    });
+    setShowDetailsModal(false);
+    setShowNewCourseModal(true);
+  };
+
+  const handleDeleteCourse = (courseId: number) => {
+    // open confirm modal instead of native confirm()
+    const course = courses.find((c) => c.id === courseId) || null;
+    setCourseToDelete(course);
+    setShowConfirmModal(true);
+  };
+
+  const performDeleteCourse = async () => {
+    if (!courseToDelete) return;
+    try {
+      await del(`/api/courses/${courseToDelete.id}`);
+      showToast('success', 'Curso deletado com sucesso!');
+      setShowConfirmModal(false);
+      setCourseToDelete(null);
+      await loadCourses();
+    } catch (err) {
+      console.error('Erro ao deletar curso:', err);
+      showToast('error', 'Erro ao deletar curso. Tente novamente.');
     }
+  };
+
+  // Simple in-component toast
+  const [toast, setToast] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
+  // Confirm modal state
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+    window.setTimeout(() => setToast(null), 4000);
   };
 
   return (
@@ -215,54 +261,130 @@ function CoursesDataPanel() {
         </div>
       </div>
 
-      <div className="courses-list">
+      <div className="courses-table-container">
+        <h2 className="table-title">Lista de Cursos</h2>
+
         {filteredCourses.length === 0 ? (
           <div className="no-results">Nenhum curso encontrado</div>
         ) : (
-          filteredCourses.map((course) => (
-            <div key={course.id} className="course-card">
-              <div className="course-header">
-                <h3 className="course-name">{course.name}</h3>
-              </div>
-              <div className="course-body">
-                <div className="course-code">Área: {course.knowledgeArea}</div>
-                <div className="course-stats">
-                  <div className="course-stat">
-                    <div className="course-stat-value">{course.vacancies}</div>
-                    <div className="course-stat-label">Vagas</div>
-                  </div>
-                  <div className="course-stat">
-                    <div className="course-stat-value">
-                      {course.periodQuantities}
+          <table className="courses-table">
+            <thead>
+              <tr>
+                <th>CURSO</th>
+                <th>ÁREA</th>
+                <th>VAGAS</th>
+                <th>PERÍODOS</th>
+                <th>ANO ABERTURA</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCourses.map((course) => (
+                <tr key={course.id}>
+                  <td>
+                    <div className="course-cell">
+                      <div className="course-name-cell">{course.name}</div>
                     </div>
-                    <div className="course-stat-label">Períodos</div>
-                  </div>
-                  <div className="course-stat">
-                    <div className="course-stat-value">
-                      {course.openingYear}
+                  </td>
+                  <td className="area-cell">{course.knowledgeArea}</td>
+                  <td className="numeric-cell">{course.vacancies}</td>
+                  <td className="numeric-cell">{course.periodQuantities}</td>
+                  <td className="numeric-cell">{course.openingYear}</td>
+                  <td>
+                    <div className="actions-cell">
+                      <button
+                        className="btn btn-primary btn-small"
+                        onClick={() => handleViewDetails(course.id)}
+                      >
+                        Detalhes
+                      </button>
+                      <button
+                        className="btn btn-danger btn-small"
+                        onClick={() => handleDeleteCourse(course.id)}
+                      >
+                        Deletar
+                      </button>
                     </div>
-                    <div className="course-stat-label">Ano Abertura</div>
-                  </div>
-                </div>
-              </div>
-              <div className="course-footer">
-                <button
-                  className="btn btn-primary btn-small"
-                  onClick={() => handleViewDetails(course.id)}
-                >
-                  Detalhes
-                </button>
-                <button
-                  className="btn btn-danger btn-small"
-                  onClick={() => void handleDeleteCourse(course.id)}
-                >
-                  Deletar
-                </button>
-              </div>
-            </div>
-          ))
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {filteredCourses.length === 0 && courses.length > 0 && (
+          <div className="no-results">
+            Nenhum curso encontrado com os filtros aplicados
+          </div>
         )}
       </div>
+
+      {/* Modal Detalhes do Curso */}
+      {showDetailsModal && detailsCourse && (
+        <div className="modal active">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3 className="modal-title">Detalhes do Curso</h3>
+              <button
+                className="close-btn"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Nome do Curso</label>
+                <input type="text" value={detailsCourse.name} readOnly />
+              </div>
+              <div className="form-group">
+                <label>Área de Conhecimento</label>
+                <input
+                  type="text"
+                  value={detailsCourse.knowledgeArea}
+                  readOnly
+                />
+              </div>
+              <div className="form-group">
+                <label>Vagas</label>
+                <input type="number" value={detailsCourse.vacancies} readOnly />
+              </div>
+              <div className="form-group">
+                <label>Quantidades de Períodos</label>
+                <input
+                  type="number"
+                  value={detailsCourse.periodQuantities}
+                  readOnly
+                />
+              </div>
+              <div className="form-group">
+                <label>Ano de Abertura</label>
+                <input
+                  type="number"
+                  value={detailsCourse.openingYear}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => openEditFromDetails()}
+              >
+                ✏️ Editar
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Novo/Editar Curso */}
       {showNewCourseModal && (
@@ -352,6 +474,61 @@ function CoursesDataPanel() {
                 }}
               >
                 ✕ Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast container */}
+      {toast && (
+        <div className={`toast ${toast.type}`} role="status">
+          <div className="toast-icon">
+            {toast.type === 'success' ? '✓' : '!'}
+          </div>
+          <div className="toast-message">{toast.message}</div>
+        </div>
+      )}
+
+      {/* Confirm Deletion Modal */}
+      {showConfirmModal && courseToDelete && (
+        <div className="modal active">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3 className="modal-title">Confirmar exclusão</h3>
+              <button
+                className="close-btn"
+                onClick={() => {
+                  setShowConfirmModal(false);
+                  setCourseToDelete(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '0.5rem 0 1.25rem' }}>
+              <p>
+                Tem certeza que deseja excluir o curso{' '}
+                <strong>{courseToDelete.name}</strong>?
+              </p>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShowConfirmModal(false);
+                  setCourseToDelete(null);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={() => void performDeleteCourse()}
+              >
+                Deletar
               </button>
             </div>
           </div>
