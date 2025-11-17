@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // <-- Importado
+import { useRouter } from 'next/navigation';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/ui/Header';
@@ -26,7 +26,12 @@ interface UserStats {
 
 export default function UsersPage() {
   const router = useRouter();
-  const { get, error } = useApi({
+  const {
+    get,
+    post,
+    put,
+    delete: del,
+  } = useApi({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   });
 
@@ -46,6 +51,28 @@ export default function UsersPage() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('Todos os Cargos');
+  const [showNewUserModal, setShowNewUserModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'USER',
+    phone: '',
+  });
+
+  // Toast state
+  const [toast, setToast] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+    window.setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     void loadUsers();
@@ -62,6 +89,7 @@ export default function UsersPage() {
       calculateStats(response.data);
     } catch (err) {
       console.error('Erro ao buscar usuários:', err);
+      showToast('error', 'Erro ao carregar usuários');
     }
   }
 
@@ -84,7 +112,6 @@ export default function UsersPage() {
   const filterUsers = () => {
     let filtered = users;
 
-    // Filtro de busca
     if (searchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -93,7 +120,6 @@ export default function UsersPage() {
       );
     }
 
-    // Filtro de cargo
     if (roleFilter !== 'Todos os Cargos') {
       filtered = filtered.filter(
         (user) => user.role.toUpperCase() === roleFilter.toUpperCase(),
@@ -101,6 +127,127 @@ export default function UsersPage() {
     }
 
     setFilteredUsers(filtered);
+  };
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveUser = async () => {
+    if (!formData.name || !formData.email) {
+      showToast('error', 'Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    if (!editingUserId && !formData.password) {
+      showToast('error', 'Por favor, informe uma senha.');
+      return;
+    }
+
+    const isEditing = editingUserId !== null;
+
+    try {
+      const userData: any = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        phone: formData.phone,
+      };
+
+      if (formData.password) {
+        userData.password = formData.password;
+      }
+
+      if (isEditing) {
+        await put(`/api/users/${editingUserId}`, userData);
+      } else {
+        await post('/api/users', userData);
+      }
+    } catch (err) {
+      console.error('Erro na requisição:', err);
+    }
+
+    setShowNewUserModal(false);
+    setEditingUserId(null);
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      role: 'USER',
+      phone: '',
+    });
+
+    try {
+      await loadUsers();
+      showToast(
+        'success',
+        isEditing
+          ? 'Usuário atualizado com sucesso!'
+          : 'Usuário criado com sucesso!',
+      );
+    } catch (err) {
+      console.error('Erro ao recarregar usuários:', err);
+      showToast('error', 'Erro ao atualizar a lista. Recarregue a página.');
+    }
+  };
+
+  const handleEdit = (userId: number) => {
+    const user = users.find((u) => u.id === userId);
+    if (!user) return;
+    setEditingUserId(user.id);
+    setFormData({
+      name: user.name,
+      email: user.email,
+      password: '',
+      role: user.role,
+      phone: user.phone,
+    });
+    setShowNewUserModal(true);
+  };
+
+  const handleDelete = (userId: number) => {
+    const user = users.find((u) => u.id === userId) || null;
+    setUserToDelete(user);
+    setShowConfirmModal(true);
+  };
+
+  const performDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await del(`/api/users/${userToDelete.id}`);
+    } catch (err) {
+      console.error('Erro na requisição de deleção:', err);
+    }
+
+    setShowConfirmModal(false);
+    setUserToDelete(null);
+
+    try {
+      await loadUsers();
+      showToast('success', 'Usuário deletado com sucesso!');
+    } catch (err) {
+      console.error('Erro ao recarregar usuários:', err);
+      showToast('error', 'Erro ao atualizar a lista. Recarregue a página.');
+    }
+  };
+
+  const handleNewUser = () => {
+    setEditingUserId(null);
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      role: 'USER',
+      phone: '',
+    });
+    setShowNewUserModal(true);
   };
 
   const getRoleBadgeClass = (role: string) => {
@@ -168,39 +315,6 @@ export default function UsersPage() {
     }
     return name.substring(0, 2).toUpperCase();
   };
-
-  const handleEdit = (userId: number) => {
-    // TODO: Implementar edição
-    console.log('Editar usuário:', userId);
-  };
-
-  const handleDelete = (userId: number) => {
-    // TODO: Implementar excluir
-    console.log('Deletar usuário', userId);
-  };
-
-  const handleNewUser = () => {
-    // TODO: Implementar criação de novo usuário
-    console.log('Novo usuário');
-  };
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="users-page">
-  //       <div className="loading">🔄 Carregando usuários...</div>
-  //     </div>
-  //   );
-  // }
-
-  if (error) {
-    return (
-      <div className="users-page">
-        <div className="error-message">
-          ❌ Erro ao carregar usuários: {error}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="user-layout">
@@ -327,6 +441,159 @@ export default function UsersPage() {
               </div>
             )}
           </div>
+
+          {/* Modal Novo/Editar Usuário */}
+          {showNewUserModal && (
+            <div className="modal active">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h3 className="modal-title">
+                    {editingUserId ? '✏️ Editar Usuário' : '➕ Novo Usuário'}
+                  </h3>
+                  <button
+                    className="close-btn"
+                    onClick={() => {
+                      setShowNewUserModal(false);
+                      setEditingUserId(null);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Nome *</label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Ex: João da Silva"
+                      value={formData.name}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>E-mail *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Ex: joao@exemplo.com"
+                      value={formData.email}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      Senha {editingUserId ? '(deixe vazio para manter)' : '*'}
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder={
+                        editingUserId ? 'Nova senha (opcional)' : 'Senha'
+                      }
+                      value={formData.password}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Cargo *</label>
+                    <select
+                      name="role"
+                      value={formData.role}
+                      onChange={handleFormChange}
+                    >
+                      <option value="USER">Usuário</option>
+                      <option value="ADMIN">Administrador</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Telefone</label>
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Ex: (45) 99999-9999"
+                      value={formData.phone}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => void handleSaveUser()}
+                  >
+                    💾 {editingUserId ? 'Atualizar Usuário' : 'Salvar Usuário'}
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setShowNewUserModal(false);
+                      setEditingUserId(null);
+                    }}
+                  >
+                    ✕ Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Toast container */}
+          {toast && (
+            <div className={`toast ${toast.type}`} role="status">
+              <div className="toast-icon">
+                {toast.type === 'success' ? '✓' : '!'}
+              </div>
+              <div className="toast-message">{toast.message}</div>
+            </div>
+          )}
+
+          {/* Confirm Deletion Modal */}
+          {showConfirmModal && userToDelete && (
+            <div className="modal active">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h3 className="modal-title">Confirmar exclusão</h3>
+                  <button
+                    className="close-btn"
+                    onClick={() => {
+                      setShowConfirmModal(false);
+                      setUserToDelete(null);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div style={{ padding: '0.5rem 0 1.25rem' }}>
+                  <p>
+                    Tem certeza que deseja excluir o usuário{' '}
+                    <strong>{userToDelete.name}</strong>?
+                  </p>
+                </div>
+
+                <div className="modal-actions">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setShowConfirmModal(false);
+                      setUserToDelete(null);
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => void performDeleteUser()}
+                  >
+                    Deletar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
