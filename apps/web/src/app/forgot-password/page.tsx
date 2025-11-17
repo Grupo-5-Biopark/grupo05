@@ -180,7 +180,11 @@ export default function ForgotPasswordPage() {
         <div className={styles.forgotCard}>
           <div className={styles.forgotHeader}>
             <div className={styles.logo}>
-              <img src="/favicon.png" alt="BIOPARK" className={styles.logoImage} />
+              <img
+                src="/favicon.png"
+                alt="BIOPARK"
+                className={styles.logoImage}
+              />
               BIOPARK
             </div>
             <p className={styles.forgotSubtitle}>Recuperar Senha</p>

@@ -127,7 +127,11 @@ export default function LoginPage() {
         <div className={styles.loginCard}>
           <div className={styles.loginHeader}>
             <div className={styles.logo}>
-              <img src="/favicon.png" alt="BIOPARK" className={styles.logoImage} />
+              <img
+                src="/favicon.png"
+                alt="BIOPARK"
+                className={styles.logoImage}
+              />
               BIOPARK
             </div>
             <p className={styles.loginSubtitle}>Sistema de Controle de Salas</p>

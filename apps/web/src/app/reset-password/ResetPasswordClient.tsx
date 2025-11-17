@@ -228,7 +228,11 @@ export default function ResetPasswordPage() {
         <div className={styles.resetCard}>
           <div className={styles.resetHeader}>
             <div className={styles.logo}>
-              <img src="/favicon.png" alt="BIOPARK" className={styles.logoImage} />
+              <img
+                src="/favicon.png"
+                alt="BIOPARK"
+                className={styles.logoImage}
+              />
               BIOPARK
             </div>
             <p className={styles.resetSubtitle}>Redefinir Senha</p>
