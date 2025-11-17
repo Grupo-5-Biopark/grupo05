@@ -20,29 +20,6 @@ export default function ForgotPasswordPage() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  useEffect(() => {
-    createParticles();
-  }, []);
-
-  const createParticles = () => {
-    const particlesContainer = document.getElementById('particles');
-    if (!particlesContainer) return;
-
-    const particleCount = 50;
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = styles.particle;
-
-      // Posição aleatória
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 20 + 's';
-      particle.style.animationDuration = 10 + Math.random() * 15 + 's';
-
-      particlesContainer.appendChild(particle);
-    }
-  };
-
   const validateEmail = (email: string) => {
     return /\S+@\S+\.\S+/.test(email);
   };
@@ -110,7 +87,6 @@ export default function ForgotPasswordPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.forgotContainer}>
           <div className={styles.forgotCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -135,7 +111,6 @@ export default function ForgotPasswordPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.forgotContainer}>
           <div className={styles.forgotCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -200,13 +175,12 @@ export default function ForgotPasswordPage() {
   return (
     <div className={styles.container}>
       <div className={styles.bgDecoration}></div>
-      <div className={styles.particles} id="particles"></div>
 
       <div className={styles.forgotContainer}>
         <div className={styles.forgotCard}>
           <div className={styles.forgotHeader}>
             <div className={styles.logo}>
-              <div className={styles.logoIcon}>🏫</div>
+              <img src="/favicon.png" alt="BIOPARK" className={styles.logoImage} />
               BIOPARK
             </div>
             <p className={styles.forgotSubtitle}>Recuperar Senha</p>

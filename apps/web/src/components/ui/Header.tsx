@@ -27,7 +27,6 @@ export default function Header({ user, onLogout }: HeaderProps) {
 
   const badgeInfo = getRoleBadge(user?.role || 'user');
 
-  // 💡 CORREÇÃO AQUI: Calcula apenas o nome da classe que define a cor (ex: 'userBadgeAdmin')
   const roleClassName = `userBadge${
     badgeInfo.color.charAt(0).toUpperCase() + badgeInfo.color.slice(1)
   }`;
@@ -45,7 +44,6 @@ export default function Header({ user, onLogout }: HeaderProps) {
         <div className={styles.userInfo}>
           <span className={styles.userName}>{user?.name || 'Usuário'}</span>
 
-          {/* 💡 CORREÇÃO AQUI: Acessa a classe hashada usando colchetes (styles[roleClassName]) */}
           <div className={`${styles.userBadge} ${styles[roleClassName]}`}>
             {badgeInfo.text}
           </div>
