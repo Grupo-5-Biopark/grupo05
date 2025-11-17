@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import styles from './reset-password.module.css';
-import { React } from 'next/dist/server/route-modules/app-page/vendored/rsc/entrypoints';
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
