@@ -32,35 +32,15 @@ export default function ResetPasswordPage() {
     const email = searchParams.get('email');
 
     if (token && email) {
-      // Simular validação do token
       setTimeout(() => {
         setIsValidToken(true);
         setIsCheckingToken(false);
-        createParticles();
       }, 1000);
     } else {
       setIsValidToken(false);
       setIsCheckingToken(false);
     }
   }, [searchParams]);
-
-  const createParticles = () => {
-    const particlesContainer = document.getElementById('particles');
-    if (!particlesContainer) return;
-
-    const particleCount = 50;
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = styles.particle;
-
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 20 + 's';
-      particle.style.animationDuration = 10 + Math.random() * 15 + 's';
-
-      particlesContainer.appendChild(particle);
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -124,7 +104,6 @@ export default function ResetPasswordPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.resetContainer}>
           <div className={styles.resetCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -153,7 +132,6 @@ export default function ResetPasswordPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.resetContainer}>
           <div className={styles.resetCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -202,7 +180,6 @@ export default function ResetPasswordPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.resetContainer}>
           <div className={styles.resetCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -245,13 +222,16 @@ export default function ResetPasswordPage() {
   return (
     <div className={styles.container}>
       <div className={styles.bgDecoration}></div>
-      <div className={styles.particles} id="particles"></div>
 
       <div className={styles.resetContainer}>
         <div className={styles.resetCard}>
           <div className={styles.resetHeader}>
             <div className={styles.logo}>
-              <div className={styles.logoIcon}>🏫</div>
+              <img
+                src="/favicon.png"
+                alt="BIOPARK"
+                className={styles.logoImage}
+              />
               BIOPARK
             </div>
             <p className={styles.resetSubtitle}>Redefinir Senha</p>
