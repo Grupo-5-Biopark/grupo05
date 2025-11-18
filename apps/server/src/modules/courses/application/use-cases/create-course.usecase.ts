@@ -36,6 +36,8 @@ export class CreateCourseUseCase {
     course.knowledgeArea = data.knowledgeArea;
     course.announcement = data.announcement;
     course.status = data.status;
+    course.expectedStudents = data.expectedStudents;
+    course.numberOfSemesters = data.numberOfSemesters;
 
     try {
       return await this.courseRepository.create(course);

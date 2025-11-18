@@ -46,6 +46,7 @@ export class CourseController {
       announcement: course.announcement,
       status: course.status,
       expectedStudents: course.expectedStudents,
+      numberOfSemesters: course.numberOfSemesters,
     };
   }
 
@@ -60,6 +61,7 @@ export class CourseController {
       announcement: course.announcement,
       status: course.status,
       expectedStudents: course.expectedStudents,
+      numberOfSemesters: course.numberOfSemesters,
     }));
   }
 
@@ -76,6 +78,7 @@ export class CourseController {
       announcement: course.announcement,
       status: course.status,
       expectedStudents: course.expectedStudents,
+      numberOfSemesters: course.numberOfSemesters,
     };
   }
 

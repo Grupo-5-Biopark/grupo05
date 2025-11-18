@@ -26,4 +26,9 @@ export class CreateCourseDto {
   @IsNumber({}, { message: 'must be a number' })
   @Min(1, { message: 'must be at least 1' })
   expectedStudents: number;
+
+  @ApiProperty({ example: 8 })
+  @IsNumber({}, { message: 'must be a number' })
+  @Min(1, { message: 'must be at least 1' })
+  numberOfSemesters: number;
 }

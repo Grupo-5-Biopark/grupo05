@@ -21,6 +21,7 @@ class Course {
     +announcement: number
     +status: string
     +expectedStudents: number
+    +numberOfSemesters: number
     +classes: Class[]
 }
 @enduml

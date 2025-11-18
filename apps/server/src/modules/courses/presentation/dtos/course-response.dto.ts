@@ -18,4 +18,7 @@ export class CourseResponseDto {
 
   @ApiProperty({ example: 30 })
   expectedStudents: number;
+
+  @ApiProperty({ example: 8 })
+  numberOfSemesters: number;
 }
