@@ -10,13 +10,8 @@
     "test:cov": "jest --coverage --passWithNoTests"
   },
   "dependencies": {
-    "next": "^15.5.2",
+    "next": "^16.0.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
-  },
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.10.1",
-    "@types/passport-jwt": "^4.0.1"
   }
 }
