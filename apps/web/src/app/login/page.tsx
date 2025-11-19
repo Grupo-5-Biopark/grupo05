@@ -20,28 +20,6 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  useEffect(() => {
-    createParticles();
-  }, []);
-
-  const createParticles = () => {
-    const particlesContainer = document.getElementById('particles');
-    if (!particlesContainer) return;
-
-    const particleCount = 50;
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = styles.particle;
-
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 15 + 's';
-      particle.style.animationDuration = 15 + Math.random() * 10 + 's';
-
-      particlesContainer.appendChild(particle);
-    }
-  };
-
   const showSuccessAnimation = () => {
     setShowSuccess(true);
     setTimeout(() => {
@@ -85,7 +63,6 @@ export default function LoginPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.loginContainer}>
           <div className={styles.loginCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -110,7 +87,6 @@ export default function LoginPage() {
     return (
       <div className={styles.container}>
         <div className={styles.bgDecoration}></div>
-        <div className={styles.particles} id="particles"></div>
         <div className={styles.loginContainer}>
           <div className={styles.loginCard}>
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -146,13 +122,16 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.bgDecoration}></div>
-      <div className={styles.particles} id="particles"></div>
 
       <div className={styles.loginContainer}>
         <div className={styles.loginCard}>
           <div className={styles.loginHeader}>
             <div className={styles.logo}>
-              <div className={styles.logoIcon}>🏫</div>
+              <img
+                src="/favicon.png"
+                alt="BIOPARK"
+                className={styles.logoImage}
+              />
               BIOPARK
             </div>
             <p className={styles.loginSubtitle}>Sistema de Controle de Salas</p>

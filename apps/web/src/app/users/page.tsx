@@ -368,7 +368,7 @@ export default function UsersPage() {
               </select>
             </div>
             <button className="btn-new-user" onClick={handleNewUser}>
-              + NOVO USUÁRIO
+              <span className="btn-plus">+</span> Novo Usuário
             </button>
           </div>
 

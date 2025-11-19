@@ -84,7 +84,8 @@
   gap: 1rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
-  align-items: flex-end;
+  /* center controls vertically so the button aligns with inputs */
+  align-items: center;
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
@@ -121,19 +122,35 @@
 }
 
 .btn-new-user {
-  background-color: #27ae60;
-  color: white;
+  /* match courses primary CTA but slightly tighter to fit users layout */
+  background-color: #eb0644;
+  color: #ffffff;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
   cursor: pointer;
   transition: background-color 0.2s;
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
 }
 
 .btn-new-user:hover {
-  background-color: #229954;
+  background-color: #d1053a;
+}
+
+.btn-new-user .btn-plus {
+  display: inline-block;
+  font-weight: 900;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 /* Table Container */
