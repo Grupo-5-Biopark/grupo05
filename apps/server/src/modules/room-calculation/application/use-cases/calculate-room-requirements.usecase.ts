@@ -48,12 +48,16 @@ export class CalculateRoomRequirementsUseCase {
         }
       }
 
-      totalBig += big;
-      totalMedium += medium;
-      totalSmall += small;
-
       const primarySize =
         big > 0 ? 'G' : medium > 0 ? 'M' : small > 0 ? 'P' : null;
+
+      if (primarySize === 'G') {
+        totalBig++;
+      } else if (primarySize === 'M') {
+        totalMedium++;
+      } else if (primarySize === 'P') {
+        totalSmall++;
+      }
 
       return {
         courseName: c.name,
@@ -90,12 +94,16 @@ export class CalculateRoomRequirementsUseCase {
         }
       }
 
-      classesTotalBig += big;
-      classesTotalMedium += medium;
-      classesTotalSmall += small;
-
       const primarySize =
         big > 0 ? 'G' : medium > 0 ? 'M' : small > 0 ? 'P' : null;
+
+      if (primarySize === 'G') {
+        classesTotalBig++;
+      } else if (primarySize === 'M') {
+        classesTotalMedium++;
+      } else if (primarySize === 'P') {
+        classesTotalSmall++;
+      }
 
       return {
         classId: cls.id,
