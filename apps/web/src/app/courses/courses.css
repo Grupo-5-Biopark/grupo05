@@ -97,12 +97,12 @@
   .courses-table thead { color: white }
 
   .courses-table th {
-    background: linear-gradient(to right, #d60f3a, #e31848);
+    background: linear-gradient(to right, #eb0644, #ce053b);
     padding: 1rem 1.5rem;
     text-align: left;
     font-weight: 600;
     font-size: 0.9rem;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     color: #ffffff;
   }
 

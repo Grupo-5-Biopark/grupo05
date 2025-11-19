@@ -156,27 +156,17 @@ function CoursesDataPanel() {
     }
   };
 
-  const handleViewDetails = (courseId: number) => {
+  const handleEdit = (courseId: number) => {
     const course = courses.find((c) => c.id === courseId);
     if (!course) return;
-    setDetailsCourse(course);
-    setShowDetailsModal(true);
-  };
-
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [detailsCourse, setDetailsCourse] = useState<Course | null>(null);
-
-  const openEditFromDetails = () => {
-    if (!detailsCourse) return;
-    setEditingCourseId(detailsCourse.id);
+    setEditingCourseId(course.id);
     setFormData({
-      name: detailsCourse.name,
-      knowledgeArea: detailsCourse.knowledgeArea,
-      vacancies: detailsCourse.vacancies.toString(),
-      periodQuantities: detailsCourse.periodQuantities.toString(),
-      openingYear: detailsCourse.openingYear.toString(),
+      name: course.name,
+      knowledgeArea: course.knowledgeArea,
+      vacancies: course.vacancies.toString(),
+      periodQuantities: course.periodQuantities.toString(),
+      openingYear: course.openingYear.toString(),
     });
-    setShowDetailsModal(false);
     setShowNewCourseModal(true);
   };
 
@@ -293,16 +283,16 @@ function CoursesDataPanel() {
                   <td>
                     <div className="actions-cell">
                       <button
-                        className="btn btn-primary btn-small"
-                        onClick={() => handleViewDetails(course.id)}
+                        className="btn-edit"
+                        onClick={() => handleEdit(course.id)}
                       >
-                        Detalhes
+                        EDITAR
                       </button>
                       <button
-                        className="btn btn-danger btn-small"
+                        className="btn-delete"
                         onClick={() => handleDeleteCourse(course.id)}
                       >
-                        Deletar
+                        EXCLUIR
                       </button>
                     </div>
                   </td>
@@ -318,73 +308,6 @@ function CoursesDataPanel() {
           </div>
         )}
       </div>
-
-      {/* Modal Detalhes do Curso */}
-      {showDetailsModal && detailsCourse && (
-        <div className="modal active">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3 className="modal-title">Detalhes do Curso</h3>
-              <button
-                className="close-btn"
-                onClick={() => setShowDetailsModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Nome do Curso</label>
-                <input type="text" value={detailsCourse.name} readOnly />
-              </div>
-              <div className="form-group">
-                <label>Área de Conhecimento</label>
-                <input
-                  type="text"
-                  value={detailsCourse.knowledgeArea}
-                  readOnly
-                />
-              </div>
-              <div className="form-group">
-                <label>Vagas</label>
-                <input type="number" value={detailsCourse.vacancies} readOnly />
-              </div>
-              <div className="form-group">
-                <label>Quantidades de Períodos</label>
-                <input
-                  type="number"
-                  value={detailsCourse.periodQuantities}
-                  readOnly
-                />
-              </div>
-              <div className="form-group">
-                <label>Ano de Abertura</label>
-                <input
-                  type="number"
-                  value={detailsCourse.openingYear}
-                  readOnly
-                />
-              </div>
-            </div>
-
-            <div className="modal-actions">
-              <button
-                className="btn btn-primary"
-                onClick={() => openEditFromDetails()}
-              >
-                ✏️ Editar
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setShowDetailsModal(false)}
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal Novo/Editar Curso */}
       {showNewCourseModal && (

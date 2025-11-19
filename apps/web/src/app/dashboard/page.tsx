@@ -166,17 +166,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🔗 Abrir página de Usuários</h3>
-            <p>
-              Para gerenciar usuários, clique no botão abaixo para abrir a
-              página dedicada.
-            </p>
-            <button
-              className="btn-open-users"
-              onClick={() => router.push('/users')}
-            >
-              Abrir Usuários
-            </button>
+            <h3>🔗 Abrindo página de Usuários...</h3>
           </div>
         </div>
       </main>
