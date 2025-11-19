@@ -13,13 +13,13 @@ export class Course {
   knowledgeArea: string;
 
   @Column()
-  announcement: number;
+  vacancies: number;
 
-  @Column({ default: 'active' })
-  status: string;
+  @Column()
+  periodQuantities: number;
 
-  @Column({ default: 30 })
-  expectedStudents: number;
+  @Column()
+  openingYear: number;
 
   @OneToMany(() => Class, (classEntity) => classEntity.course)
   classes: Class[];
