@@ -12,23 +12,18 @@ export class CreateCourseDto {
   @IsNotEmpty({ message: 'cannot be empty' })
   knowledgeArea: string;
 
-  @ApiProperty({ example: 2024 })
+  @ApiProperty({ example: 40 })
   @IsNumber({}, { message: 'must be a number' })
   @Min(1, { message: 'must be at least 1' })
-  announcement: number;
+  vacancies: number;
 
-  @ApiProperty({ example: 'active' })
-  @IsString({ message: 'must be a string' })
-  @IsNotEmpty({ message: 'cannot be empty' })
-  status: string;
-
-  @ApiProperty({ example: 30 })
+  @ApiProperty({ example: 4 })
   @IsNumber({}, { message: 'must be a number' })
   @Min(1, { message: 'must be at least 1' })
-  expectedStudents: number;
+  periodQuantities: number;
 
-  @ApiProperty({ example: 8 })
+  @ApiProperty({ example: 2025 })
   @IsNumber({}, { message: 'must be a number' })
-  @Min(1, { message: 'must be at least 1' })
-  numberOfSemesters: number;
+  @Min(1990, { message: 'must be at least 1990' })
+  openingYear: number;
 }

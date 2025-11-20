@@ -11,7 +11,7 @@ export class CalculateRoomRequirementsUseCase {
     private readonly classRepository?: ClassRepository,
   ) {}
 
-  async execute() {
+  async execute(requestedYear?: number) {
     const courses = await this.courseRepository.findAll();
     const paramsList = await this.calculationParametersRepository.findAll();
     if (!paramsList || paramsList.length === 0)
@@ -19,6 +19,7 @@ export class CalculateRoomRequirementsUseCase {
 
     const params = paramsList[0];
     const dropout = Number(params.dropoutPercentage);
+
     const smallCap = params.studentsPerSmallRoom;
     const medCap = params.studentsPerMediumRoom;
     const bigCap = params.studentsPerBigRoom;
@@ -27,41 +28,44 @@ export class CalculateRoomRequirementsUseCase {
     let totalMedium = 0;
     let totalBig = 0;
 
+    const exceededLimits: Array<{
+      type: 'Course' | 'Class';
+      name: string;
+      studentCount: number;
+      maxLimit: number;
+    }> = [];
+
     const coursesSummary = courses.map((c) => {
-      const expected = c.expectedStudents ?? 0;
+      const expected = c.vacancies ?? 0;
       const afterDropout = Math.ceil(expected * (1 - dropout / 100));
 
-      let remaining = afterDropout;
+      let sizeCode: 'P' | 'M' | 'G' | 'EXCEDIDO' | null = null;
 
-      const big = bigCap > 0 ? Math.floor(remaining / bigCap) : 0;
-      remaining = remaining - big * bigCap;
-
-      const medium = medCap > 0 ? Math.floor(remaining / medCap) : 0;
-      remaining = remaining - medium * medCap;
-
-      let small = 0;
-      if (smallCap > 0) {
-        if (remaining > 0) {
-          small = Math.ceil(remaining / smallCap);
+      if (afterDropout > 0) {
+        if (afterDropout > bigCap) {
+          sizeCode = 'EXCEDIDO';
+          exceededLimits.push({
+            type: 'Course',
+            name: c.name,
+            studentCount: afterDropout,
+            maxLimit: bigCap,
+          });
+        } else if (afterDropout > medCap) {
+          sizeCode = 'G';
+          totalBig++;
+        } else if (afterDropout > smallCap) {
+          sizeCode = 'M';
+          totalMedium++;
         } else {
-          small = 0;
+          sizeCode = 'P';
+          totalSmall++;
         }
-      }
-
-      const primarySize =
-        big > 0 ? 'G' : medium > 0 ? 'M' : small > 0 ? 'P' : null;
-
-      if (primarySize === 'G') {
-        totalBig++;
-      } else if (primarySize === 'M') {
-        totalMedium++;
-      } else if (primarySize === 'P') {
-        totalSmall++;
       }
 
       return {
         courseName: c.name,
-        roomSize: primarySize,
+        studentCount: afterDropout,
+        roomSize: sizeCode,
       };
     });
 
@@ -69,61 +73,68 @@ export class CalculateRoomRequirementsUseCase {
       ? await this.classRepository.findAll()
       : [];
 
-    let classesTotalSmall = 0;
-    let classesTotalMedium = 0;
-    let classesTotalBig = 0;
+    const classesFiltered = classes.filter((cls) => {
+      if (!requestedYear) return true;
+      const course = cls.course;
+      if (!course || course.periodQuantities == null) return true;
 
-    const classesSummary = classes.map((cls) => {
+      const periods = Number(course.periodQuantities) || 0;
+      const durationYears = Math.ceil(periods / 2);
+      const startYear = Number(cls.year) || 0;
+      const lastActiveYear = startYear + Math.max(1, durationYears) - 1;
+
+      return requestedYear >= startYear && requestedYear <= lastActiveYear;
+    });
+
+    const classesSummary = classesFiltered.map((cls) => {
       const expected = cls.currentStudents ?? 0;
       const afterDropout = Math.ceil(expected * (1 - dropout / 100));
 
-      let remaining = afterDropout;
+      let sizeCode: 'P' | 'M' | 'G' | 'EXCEDIDO' | null = null;
+      const identifier = cls.course?.name
+        ? `${cls.course.name} (Turma ${cls.id})`
+        : `Turma ${cls.id}`;
 
-      const big = bigCap > 0 ? Math.floor(remaining / bigCap) : 0;
-      remaining = remaining - big * bigCap;
-
-      const medium = medCap > 0 ? Math.floor(remaining / medCap) : 0;
-      remaining = remaining - medium * medCap;
-
-      let small = 0;
-      if (smallCap > 0) {
-        if (remaining > 0) {
-          small = Math.ceil(remaining / smallCap);
+      if (afterDropout > 0) {
+        if (afterDropout > bigCap) {
+          sizeCode = 'EXCEDIDO';
+          exceededLimits.push({
+            type: 'Class',
+            name: identifier,
+            studentCount: afterDropout,
+            maxLimit: bigCap,
+          });
+        } else if (afterDropout > medCap) {
+          sizeCode = 'G';
+          totalBig++;
+        } else if (afterDropout > smallCap) {
+          sizeCode = 'M';
+          totalMedium++;
         } else {
-          small = 0;
+          sizeCode = 'P';
+          totalSmall++;
         }
-      }
-
-      const primarySize =
-        big > 0 ? 'G' : medium > 0 ? 'M' : small > 0 ? 'P' : null;
-
-      if (primarySize === 'G') {
-        classesTotalBig++;
-      } else if (primarySize === 'M') {
-        classesTotalMedium++;
-      } else if (primarySize === 'P') {
-        classesTotalSmall++;
       }
 
       return {
         classId: cls.id,
         courseName: cls.course?.name ?? null,
-        roomSize: primarySize,
+        studentCount: afterDropout,
+        roomSize: sizeCode,
       };
     });
 
-    const combinedSmall = totalSmall + classesTotalSmall;
-    const combinedMedium = totalMedium + classesTotalMedium;
-    const combinedBig = totalBig + classesTotalBig;
-
     return {
-      totalRooms: {
-        small: combinedSmall,
-        medium: combinedMedium,
-        big: combinedBig,
+      exceededLimits,
+      totalRoomsRequired: {
+        small: totalSmall,
+        medium: totalMedium,
+        big: totalBig,
       },
-      courses: coursesSummary,
-      classes: classesSummary,
+      details: {
+        courses: coursesSummary,
+        classes: classesSummary,
+      },
     };
   }
 }

@@ -7,18 +7,15 @@ export class CourseResponseDto {
   @ApiProperty({ example: 'Ciência da Computação' })
   name: string;
 
-  @ApiProperty({ example: 'Tecnologia' })
+  @ApiProperty({ example: 'Computação' })
   knowledgeArea: string;
 
-  @ApiProperty({ example: 2024 })
-  announcement: number;
+  @ApiProperty({ example: 40 })
+  vacancies: number;
 
-  @ApiProperty({ example: 'active' })
-  status: string;
+  @ApiProperty({ example: 4 })
+  periodQuantities: number;
 
-  @ApiProperty({ example: 30 })
-  expectedStudents: number;
-
-  @ApiProperty({ example: 8 })
-  numberOfSemesters: number;
+  @ApiProperty({ example: 2025 })
+  openingYear: number;
 }

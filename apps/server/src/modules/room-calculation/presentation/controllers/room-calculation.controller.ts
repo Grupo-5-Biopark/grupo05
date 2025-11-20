@@ -1,4 +1,10 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../auth/infrastructure/guards/jwt-auth.guard';
 import { CalculateRoomRequirementsUseCase } from '../../application/use-cases/calculate-room-requirements.usecase';
@@ -14,7 +20,7 @@ export class RoomCalculationController {
 
   @Get()
   @ApiOperation({ summary: 'Get room calculation per course' })
-  async findAll() {
-    return await this.calculateRoomRequirementsUseCase.execute();
+  async findAll(@Query('year', ParseIntPipe) year: number) {
+    return await this.calculateRoomRequirementsUseCase.execute(year);
   }
 }

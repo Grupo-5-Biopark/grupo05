@@ -16,11 +16,14 @@ export class ClassRepository {
   }
 
   async findAll(): Promise<Class[]> {
-    return await this.repository.find();
+    return await this.repository.find({ relations: ['course'] });
   }
 
   async findById(id: number): Promise<Class | null> {
-    return await this.repository.findOneBy({ id });
+    return await this.repository.findOne({
+      where: { id },
+      relations: ['course'],
+    });
   }
 
   async update(id: number, classData: Partial<Class>): Promise<void> {

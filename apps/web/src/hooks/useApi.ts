@@ -48,18 +48,34 @@ export function useApi(config?: ApiConfig) {
           },
         });
 
-        const data = (await response.json()) as ApiResponsePayload;
+        // Some responses (204 No Content) have an empty body and calling
+        // response.json() will throw. Handle that gracefully by attempting
+        // to parse JSON only when present.
+        let data: ApiResponsePayload | null = null;
+        try {
+          // Only try to parse JSON when content-type indicates JSON
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            data = (await response.json()) as ApiResponsePayload;
+          } else {
+            // No JSON body
+            data = null;
+          }
+        } catch {
+          // Failed to parse JSON — treat as no body
+          data = null;
+        }
 
         if (!response.ok) {
-          throw new Error(
-            data.message || `HTTP error! status: ${response.status}`,
-          );
+          const message =
+            (data && data.message) || `HTTP error! status: ${response.status}`;
+          throw new Error(message);
         }
 
         return {
-          data: data as T,
+          data: data as unknown as T,
           status: response.status,
-          message: data.message,
+          message: data?.message,
         };
       } catch (err) {
         const errorMessage =

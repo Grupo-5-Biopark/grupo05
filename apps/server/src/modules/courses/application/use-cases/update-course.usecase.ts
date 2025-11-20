@@ -24,6 +24,17 @@ export class UpdateCourseUseCase {
       }
     }
 
-    await this.courseRepository.update(id, data);
+    // DTO guarantees camelCase properties (we keep @Transform to accept snake_case inputs),
+    // so normalize using camelCase only.
+    const payload: Partial<any> = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.knowledgeArea !== undefined)
+      payload.knowledgeArea = data.knowledgeArea;
+    if (data.vacancies !== undefined) payload.vacancies = data.vacancies;
+    if (data.periodQuantities !== undefined)
+      payload.periodQuantities = data.periodQuantities;
+    if (data.openingYear !== undefined) payload.openingYear = data.openingYear;
+
+    await this.courseRepository.update(id, payload);
   }
 }
