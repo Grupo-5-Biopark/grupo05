@@ -2,18 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CourseRepository } from '../../../courses/infrastructure/repositories/course.repository';
 import { ClassRepository } from '../../../classes/infrastructure/repositories/class.repository';
 import { CalculationParametersRepository } from '../../../calculation-parameters/infrastructure/repositories/calculation-parameters.repository';
+import { ClassProjectionService } from '../services/ClassProjectionService';
 
 @Injectable()
 export class CalculateRoomRequirementsUseCase {
   constructor(
     private readonly courseRepository: CourseRepository,
     private readonly calculationParametersRepository: CalculationParametersRepository,
+    private readonly classProjectionService: ClassProjectionService,
     private readonly classRepository?: ClassRepository,
   ) {}
 
   async execute(requestedYear?: number) {
     const courses = await this.courseRepository.findAll();
     const paramsList = await this.calculationParametersRepository.findAll();
+
     if (!paramsList || paramsList.length === 0)
       throw new NotFoundException('Calculation parameters not found');
 
@@ -24,76 +27,72 @@ export class CalculateRoomRequirementsUseCase {
     const medCap = params.studentsPerMediumRoom;
     const bigCap = params.studentsPerBigRoom;
 
+    const realClasses = this.classRepository
+      ? await this.classRepository.findAll()
+      : [];
+
+    let allClasses = [...realClasses];
+
+    // 1. Aplica a projeção se houver ano solicitado
+    if (requestedYear) {
+      const projectedClasses =
+        await this.classProjectionService.projectMissingClasses(
+          requestedYear,
+          courses,
+          realClasses,
+        );
+
+      // Une turmas reais com virtuais
+      allClasses = [...realClasses, ...projectedClasses] as any;
+    }
+
+    // 2. Inicializa contadores
     let totalSmall = 0;
     let totalMedium = 0;
     let totalBig = 0;
 
     const exceededLimits: Array<{
-      type: 'Course' | 'Class';
+      type: 'Class'; // Removi 'Course' já que tudo agora é tratado como turma
       name: string;
       studentCount: number;
       maxLimit: number;
+      isProjected?: boolean;
     }> = [];
 
-    const coursesSummary = courses.map((c) => {
-      const expected = c.vacancies ?? 0;
-      const afterDropout = Math.ceil(expected * (1 - dropout / 100));
-
-      let sizeCode: 'P' | 'M' | 'G' | 'EXCEDIDO' | null = null;
-
-      if (afterDropout > 0) {
-        if (afterDropout > bigCap) {
-          sizeCode = 'EXCEDIDO';
-          exceededLimits.push({
-            type: 'Course',
-            name: c.name,
-            studentCount: afterDropout,
-            maxLimit: bigCap,
-          });
-        } else if (afterDropout > medCap) {
-          sizeCode = 'G';
-          totalBig++;
-        } else if (afterDropout > smallCap) {
-          sizeCode = 'M';
-          totalMedium++;
-        } else {
-          sizeCode = 'P';
-          totalSmall++;
-        }
-      }
-
-      return {
-        courseName: c.name,
-        studentCount: afterDropout,
-        roomSize: sizeCode,
-      };
-    });
-
-    const classes = this.classRepository
-      ? await this.classRepository.findAll()
-      : [];
-
-    const classesFiltered = classes.filter((cls) => {
+    // 3. Filtra turmas ativas no ano solicitado
+    const classesFiltered = allClasses.filter((cls) => {
       if (!requestedYear) return true;
+
       const course = cls.course;
       if (!course || course.periodQuantities == null) return true;
 
       const periods = Number(course.periodQuantities) || 0;
       const durationYears = Math.ceil(periods / 2);
+
       const startYear = Number(cls.year) || 0;
       const lastActiveYear = startYear + Math.max(1, durationYears) - 1;
 
       return requestedYear >= startYear && requestedYear <= lastActiveYear;
     });
 
+    // 4. Processa APENAS as turmas (Reais + Projetadas)
     const classesSummary = classesFiltered.map((cls) => {
-      const expected = cls.currentStudents ?? 0;
+      // Se for projetada, usa vacancies do curso. Se real, usa currentStudents.
+      const expected = (cls as any).isAssumed
+        ? (cls.course?.vacancies ?? 0)
+        : (cls.currentStudents ?? 0);
+
       const afterDropout = Math.ceil(expected * (1 - dropout / 100));
 
       let sizeCode: 'P' | 'M' | 'G' | 'EXCEDIDO' | null = null;
-      const identifier = cls.course?.name
+
+      let identifier = cls.course?.name
         ? `${cls.course.name} (Turma ${cls.id})`
         : `Turma ${cls.id}`;
+
+      if ((cls as any).isAssumed) {
+        identifier += ' [PROJEÇÃO]';
+      }
 
       if (afterDropout > 0) {
         if (afterDropout > bigCap) {
@@ -103,6 +102,7 @@ export class CalculateRoomRequirementsUseCase {
             name: identifier,
             studentCount: afterDropout,
             maxLimit: bigCap,
+            isProjected: (cls as any).isAssumed,
           });
         } else if (afterDropout > medCap) {
           sizeCode = 'G';
@@ -121,6 +121,8 @@ export class CalculateRoomRequirementsUseCase {
         courseName: cls.course?.name ?? null,
         studentCount: afterDropout,
         roomSize: sizeCode,
+        isAssumed: (cls as any).isAssumed || false,
+        startYear: cls.year,
       };
     });
 
@@ -132,8 +134,13 @@ export class CalculateRoomRequirementsUseCase {
         big: totalBig,
       },
       details: {
-        courses: coursesSummary,
+        // Removida a propriedade 'courses', retornando apenas as turmas processadas
         classes: classesSummary,
+      },
+      metadata: {
+        requestedYear,
+        isProjection: requestedYear > new Date().getFullYear(),
+        simulatedClassesCount: allClasses.length - realClasses.length,
       },
     };
   }

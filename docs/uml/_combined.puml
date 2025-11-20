@@ -1,6 +1,6 @@
 @startuml
 ' Combined Domain Model
-' Generated: 2025-11-20T18:19:43.381Z
+' Generated: 2025-11-20T19:47:38.929Z
 ' Modules: calculation-parameters, classes, courses, rooms, shifts, users
 
 
@@ -35,6 +35,7 @@ class Class {
     +year: number
     +semester: number
     +currentStudents: number
+    +isAssumed?: boolean
 }
 class Rooms {
     +id: number

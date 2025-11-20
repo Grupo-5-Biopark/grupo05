@@ -35,4 +35,7 @@ export class Class {
 
   @Column()
   currentStudents: number;
+
+  @Column({ type: 'boolean', nullable: true, default: false })
+  isAssumed?: boolean;
 }

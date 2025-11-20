@@ -23,6 +23,7 @@ class Class {
     +year: number
     +semester: number
     +currentStudents: number
+    +isAssumed?: boolean
 }
 
 ' Relationships

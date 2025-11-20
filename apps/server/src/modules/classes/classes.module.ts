@@ -20,6 +20,6 @@ import { DeleteClassUseCase } from './application/use-cases/delete-class.usecase
     UpdateClassUseCase,
     DeleteClassUseCase,
   ],
-  exports: [ClassRepository, FindClassByIdUseCase],
+  exports: [ClassRepository, FindClassByIdUseCase, CreateClassUseCase],
 })
 export class ClassesModule {}
