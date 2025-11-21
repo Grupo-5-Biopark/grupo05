@@ -588,7 +588,7 @@ export default function UsersPage() {
                     className="btn btn-danger"
                     onClick={() => void performDeleteUser()}
                   >
-                    Deletar
+                    Excluir
                   </button>
                 </div>
               </div>
