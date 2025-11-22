@@ -139,6 +139,29 @@ export default function UsersPage() {
     }));
   };
 
+  const translateErrorMessage = (message: string): string => {
+    const lowerMessage = message.toLowerCase();
+
+    if (
+      lowerMessage.includes('email') &&
+      (lowerMessage.includes('invalid') || lowerMessage.includes('format'))
+    ) {
+      return 'Formato de email inválido';
+    }
+    if (lowerMessage.includes('email') && lowerMessage.includes('exist')) {
+      return 'Email já cadastrado';
+    }
+
+    if (
+      lowerMessage.includes('password') &&
+      (lowerMessage.includes('short') || lowerMessage.includes('length'))
+    ) {
+      return 'Senha muito curta';
+    }
+
+    return message;
+  };
+
   const handleSaveUser = async () => {
     if (!formData.name || !formData.email) {
       showToast('error', 'Por favor, preencha todos os campos obrigatórios.');
@@ -149,8 +172,6 @@ export default function UsersPage() {
       showToast('error', 'Por favor, informe uma senha.');
       return;
     }
-
-    const isEditing = editingUserId !== null;
 
     try {
       const userData: any = {
@@ -164,36 +185,39 @@ export default function UsersPage() {
         userData.password = formData.password;
       }
 
-      if (isEditing) {
+      if (editingUserId !== null) {
         await put(`/api/users/${editingUserId}`, userData);
+        showToast('success', 'Usuário atualizado com sucesso!');
       } else {
         await post('/api/users', userData);
+        showToast('success', 'Usuário criado com sucesso!');
       }
-    } catch (err) {
-      console.error('Erro na requisição:', err);
-    }
 
-    setShowNewUserModal(false);
-    setEditingUserId(null);
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      role: 'USER',
-      phone: '',
-    });
-
-    try {
+      setShowNewUserModal(false);
+      setEditingUserId(null);
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'USER',
+        phone: '',
+      });
       await loadUsers();
-      showToast(
-        'success',
-        isEditing
-          ? 'Usuário atualizado com sucesso!'
-          : 'Usuário criado com sucesso!',
-      );
-    } catch (err) {
-      console.error('Erro ao recarregar usuários:', err);
-      showToast('error', 'Erro ao atualizar a lista. Recarregue a página.');
+    } catch (err: any) {
+      console.error('Erro ao salvar usuário:', err);
+      let serverMessage = 'Erro ao salvar usuário. Tente novamente.';
+      if (err instanceof Error)
+        serverMessage = translateErrorMessage(err.message);
+      else if (err && typeof err === 'object') {
+        const anyErr = err;
+        if (anyErr.response?.data?.message)
+          serverMessage = translateErrorMessage(anyErr.response.data.message);
+        else if (anyErr.response?.data?.error)
+          serverMessage = translateErrorMessage(anyErr.response.data.error);
+        else if (anyErr.response?.data)
+          serverMessage = translateErrorMessage(anyErr.response.data);
+      }
+      showToast('error', serverMessage);
     }
   };
 
@@ -368,7 +392,7 @@ export default function UsersPage() {
               </select>
             </div>
             <button className="btn-new-user" onClick={handleNewUser}>
-              <span className="btn-plus">+</span> Novo Usuário
+              + NOVO USUÁRIO
             </button>
           </div>
 
