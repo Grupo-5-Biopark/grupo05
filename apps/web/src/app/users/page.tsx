@@ -1,4 +1,3 @@
-// components/ui/UsersPage.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -63,7 +62,6 @@ export default function UsersPage() {
     phone: '',
   });
 
-  // Toast state
   const [toast, setToast] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -142,16 +140,20 @@ export default function UsersPage() {
   const translateErrorMessage = (message: string): string => {
     const lowerMessage = message.toLowerCase();
 
-    if (
-      lowerMessage.includes('email') &&
-      (lowerMessage.includes('invalid') || lowerMessage.includes('format'))
-    ) {
+    if (lowerMessage.includes('email') && lowerMessage.includes('valid')) {
       return 'Formato de email inválido';
     }
     if (lowerMessage.includes('email') && lowerMessage.includes('exist')) {
       return 'Email já cadastrado';
     }
-
+    // Erro de senha curta - verifica se contém "password" e "at least"
+    if (
+      lowerMessage.includes('password') &&
+      lowerMessage.includes('at least')
+    ) {
+      return 'Senha muito curta (mínimo 6 caracteres)';
+    }
+    // Erro de senha curta alternativo
     if (
       lowerMessage.includes('password') &&
       (lowerMessage.includes('short') || lowerMessage.includes('length'))
