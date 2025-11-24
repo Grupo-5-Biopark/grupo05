@@ -1,4 +1,4 @@
-import { IsNumber, Min, Max, IsString } from 'class-validator';
+import { IsNumber, Min, Max, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRoomsDto {
@@ -15,4 +15,9 @@ export class CreateRoomsDto {
   @ApiProperty({ example: 'G' })
   @IsString({ message: 'must be a text' })
   size: string;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsNumber({}, { message: 'must be a number' })
+  @IsOptional()
+  classId?: number;
 }
