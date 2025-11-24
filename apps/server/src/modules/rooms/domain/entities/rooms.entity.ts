@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Class } from '../../../classes/domain/entities/class.entity';
 
 @Entity('rooms')
 export class Rooms {
@@ -13,4 +20,11 @@ export class Rooms {
 
   @Column()
   size: string;
+
+  @Column({ nullable: true })
+  classId: number;
+
+  @ManyToOne(() => Class, { nullable: true })
+  @JoinColumn({ name: 'classId' })
+  class: Class;
 }
