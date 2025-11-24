@@ -1,8 +1,39 @@
 @startuml
+class Course {
+    +id: number
+    +name: string
+    +knowledgeArea: string
+    +vacancies: number
+    +periodQuantities: number
+    +openingYear: number
+    +numberOfSemesters: number
+    +classes: Class[]
+}
+class Shift {
+    +id: number
+    +name: string
+    +classes: Class[]
+}
+class Class {
+    +id: number
+    +courseId: number
+    +course: Course
+    +shiftId: number
+    +shift: Shift
+    +year: number
+    +semester: number
+    +currentStudents: number
+    +isAssumed?: boolean
+}
 class Rooms {
     +id: number
     +block: string
     +number: number
     +size: string
+    +classId: number
+    +class: Class
 }
+
+' Relationships
+Rooms "*" }o-- "1" Class
 @enduml
