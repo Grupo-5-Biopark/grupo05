@@ -1,16 +1,4 @@
 @startuml
-' Combined Domain Model
-' Generated: 2025-11-24T16:06:49.369Z
-' Modules: calculation-parameters, classes, courses, rooms, shifts, users
-
-
-class CalculationParameters {
-    +id: number
-    +dropoutPercentage: number
-    +studentsPerSmallRoom: number
-    +studentsPerMediumRoom: number
-    +studentsPerBigRoom: number
-}
 class Course {
     +id: number
     +name: string
@@ -43,20 +31,7 @@ class Rooms {
     +classId: number
     +class: Class
 }
-class User {
-    +id: number
-    +name: string
-    +email: string
-    -password: string
-    +role: string
-    +phone: string
-    +createdAt: Date
-    +setPassword(hashedPassword: string): void
-    +getPassword(): string
-}
 
 ' Relationships
-Class "*" }o-- "1" Course
-Class "*" }o-- "1" Shift
 Rooms "*" }o-- "1" Class
 @enduml

@@ -14,4 +14,9 @@ export class UpdateRoomsDto {
   @ApiPropertyOptional({ example: 'G' })
   @IsString({ message: 'must be a text' })
   size: string;
+
+  @ApiPropertyOptional({ example: 1 })
+  @IsNumber({}, { message: 'must be a number' })
+  @IsOptional()
+  classId?: number;
 }
