@@ -301,12 +301,6 @@ function CoursesDataPanel() {
             </tbody>
           </table>
         )}
-
-        {filteredCourses.length === 0 && courses.length > 0 && (
-          <div className="no-results">
-            Nenhum curso encontrado com os filtros aplicados
-          </div>
-        )}
       </div>
 
       {/* Modal Novo/Editar Curso */}
@@ -451,7 +445,7 @@ function CoursesDataPanel() {
                 className="btn btn-danger"
                 onClick={() => void performDeleteCourse()}
               >
-                Deletar
+                Excluir
               </button>
             </div>
           </div>
