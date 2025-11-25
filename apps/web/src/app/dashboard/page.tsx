@@ -116,11 +116,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção será desenvolvida para controlar a quantidade e tamanho
-              das salas baseado na quantidade de alunos.
-            </p>
+            <h3>🔗 Abrindo página de Salas...</h3>
           </div>
         </div>
 
