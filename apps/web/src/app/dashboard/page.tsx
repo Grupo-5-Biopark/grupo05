@@ -116,11 +116,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção será desenvolvida para controlar a quantidade e tamanho
-              das salas baseado na quantidade de alunos.
-            </p>
+            <h3>🔗 Abrindo página de Salas...</h3>
           </div>
         </div>
 
@@ -134,11 +130,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção permitirá configurar valores de cálculo como taxa de
-              evasão, capacidade das salas, etc.
-            </p>
+            <h3>🔗 Abrindo página de Configurações...</h3>
           </div>
         </div>
 
@@ -150,11 +142,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção gerará relatórios de quantidade de salas por tamanho e
-              previsões semestrais.
-            </p>
+            <h3>🔗 Abrindo página de Relatórios...</h3>
           </div>
         </div>
 
