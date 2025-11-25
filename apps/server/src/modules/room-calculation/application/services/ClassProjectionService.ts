@@ -33,17 +33,16 @@ export class ClassProjectionService {
       for (const course of courses) {
         const createDto: CreateClassDto = {
           courseId: course.id,
-
           shiftId: course.shiftId ?? 1,
           year: currentYearCheck,
-
           semester: course.semester ?? 1,
-          currentStudents: course.vacancies ?? 0,
+          currentStudents: course.vacancies ?? 0, // Note que você já passou o valor aqui
           isAssumed: true,
         };
 
         try {
           const created = await this.createClassUseCase.execute(createDto);
+          (created as any).course = course;
           createdClasses.push(created);
         } catch (err) {
           this.logger.error(

@@ -82,8 +82,20 @@ export class CalculateRoomRequirementsUseCase {
         ? (cls.course?.vacancies ?? 0)
         : (cls.currentStudents ?? 0);
 
-      const afterDropout = Math.ceil(expected * (1 - dropout / 100));
+      let afterDropout = expected;
+      let currentSemester = cls.semester;
 
+      if (requestedYear && cls.year) {
+        const yearsPassed = requestedYear - cls.year;
+        if (yearsPassed > 0) {
+          const semestersPassed = yearsPassed * 2;
+          for (let i = 0; i < semestersPassed; i++) {
+            afterDropout *= 1 - dropout / 100;
+          }
+          currentSemester += semestersPassed;
+        }
+      }
+      afterDropout = Math.ceil(afterDropout);
       let sizeCode: 'P' | 'M' | 'G' | 'EXCEDIDO' | null = null;
 
       let identifier = cls.course?.name
@@ -123,6 +135,7 @@ export class CalculateRoomRequirementsUseCase {
         roomSize: sizeCode,
         isAssumed: (cls as any).isAssumed || false,
         startYear: cls.year,
+        semester: currentSemester,
       };
     });
 
