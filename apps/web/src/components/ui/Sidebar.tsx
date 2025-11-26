@@ -62,6 +62,13 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       route: '/users',
       adminOnly: true,
     },
+    {
+      id: 'turmas',
+      label: 'Turmas',
+      icon: '🏫',
+      route: '/classes',
+      adminOnly: false,
+    },
   ];
 
   // Filtrar itens baseado no papel do usuário
