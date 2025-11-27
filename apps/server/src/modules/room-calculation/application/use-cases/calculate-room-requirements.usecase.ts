@@ -13,7 +13,7 @@ export class CalculateRoomRequirementsUseCase {
     private readonly classRepository?: ClassRepository,
   ) {}
 
-  async execute(requestedYear?: number) {
+  async execute(requestedYear?: number, requestedSemester?: number) {
     const courses = await this.courseRepository.findAll();
     const paramsList = await this.calculationParametersRepository.findAll();
 
@@ -72,7 +72,26 @@ export class CalculateRoomRequirementsUseCase {
       const startYear = Number(cls.year) || 0;
       const lastActiveYear = startYear + Math.max(1, durationYears) - 1;
 
-      return requestedYear >= startYear && requestedYear <= lastActiveYear;
+      // Filtra por ano
+      const isInYearRange =
+        requestedYear >= startYear && requestedYear <= lastActiveYear;
+
+      // Se não especificou semestre, retorna apenas baseado no ano
+      if (!requestedSemester) return isInYearRange;
+
+      // Se especificou semestre, filtra também por semestre
+      if (!isInYearRange) return false;
+
+      // Calcula o "semestre acadêmico" da turma no ano/semestre solicitado
+      const academicSemester =
+        (requestedYear - startYear) * 2 +
+        (requestedSemester - cls.semester) +
+        1;
+
+      // A turma está ativa se o semestre acadêmico for positivo e não exceder a duração do curso
+      const isActive = academicSemester > 0 && academicSemester <= periods;
+
+      return isActive;
     });
 
     // 4. Processa APENAS as turmas (Reais + Projetadas)
@@ -85,14 +104,16 @@ export class CalculateRoomRequirementsUseCase {
       let afterDropout = expected;
       let currentSemester = cls.semester;
 
-      if (requestedYear && cls.year) {
-        const yearsPassed = requestedYear - cls.year;
-        if (yearsPassed > 0) {
-          const semestersPassed = yearsPassed * 2;
-          for (let i = 0; i < semestersPassed; i++) {
-            afterDropout *= 1 - dropout / 100;
-          }
-          currentSemester += semestersPassed;
+      if (requestedYear && cls.year && requestedSemester) {
+        const academicSemester =
+          (requestedYear - cls.year) * 2 +
+          (requestedSemester - cls.semester) +
+          1;
+        currentSemester = academicSemester;
+
+        const semestersPassed = academicSemester > 0 ? academicSemester - 1 : 0;
+        for (let i = 0; i < semestersPassed; i++) {
+          afterDropout *= 1 - dropout / 100;
         }
       }
       afterDropout = Math.ceil(afterDropout);
@@ -152,6 +173,7 @@ export class CalculateRoomRequirementsUseCase {
       },
       metadata: {
         requestedYear,
+        requestedSemester,
         isProjection: requestedYear > new Date().getFullYear(),
         simulatedClassesCount: allClasses.length - realClasses.length,
       },
