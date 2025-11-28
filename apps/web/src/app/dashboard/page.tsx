@@ -102,11 +102,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção será desenvolvida para gerenciar cursos, turmas e
-              cálculos de evasão.
-            </p>
+            <h3>🔗 Abrindo página de Cursos...</h3>
           </div>
         </div>
 
@@ -120,11 +116,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção será desenvolvida para controlar a quantidade e tamanho
-              das salas baseado na quantidade de alunos.
-            </p>
+            <h3>🔗 Abrindo página de Salas...</h3>
           </div>
         </div>
 
@@ -138,11 +130,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção permitirá configurar valores de cálculo como taxa de
-              evasão, capacidade das salas, etc.
-            </p>
+            <h3>🔗 Abrindo página de Configurações...</h3>
           </div>
         </div>
 
@@ -154,11 +142,19 @@ export default function DashboardPage() {
           </div>
 
           <div className="content-placeholder">
-            <h3>🚧 Em Desenvolvimento</h3>
-            <p>
-              Esta seção gerará relatórios de quantidade de salas por tamanho e
-              previsões semestrais.
-            </p>
+            <h3>🔗 Abrindo página de Relatórios...</h3>
+          </div>
+        </div>
+
+        {/* USUÁRIOS PAGE */}
+        <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
+          <div className="page-header">
+            <h1 className="page-title">Gerenciamento de Usuários</h1>
+            <p className="page-subtitle">Abra a página completa de usuários</p>
+          </div>
+
+          <div className="content-placeholder">
+            <h3>🔗 Abrindo página de Usuários...</h3>
           </div>
         </div>
       </main>

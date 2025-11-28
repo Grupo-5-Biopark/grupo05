@@ -43,9 +43,9 @@ export class CourseController {
       id: course.id,
       name: course.name,
       knowledgeArea: course.knowledgeArea,
-      announcement: course.announcement,
-      status: course.status,
-      expectedStudents: course.expectedStudents,
+      vacancies: course.vacancies,
+      periodQuantities: course.periodQuantities,
+      openingYear: course.openingYear,
     };
   }
 
@@ -57,9 +57,9 @@ export class CourseController {
       id: course.id,
       name: course.name,
       knowledgeArea: course.knowledgeArea,
-      announcement: course.announcement,
-      status: course.status,
-      expectedStudents: course.expectedStudents,
+      vacancies: course.vacancies,
+      periodQuantities: course.periodQuantities,
+      openingYear: course.openingYear,
     }));
   }
 
@@ -73,9 +73,9 @@ export class CourseController {
       id: course.id,
       name: course.name,
       knowledgeArea: course.knowledgeArea,
-      announcement: course.announcement,
-      status: course.status,
-      expectedStudents: course.expectedStudents,
+      vacancies: course.vacancies,
+      periodQuantities: course.periodQuantities,
+      openingYear: course.openingYear,
     };
   }
 

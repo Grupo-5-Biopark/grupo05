@@ -12,4 +12,7 @@ export class RoomsResponseDto {
 
   @ApiProperty({ example: 'G' })
   size: string;
+
+  @ApiProperty({ example: 1, required: false })
+  classId?: number;
 }

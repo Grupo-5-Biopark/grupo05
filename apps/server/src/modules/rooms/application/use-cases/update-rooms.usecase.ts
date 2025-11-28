@@ -13,6 +13,8 @@ export class UpdateRoomsUseCase {
       throw new RoomsNotFoundException(id);
     }
 
-    await this.roomsRepository.update(id, data);
+    // Allow updating classId when provided
+    const updateData: Partial<typeof existingRooms> = { ...data };
+    await this.roomsRepository.update(id, updateData);
   }
 }

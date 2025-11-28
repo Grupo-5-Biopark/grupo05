@@ -23,8 +23,15 @@ class Class {
     +semester: number
     +currentStudents: number
 }
+class Rooms {
+    +id: number
+    +block: string
+    +number: number
+    +size: string
+    +classId: number
+    +class: Class
+}
 
 ' Relationships
-Class "*" }o-- "1" Course
-Class "*" }o-- "1" Shift
+Rooms "*" }o-- "1" Class
 @enduml
