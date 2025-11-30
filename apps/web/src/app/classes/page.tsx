@@ -57,7 +57,6 @@ export default function ClassesPage() {
   };
 
   useEffect(() => {
-    if (!user) router.push('/login');
     void loadClasses();
     void loadCourses();
   }, [user]);
@@ -185,7 +184,7 @@ export default function ClassesPage() {
   return (
     <div className="user-layout">
       <Header user={user} onLogout={handleLogout} />
-      <Sidebar currentPage="classes" onPageChange={() => {}} />
+      <Sidebar currentPage="turmas" onPageChange={() => {}} />
       <main className="main-content">
         <div className="users-page">
           <div className="users-header">
