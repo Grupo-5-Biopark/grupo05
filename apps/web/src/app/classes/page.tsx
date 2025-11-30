@@ -6,7 +6,7 @@ import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/ui/Header';
 import Sidebar from '@/components/ui/Sidebar';
-import './classes.css'; // Usa estilos que devem ser definidos em users.css/classes.css
+import './classes.css';
 
 interface Course {
   id: number;
@@ -24,7 +24,16 @@ interface ClassItem {
 export default function ClassesPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const api = useApi();
+
+  // ⬅️ ALTERAÇÃO PRINCIPAL: Desestruturando o useApi e forçando o baseURL
+  const {
+    get,
+    post,
+    put,
+    delete: del,
+  } = useApi({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  });
 
   const handleLogout = () => {
     logout();
@@ -33,7 +42,7 @@ export default function ClassesPage() {
 
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredClasses, setFilteredClasses] = useState<ClassItem[]>([]); // NOVO: Estado para a lista filtrada
+  const [filteredClasses, setFilteredClasses] = useState<ClassItem[]>([]);
 
   const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,52 +51,50 @@ export default function ClassesPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const [toast, setToast] = useState<{
-    // NOVO: Estado de Toast (como UsersPage)
     type: 'success' | 'error';
     message: string;
   } | null>(null);
 
   const showToast = (type: 'success' | 'error', message: string) => {
-    // NOVO: Função para mostrar Toast
     setToast({ type, message });
     window.setTimeout(() => setToast(null), 4000);
   };
 
   useEffect(() => {
     if (!user) router.push('/login');
-    void loadClasses(); // Usando void para async call no useEffect
+    void loadClasses();
     void loadCourses();
   }, [user]);
 
-  // NOVO: useEffect para filtragem (como UsersPage)
   useEffect(() => {
     filterClasses();
   }, [classes, searchTerm]);
 
-  const loadClasses = async () => {
+  async function loadClasses() {
     try {
-      const response = await api.get('/classes');
+      // ⬅️ ALTERADO: api.get para get
+      const response = await get('/api/classes');
       if (response && (response as any).success) {
         setClasses((response as any).data);
       }
     } catch (error) {
       console.error('Erro ao carregar turmas:', error);
-      showToast('error', 'Erro ao carregar lista de turmas.');
+      showToast('error', 'Erro ao carregar lista de turmas. (Verifique a API)');
     }
-  };
+  }
 
-  const loadCourses = async () => {
+  async function loadCourses() {
     try {
-      const response = await api.get('/courses');
+      // ⬅️ ALTERADO: api.get para get
+      const response = await get('/api/courses');
       if (response && (response as any).success) {
         setCourses((response as any).data);
       }
     } catch (error) {
       console.error('Erro ao carregar cursos:', error);
     }
-  };
+  }
 
-  // NOVO: Função de filtragem
   const filterClasses = () => {
     let filtered = classes;
 
@@ -105,7 +112,7 @@ export default function ClassesPage() {
     setSelectedClass(
       classItem ?? {
         id: 0,
-        courseId: courses.length > 0 ? courses[0].id : 0, // Pre-seleciona o primeiro curso se houver
+        courseId: courses.length > 0 ? courses[0].id : 0,
         year: new Date().getFullYear(),
         semester: 1,
         currentStudents: 0,
@@ -145,12 +152,14 @@ export default function ClassesPage() {
     try {
       let response;
       if (selectedClass.id === 0) {
-        response = await api.post('/classes', payload);
+        // ⬅️ ALTERADO: api.post para post
+        response = await post('/api/classes', payload);
         if (response && response.success) {
           showToast('success', 'Turma criada com sucesso!');
         }
       } else {
-        response = await api.put(`/classes/${selectedClass.id}`, payload);
+        // ⬅️ ALTERADO: api.put para put
+        response = await put(`/api/classes/${selectedClass.id}`, payload);
         if (response && response.success) {
           showToast('success', 'Turma atualizada com sucesso!');
         }
@@ -170,7 +179,8 @@ export default function ClassesPage() {
     if (!selectedClass) return;
 
     try {
-      const response = await api.delete(`/classes/${selectedClass.id}`);
+      // ⬅️ ALTERADO: api.delete para del
+      const response = await del(`/api/classes/${selectedClass.id}`);
 
       if (response && (response as any).success) {
         showToast('success', 'Turma excluída com sucesso!');
@@ -183,7 +193,6 @@ export default function ClassesPage() {
     }
   };
 
-  // Função auxiliar para obter o nome do curso
   const getCourseName = (courseId: number) => {
     return courses.find((x) => x.id === courseId)?.name || 'Curso Desconhecido';
   };
@@ -195,11 +204,9 @@ export default function ClassesPage() {
       <main className="main-content">
         <div className="users-page">
           <div className="users-header">
-            {' '}
-            {/* Adicionado para seguir o padrão da UsersPage */}
             <h1>Gerenciamento de Turmas</h1>
             <p className="subtitle">
-              Cadastro, edição e visualização de turmas por curso.
+              Edição e visualização de turmas por curso.
             </p>
           </div>
 
@@ -214,15 +221,11 @@ export default function ClassesPage() {
                 className="search-input"
               />
             </div>
-            <button className="btn-new-user" onClick={() => openModal()}>
-              + NOVA TURMA
-            </button>
           </div>
 
           <div className="users-table-container">
-            {' '}
-            {/* Adicionado container da UsersPage */}
             <h2 className="table-title">Lista de Turmas</h2>
+
             {classes.length === 0 ? (
               <div className="no-results">Nenhuma turma cadastrada.</div>
             ) : filteredClasses.length === 0 ? (
@@ -241,48 +244,38 @@ export default function ClassesPage() {
                 </thead>
 
                 <tbody>
-                  {filteredClasses.map(
-                    (
-                      c, // CORRIGIDO: Usando filteredClasses
-                    ) => (
-                      <tr key={c.id}>
-                        <td>{getCourseName(c.courseId)}</td>{' '}
-                        {/* Usa função auxiliar */}
-                        <td>{c.year}</td>
-                        <td>{c.currentStudents}</td>
-                        <td>
-                          <div className="actions-cell">
-                            <button
-                              className="btn-edit" // CORRIGIDO: Usando classe da UsersPage
-                              onClick={() => openModal(c)}
-                            >
-                              EDITAR
-                            </button>
-                            <button
-                              className="btn-delete" // CORRIGIDO: Usando classe da UsersPage
-                              onClick={() => openDeleteModal(c)}
-                            >
-                              EXCLUIR
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ),
-                  )}
+                  {filteredClasses.map((c) => (
+                    <tr key={c.id}>
+                      <td>{getCourseName(c.courseId)}</td>
+                      <td>{c.year}</td>
+                      <td>{c.currentStudents}</td>
+                      <td>
+                        <div className="actions-cell">
+                          <button
+                            className="btn-edit"
+                            onClick={() => openModal(c)}
+                          >
+                            EDITAR
+                          </button>
+                          <button
+                            className="btn-delete"
+                            onClick={() => openDeleteModal(c)}
+                          >
+                            EXCLUIR
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             )}
           </div>
 
-          {/* Modal Novo/Editar Turma */}
           {isModalOpen && selectedClass && (
             <div className="modal active">
-              {' '}
-              {/* Usando 'modal active' para o CSS */}
               <div className="modal-content">
                 <div className="modal-header">
-                  {' '}
-                  {/* Adicionado header do modal */}
                   <h3 className="modal-title">
                     {selectedClass.id === 0
                       ? '➕ Nova Turma'
@@ -294,11 +287,7 @@ export default function ClassesPage() {
                 </div>
 
                 <div className="form-grid">
-                  {' '}
-                  {/* Usando form-grid */}
                   <div className="form-group">
-                    {' '}
-                    {/* Usando form-group */}
                     <label>Curso:</label>
                     <select
                       value={selectedClass.courseId}
@@ -317,6 +306,7 @@ export default function ClassesPage() {
                       ))}
                     </select>
                   </div>
+
                   <div className="form-group">
                     <label>Ano:</label>
                     <input
@@ -330,21 +320,7 @@ export default function ClassesPage() {
                       }
                     />
                   </div>
-                  <div className="form-group">
-                    <label>Semestre:</label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={2}
-                      value={selectedClass.semester}
-                      onChange={(e) =>
-                        setSelectedClass({
-                          ...selectedClass,
-                          semester: Number(e.target.value),
-                        })
-                      }
-                    />
-                  </div>
+
                   <div className="form-group">
                     <label>Alunos atuais:</label>
                     <input
@@ -362,7 +338,7 @@ export default function ClassesPage() {
 
                 <div className="modal-actions">
                   <button className="btn btn-secondary" onClick={closeModal}>
-                    Cancelar
+                    ✕ Cancelar
                   </button>
                   <button
                     className="btn btn-primary"
@@ -375,11 +351,8 @@ export default function ClassesPage() {
             </div>
           )}
 
-          {/* Modal de Confirmação de Exclusão */}
           {isDeleteModalOpen && selectedClass && (
             <div className="modal active">
-              {' '}
-              {/* Usando 'modal active' para o CSS */}
               <div className="modal-content">
                 <div className="modal-header">
                   <h3 className="modal-title">Confirmar exclusão</h3>
@@ -414,7 +387,6 @@ export default function ClassesPage() {
             </div>
           )}
 
-          {/* Toast container (como UsersPage) */}
           {toast && (
             <div className={`toast ${toast.type}`} role="status">
               <div className="toast-icon">
