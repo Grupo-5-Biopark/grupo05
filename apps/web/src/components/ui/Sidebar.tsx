@@ -42,11 +42,11 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       adminOnly: false,
     },
     {
-      id: 'configuracoes',
-      label: 'Configurações',
-      icon: '⚙️',
-      route: '/settings',
-      adminOnly: false,
+      id: 'usuarios',
+      label: 'Usuários',
+      icon: '👥',
+      route: '/users',
+      adminOnly: true,
     },
     {
       id: 'relatorios',
@@ -56,11 +56,18 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       adminOnly: false,
     },
     {
-      id: 'usuarios',
-      label: 'Usuários',
-      icon: '👥',
-      route: '/users',
-      adminOnly: true,
+      id: 'configuracoes',
+      label: 'Configurações',
+      icon: '⚙️',
+      route: '/settings',
+      adminOnly: false,
+    },
+    {
+      id: 'turmas',
+      label: 'Turmas',
+      icon: '🏫',
+      route: '/classes',
+      adminOnly: false,
     },
   ];
 
