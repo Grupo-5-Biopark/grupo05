@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,7 +25,6 @@ export default function ClassesPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  // ⬅️ ALTERAÇÃO PRINCIPAL: Desestruturando o useApi e forçando o baseURL
   const {
     get,
     post,
@@ -42,14 +41,11 @@ export default function ClassesPage() {
 
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredClasses, setFilteredClasses] = useState<ClassItem[]>([]);
 
   const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState('');
-
   const [toast, setToast] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -66,47 +62,45 @@ export default function ClassesPage() {
     void loadCourses();
   }, [user]);
 
-  useEffect(() => {
-    filterClasses();
-  }, [classes, searchTerm]);
-
   async function loadClasses() {
     try {
-      // ⬅️ ALTERADO: api.get para get
       const response = await get('/api/classes');
-      if (response && (response as any).success) {
-        setClasses((response as any).data);
+
+      console.log('Load Classes Response:', response);
+
+      if (response && Array.isArray(response.data)) {
+        setClasses(response.data);
+      } else if (Array.isArray(response)) {
+        setClasses(response);
       }
     } catch (error) {
       console.error('Erro ao carregar turmas:', error);
-      showToast('error', 'Erro ao carregar lista de turmas. (Verifique a API)');
+      showToast('error', 'Erro ao carregar lista de turmas.');
     }
   }
 
   async function loadCourses() {
     try {
-      // ⬅️ ALTERADO: api.get para get
       const response = await get('/api/courses');
-      if (response && (response as any).success) {
-        setCourses((response as any).data);
+
+      if (response && Array.isArray(response.data)) {
+        setCourses(response.data);
+      } else if (Array.isArray(response)) {
+        setCourses(response);
       }
     } catch (error) {
       console.error('Erro ao carregar cursos:', error);
     }
   }
 
-  const filterClasses = () => {
-    let filtered = classes;
+  const filteredClasses = useMemo(() => {
+    if (!searchTerm) return classes;
 
-    if (searchTerm) {
-      filtered = filtered.filter((c) => {
-        const courseName = courses.find((x) => x.id === c.courseId)?.name || '';
-        return courseName.toLowerCase().includes(searchTerm.toLowerCase());
-      });
-    }
-
-    setFilteredClasses(filtered);
-  };
+    return classes.filter((c) => {
+      const courseName = courses.find((x) => x.id === c.courseId)?.name || '';
+      return courseName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [classes, courses, searchTerm]);
 
   const openModal = (classItem: ClassItem | null = null) => {
     setSelectedClass(
@@ -152,37 +146,28 @@ export default function ClassesPage() {
     try {
       let response;
       if (selectedClass.id === 0) {
-        // ⬅️ ALTERADO: api.post para post
         response = await post('/api/classes', payload);
-        if (response && response.success) {
-          showToast('success', 'Turma criada com sucesso!');
-        }
+        if (response) showToast('success', 'Turma criada com sucesso!');
       } else {
-        // ⬅️ ALTERADO: api.put para put
         response = await put(`/api/classes/${selectedClass.id}`, payload);
-        if (response && response.success) {
-          showToast('success', 'Turma atualizada com sucesso!');
-        }
+        if (response) showToast('success', 'Turma atualizada com sucesso!');
       }
 
-      if (response && response.success) {
+      if (response) {
         closeModal();
         await loadClasses();
       }
     } catch (error) {
       console.error('Erro ao salvar turma:', error);
-      showToast('error', 'Erro ao salvar turma. Verifique os dados.');
+      showToast('error', 'Erro ao salvar turma.');
     }
   };
 
   const deleteClass = async () => {
     if (!selectedClass) return;
-
     try {
-      // ⬅️ ALTERADO: api.delete para del
       const response = await del(`/api/classes/${selectedClass.id}`);
-
-      if (response && (response as any).success) {
+      if (response) {
         showToast('success', 'Turma excluída com sucesso!');
         closeDeleteModal();
         await loadClasses();
@@ -226,8 +211,11 @@ export default function ClassesPage() {
           <div className="users-table-container">
             <h2 className="table-title">Lista de Turmas</h2>
 
+            {/* Lógica de exibição ajustada */}
             {classes.length === 0 ? (
-              <div className="no-results">Nenhuma turma cadastrada.</div>
+              <div className="no-results">
+                Nenhuma turma cadastrada (Lista Vazia).
+              </div>
             ) : filteredClasses.length === 0 ? (
               <div className="no-results">
                 Nenhuma turma encontrada com o termo de busca.
@@ -242,7 +230,6 @@ export default function ClassesPage() {
                     <th>AÇÕES</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {filteredClasses.map((c) => (
                     <tr key={c.id}>
@@ -272,9 +259,11 @@ export default function ClassesPage() {
             )}
           </div>
 
+          {/* Modais e Toast permanecem iguais... */}
           {isModalOpen && selectedClass && (
             <div className="modal active">
               <div className="modal-content">
+                {/* Conteúdo do Modal (igual ao anterior) */}
                 <div className="modal-header">
                   <h3 className="modal-title">
                     {selectedClass.id === 0
@@ -285,7 +274,6 @@ export default function ClassesPage() {
                     ✕
                   </button>
                 </div>
-
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Curso:</label>
@@ -306,7 +294,6 @@ export default function ClassesPage() {
                       ))}
                     </select>
                   </div>
-
                   <div className="form-group">
                     <label>Ano:</label>
                     <input
@@ -320,7 +307,6 @@ export default function ClassesPage() {
                       }
                     />
                   </div>
-
                   <div className="form-group">
                     <label>Alunos atuais:</label>
                     <input
@@ -335,7 +321,6 @@ export default function ClassesPage() {
                     />
                   </div>
                 </div>
-
                 <div className="modal-actions">
                   <button className="btn btn-secondary" onClick={closeModal}>
                     ✕ Cancelar
@@ -360,15 +345,12 @@ export default function ClassesPage() {
                     ✕
                   </button>
                 </div>
-
                 <div style={{ padding: '0.5rem 0 1.25rem' }}>
                   <p>
-                    Tem certeza que deseja excluir a turma do curso **
-                    {getCourseName(selectedClass.courseId)}** (
-                    {selectedClass.year}/{selectedClass.semester})?
+                    Tem certeza que deseja excluir a turma do curso{' '}
+                    <strong>{getCourseName(selectedClass.courseId)}</strong>?
                   </p>
                 </div>
-
                 <div className="modal-actions">
                   <button
                     className="btn btn-secondary"
