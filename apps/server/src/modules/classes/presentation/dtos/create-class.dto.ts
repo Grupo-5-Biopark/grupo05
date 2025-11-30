@@ -1,5 +1,12 @@
-import { IsNumber, IsPositive, Min, Max } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNumber,
+  IsPositive,
+  Min,
+  Max,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateClassDto {
   @ApiProperty({ example: 1 })
@@ -27,4 +34,9 @@ export class CreateClassDto {
   @IsNumber({}, { message: 'must be a number' })
   @Min(0, { message: 'must be at least 0' })
   currentStudents: number;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean({ message: 'must be a boolean' })
+  isAssumed?: boolean;
 }

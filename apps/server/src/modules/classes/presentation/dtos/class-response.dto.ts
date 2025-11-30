@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ClassResponseDto {
   @ApiProperty({ example: 1 })
@@ -18,4 +18,7 @@ export class ClassResponseDto {
 
   @ApiProperty({ example: 25 })
   currentStudents: number;
+
+  @ApiPropertyOptional({ example: false })
+  isAssumed?: boolean;
 }
