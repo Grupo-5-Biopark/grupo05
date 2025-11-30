@@ -193,10 +193,16 @@ function RoomsDataPanel() {
       let serverMessage = 'Erro ao salvar sala. Tente novamente.';
       if (err instanceof Error) serverMessage = err.message;
       else if (err && typeof err === 'object') {
-        const anyErr = err as any;
-        if (anyErr.response?.data?.message)
+        const anyErr = err as {
+          response?: { data?: { message?: string } | string };
+        };
+        if (
+          typeof anyErr.response?.data === 'object' &&
+          anyErr.response?.data?.message
+        )
           serverMessage = anyErr.response.data.message;
-        else if (anyErr.response?.data) serverMessage = anyErr.response.data;
+        else if (typeof anyErr.response?.data === 'string')
+          serverMessage = anyErr.response.data;
       }
       showToast('error', serverMessage);
     }

@@ -112,22 +112,22 @@ Este monorepo está organizado da seguinte forma:
 <details>
 <summary>Clique para ver todos os scripts</summary>
 
-| Script               | Descrição                                                              |
-| :------------------- | :--------------------------------------------------------------------- |
-| `npm run dev`        | Inicia o ambiente completo de desenvolvimento com Docker e hot-reload. |
-| `npm run stop`       | Para e remove todos os containers do ambiente de desenvolvimento.      |
-| `npm run dev:server` | Inicia apenas o backend (`server`) e o banco de dados.                 |
-| `npm run dev:web`    | Inicia apenas o frontend (`web`).                                      |
-| `npm run start:prod` | Constrói as imagens de produção e inicia o ambiente.                   |
-| `npm run stop:prod`  | Para e remove todos os containers do ambiente de produção.             |
-| `npm run lint`       | Executa o linter para verificar e corrigir a qualidade do código.      |
-| `npm run format`     | Formata todo o código do projeto com o Prettier.                       |
-| `npm run test`       | Executa todos os testes (unitários e e2e) de todas as aplicações.      |
-| `npm run test:cov`   | Executa todos os testes com relatório de cobertura.                    |
-| `npm run build`      | Executa o build de produção para todas as aplicações.                  |
-| `npm run sonar:start`| Inicia o servidor SonarQube para análise de código (porta 9000).       |
-| `npm run sonar:scan` | Executa testes com cobertura e envia análise para o SonarQube.         |
-| `npm run sonar:stop` | Para o servidor SonarQube.                                              |
+| Script                | Descrição                                                              |
+| :-------------------- | :--------------------------------------------------------------------- |
+| `npm run dev`         | Inicia o ambiente completo de desenvolvimento com Docker e hot-reload. |
+| `npm run stop`        | Para e remove todos os containers do ambiente de desenvolvimento.      |
+| `npm run dev:server`  | Inicia apenas o backend (`server`) e o banco de dados.                 |
+| `npm run dev:web`     | Inicia apenas o frontend (`web`).                                      |
+| `npm run start:prod`  | Constrói as imagens de produção e inicia o ambiente.                   |
+| `npm run stop:prod`   | Para e remove todos os containers do ambiente de produção.             |
+| `npm run lint`        | Executa o linter para verificar e corrigir a qualidade do código.      |
+| `npm run format`      | Formata todo o código do projeto com o Prettier.                       |
+| `npm run test`        | Executa todos os testes (unitários e e2e) de todas as aplicações.      |
+| `npm run test:cov`    | Executa todos os testes com relatório de cobertura.                    |
+| `npm run build`       | Executa o build de produção para todas as aplicações.                  |
+| `npm run sonar:start` | Inicia o servidor SonarQube para análise de código (porta 9000).       |
+| `npm run sonar:scan`  | Executa testes com cobertura e envia análise para o SonarQube.         |
+| `npm run sonar:stop`  | Para o servidor SonarQube.                                             |
 
 </details>
 
@@ -138,9 +138,11 @@ O SonarQube analisa a qualidade do código, cobertura de testes e vulnerabilidad
 #### Primeiro uso:
 
 1. Inicie o servidor SonarQube:
+
    ```bash
    npm run sonar:start
    ```
+
    - Aguarde aproximadamente 90 segundos para inicialização completa
 
 2. Configure o acesso:
@@ -154,6 +156,7 @@ O SonarQube analisa a qualidade do código, cobertura de testes e vulnerabilidad
 ```bash
 npm run sonar:scan
 ```
+
 - Executa todos os testes com cobertura
 - Envia a análise para o SonarQube
 - Visualize os resultados em http://localhost:9000
@@ -163,6 +166,7 @@ npm run sonar:scan
 ```bash
 npm run sonar:stop
 ```
+
 - Para o servidor e libera aproximadamente 2GB de RAM
 
 > **⚠️ Importante:** O SonarQube NÃO inicia automaticamente com `npm run dev` e NÃO roda em produção. Ele só é executado quando você solicita explicitamente através dos comandos acima.
@@ -171,6 +175,6 @@ npm run sonar:stop
 
 ## 📚 Documentação Adicional
 
-* **[Guia de Contribuição](CONTRIBUTING.md)**: Aprenda como contribuir com o projeto, incluindo padrões de commit e fluxo de desenvolvimento.
-* **[Wiki do Projeto](https://github.com/Grupo-5-Biopark/grupo05/wiki)**: Detalhes sobre regras de negócio e arquitetura.
-* **[Documentação da API (Swagger)](http://localhost:3001/api-docs)**: Disponível quando o ambiente de desenvolvimento está em execução.
+- **[Guia de Contribuição](CONTRIBUTING.md)**: Aprenda como contribuir com o projeto, incluindo padrões de commit e fluxo de desenvolvimento.
+- **[Wiki do Projeto](https://github.com/Grupo-5-Biopark/grupo05/wiki)**: Detalhes sobre regras de negócio e arquitetura.
+- **[Documentação da API (Swagger)](http://localhost:3001/api-docs)**: Disponível quando o ambiente de desenvolvimento está em execução.
