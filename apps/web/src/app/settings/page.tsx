@@ -37,12 +37,12 @@ export default function SettingsPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Form state
+  // Form state - using strings to allow empty input fields
   const [formData, setFormData] = useState({
-    dropoutPercentage: 0,
-    studentsPerSmallRoom: 10,
-    studentsPerMediumRoom: 20,
-    studentsPerBigRoom: 30,
+    dropoutPercentage: '',
+    studentsPerSmallRoom: '',
+    studentsPerMediumRoom: '',
+    studentsPerBigRoom: '',
   });
 
   useEffect(() => {
@@ -61,10 +61,10 @@ export default function SettingsPage() {
         const params = response.data[0];
         setParameters(params);
         setFormData({
-          dropoutPercentage: params.dropoutPercentage,
-          studentsPerSmallRoom: params.studentsPerSmallRoom,
-          studentsPerMediumRoom: params.studentsPerMediumRoom,
-          studentsPerBigRoom: params.studentsPerBigRoom,
+          dropoutPercentage: String(params.dropoutPercentage),
+          studentsPerSmallRoom: String(params.studentsPerSmallRoom),
+          studentsPerMediumRoom: String(params.studentsPerMediumRoom),
+          studentsPerBigRoom: String(params.studentsPerBigRoom),
         });
       }
     } catch (err) {
@@ -75,36 +75,67 @@ export default function SettingsPage() {
     }
   }
 
-  const handleInputChange = (field: string, value: string) => {
-    const numValue = Number.parseFloat(value) || 0;
-    setFormData((prev) => ({
-      ...prev,
-      [field]: numValue,
-    }));
-    // Clear messages when user starts editing
-    setSuccessMessage('');
-    setErrorMessage('');
+  // Validates and filters input to only allow valid number characters
+  const handleInputChange = (
+    field: string,
+    value: string,
+    allowDecimals: boolean = false,
+  ) => {
+    // Allow empty string for clearing the field
+    if (value === '') {
+      setFormData((prev) => ({ ...prev, [field]: '' }));
+      setSuccessMessage('');
+      setErrorMessage('');
+      return;
+    }
+
+    // Regex pattern: integers only or decimals (with . or , as separator)
+    const pattern = allowDecimals ? /^-?\d*[.,]?\d*$/ : /^-?\d*$/;
+
+    if (pattern.test(value)) {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+      setSuccessMessage('');
+      setErrorMessage('');
+    }
   };
 
+  // Helper to parse form values to numbers (handles both . and , as decimal separator)
+  const parseFormData = () => ({
+    dropoutPercentage:
+      Number.parseFloat(formData.dropoutPercentage.replace(',', '.')) || 0,
+    studentsPerSmallRoom:
+      Number.parseInt(formData.studentsPerSmallRoom, 10) || 0,
+    studentsPerMediumRoom:
+      Number.parseInt(formData.studentsPerMediumRoom, 10) || 0,
+    studentsPerBigRoom: Number.parseInt(formData.studentsPerBigRoom, 10) || 0,
+  });
+
   const handleSave = async () => {
+    const {
+      dropoutPercentage,
+      studentsPerSmallRoom,
+      studentsPerMediumRoom,
+      studentsPerBigRoom,
+    } = parseFormData();
+
     // Validation
-    if (formData.dropoutPercentage < 0 || formData.dropoutPercentage > 100) {
+    if (dropoutPercentage < 0 || dropoutPercentage > 100) {
       setErrorMessage('A porcentagem de evasão deve estar entre 0 e 100');
       return;
     }
 
     if (
-      formData.studentsPerSmallRoom <= 0 ||
-      formData.studentsPerMediumRoom <= 0 ||
-      formData.studentsPerBigRoom <= 0
+      studentsPerSmallRoom <= 0 ||
+      studentsPerMediumRoom <= 0 ||
+      studentsPerBigRoom <= 0
     ) {
       setErrorMessage('O número de alunos por sala deve ser maior que zero');
       return;
     }
 
     if (
-      formData.studentsPerSmallRoom >= formData.studentsPerMediumRoom ||
-      formData.studentsPerMediumRoom >= formData.studentsPerBigRoom
+      studentsPerSmallRoom >= studentsPerMediumRoom ||
+      studentsPerMediumRoom >= studentsPerBigRoom
     ) {
       setErrorMessage('O número de alunos deve ser: Pequena < Média < Grande');
       return;
@@ -115,7 +146,13 @@ export default function SettingsPage() {
     setSuccessMessage('');
 
     try {
-      await put('/api/calculationParameters', formData);
+      const dataToSend = {
+        dropoutPercentage,
+        studentsPerSmallRoom,
+        studentsPerMediumRoom,
+        studentsPerBigRoom,
+      };
+      await put('/api/calculationParameters', dataToSend);
       setSuccessMessage('Parâmetros salvos com sucesso! ✅');
       await loadParameters(); // Reload to confirm changes
     } catch (err) {
@@ -129,10 +166,10 @@ export default function SettingsPage() {
   const handleReset = () => {
     if (parameters) {
       setFormData({
-        dropoutPercentage: parameters.dropoutPercentage,
-        studentsPerSmallRoom: parameters.studentsPerSmallRoom,
-        studentsPerMediumRoom: parameters.studentsPerMediumRoom,
-        studentsPerBigRoom: parameters.studentsPerBigRoom,
+        dropoutPercentage: String(parameters.dropoutPercentage),
+        studentsPerSmallRoom: String(parameters.studentsPerSmallRoom),
+        studentsPerMediumRoom: String(parameters.studentsPerMediumRoom),
+        studentsPerBigRoom: String(parameters.studentsPerBigRoom),
       });
       setSuccessMessage('');
       setErrorMessage('');
@@ -197,13 +234,15 @@ export default function SettingsPage() {
                   <div className="input-group">
                     <input
                       id="dropoutPercentage"
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.01"
+                      type="text"
+                      inputMode="decimal"
                       value={formData.dropoutPercentage}
                       onChange={(e) =>
-                        handleInputChange('dropoutPercentage', e.target.value)
+                        handleInputChange(
+                          'dropoutPercentage',
+                          e.target.value,
+                          true,
+                        )
                       }
                       className="form-input"
                     />
@@ -224,9 +263,8 @@ export default function SettingsPage() {
                   <div className="input-group">
                     <input
                       id="studentsPerSmallRoom"
-                      type="number"
-                      min="1"
-                      step="1"
+                      type="text"
+                      inputMode="numeric"
                       value={formData.studentsPerSmallRoom}
                       onChange={(e) =>
                         handleInputChange(
@@ -252,9 +290,8 @@ export default function SettingsPage() {
                   <div className="input-group">
                     <input
                       id="studentsPerMediumRoom"
-                      type="number"
-                      min="1"
-                      step="1"
+                      type="text"
+                      inputMode="numeric"
                       value={formData.studentsPerMediumRoom}
                       onChange={(e) =>
                         handleInputChange(
@@ -281,9 +318,8 @@ export default function SettingsPage() {
                   <div className="input-group">
                     <input
                       id="studentsPerBigRoom"
-                      type="number"
-                      min="1"
-                      step="1"
+                      type="text"
+                      inputMode="numeric"
                       value={formData.studentsPerBigRoom}
                       onChange={(e) =>
                         handleInputChange('studentsPerBigRoom', e.target.value)
