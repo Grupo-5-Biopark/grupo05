@@ -21,6 +21,9 @@ export class Course {
   @Column()
   openingYear: number;
 
+  @Column({ default: 8 })
+  numberOfSemesters: number;
+
   @OneToMany(() => Class, (classEntity) => classEntity.course)
   classes: Class[];
 }

@@ -46,6 +46,7 @@ export class ClassController {
       year: classEntity.year,
       semester: classEntity.semester,
       currentStudents: classEntity.currentStudents,
+      isAssumed: classEntity.isAssumed,
     };
   }
 
@@ -60,6 +61,7 @@ export class ClassController {
       year: classEntity.year,
       semester: classEntity.semester,
       currentStudents: classEntity.currentStudents,
+      isAssumed: classEntity.isAssumed,
     }));
   }
 
@@ -76,6 +78,7 @@ export class ClassController {
       year: classEntity.year,
       semester: classEntity.semester,
       currentStudents: classEntity.currentStudents,
+      isAssumed: classEntity.isAssumed,
     };
   }
 
