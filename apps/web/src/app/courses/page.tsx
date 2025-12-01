@@ -216,9 +216,7 @@ function CoursesDataPanel() {
     <div className="courses-page">
       <div className="page-header">
         <h1 className="page-title">Gerenciamento de Cursos</h1>
-        <p className="page-subtitle">
-          Visualização e edição de cursos e suas turmas
-        </p>
+        <p className="page-subtitle">Visualização e edição de cursos</p>
       </div>
 
       <div className="stats-container">

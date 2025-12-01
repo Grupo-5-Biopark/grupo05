@@ -13,6 +13,7 @@ class Class {
     +year: number
     +semester: number
     +currentStudents: number
+    +isAssumed?: boolean
 }
 class Course {
     +id: number
@@ -21,6 +22,7 @@ class Course {
     +vacancies: number
     +periodQuantities: number
     +openingYear: number
+    +numberOfSemesters: number
     +classes: Class[]
 }
 @enduml

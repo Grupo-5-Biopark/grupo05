@@ -14,6 +14,9 @@ export class CreateClassUseCase {
     classEntity.year = data.year;
     classEntity.semester = data.semester;
     classEntity.currentStudents = data.currentStudents;
+    if (typeof data.isAssumed !== 'undefined') {
+      classEntity.isAssumed = data.isAssumed;
+    }
 
     return await this.classRepository.create(classEntity);
   }
