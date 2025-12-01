@@ -162,7 +162,7 @@ export class CalculateRoomRequirementsUseCase {
         courseName: cls.course?.name ?? null,
         studentCount: afterDropout,
         roomSize: sizeCode,
-        isAssumed: cls.isAssumed ?? false,
+        isAssumed: cls.isAssumed || false,
         startYear: cls.year,
         semester: currentSemester,
       };
