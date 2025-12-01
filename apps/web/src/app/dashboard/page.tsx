@@ -1,48 +1,148 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../hooks/useAuth';
-import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
+import { useAuth } from '@/hooks/useAuth';
+import Header from '@/components/ui/Header';
+import Sidebar from '@/components/ui/Sidebar';
+import {
+  useDashboardData,
+  useRoomCalculation,
+  usePeriodSelector,
+} from './hooks';
+import {
+  StatsCards,
+  PeriodSelector,
+  ForecastContent,
+  ForecastLoading,
+  ForecastEmpty,
+  DashboardCharts,
+  CourseSummary,
+} from './components';
+import { COLORS, RoomCalculationResponse, DashboardStats } from './types';
 import './dashboard.css';
+
+function LoadingScreen() {
+  return (
+    <div className="loading-container">
+      <div className="loading-spinner">🔄</div>
+      <p>Carregando...</p>
+    </div>
+  );
+}
+
+function LoadingData() {
+  return (
+    <div className="loading-data">
+      <div className="loading-spinner">🔄</div>
+      <p>Carregando dados...</p>
+    </div>
+  );
+}
+
+interface RoomsBySize {
+  readonly small: number;
+  readonly medium: number;
+  readonly big: number;
+}
+
+function prepareRoomSizeData(roomsBySize: RoomsBySize) {
+  return [
+    { name: 'Pequenas (P)', value: roomsBySize.small, color: COLORS.small },
+    { name: 'Médias (M)', value: roomsBySize.medium, color: COLORS.medium },
+    { name: 'Grandes (G)', value: roomsBySize.big, color: COLORS.big },
+  ].filter((item) => item.value > 0);
+}
+
+function prepareCoursesByAreaData(coursesByArea: Record<string, number>) {
+  return Object.entries(coursesByArea).map(([area, count]) => ({
+    name: area.length > 15 ? `${area.substring(0, 15)}...` : area,
+    fullName: area,
+    cursos: count,
+  }));
+}
+
+function prepareRoomsByBlockData(roomsByBlock: Record<string, number>) {
+  return Object.entries(roomsByBlock).map(([block, count]) => ({
+    name: block,
+    salas: count,
+  }));
+}
+
+interface ForecastSectionProps {
+  readonly isLoadingCalculation: boolean;
+  readonly roomCalculation: RoomCalculationResponse | null;
+  readonly stats: DashboardStats;
+  readonly isProjection: boolean;
+}
+
+function ForecastSection({
+  isLoadingCalculation,
+  roomCalculation,
+  stats,
+  isProjection,
+}: Readonly<ForecastSectionProps>) {
+  if (isLoadingCalculation) {
+    return <ForecastLoading />;
+  }
+
+  if (roomCalculation) {
+    return (
+      <ForecastContent
+        roomCalculation={roomCalculation}
+        stats={stats}
+        isProjection={isProjection}
+      />
+    );
+  }
+
+  return <ForecastEmpty />;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
-
   const { isAuthenticated, isLoading: authLoading, logout, user } = useAuth();
-  const [currentPage, setCurrentPage] = useState('dashboard');
 
+  // Custom hooks para gerenciar estado
+  const { stats, courses, isLoading, dataLoaded } =
+    useDashboardData(isAuthenticated);
+
+  const {
+    selectedYear,
+    selectedSemester,
+    canGoPrevious,
+    isProjection,
+    handlePreviousPeriod,
+    handleNextPeriod,
+    handleGoToCurrentPeriod,
+  } = usePeriodSelector();
+
+  const { roomCalculation, isLoadingCalculation } = useRoomCalculation(
+    isAuthenticated,
+    dataLoaded,
+    selectedYear,
+    selectedSemester,
+  );
+
+  // Redirecionar se não autenticado
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, authLoading, router]);
 
-  const showPage = (pageId: string) => {
-    setCurrentPage(pageId);
-  };
-
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
 
+  // Preparar dados para gráficos
+  const roomSizeData = prepareRoomSizeData(stats.roomsBySize);
+  const coursesByAreaData = prepareCoursesByAreaData(stats.coursesByArea);
+  const roomsByBlockData = prepareRoomsByBlockData(stats.roomsByBlock);
+
   if (authLoading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          fontSize: '1.2rem',
-          color: '#233444',
-        }}
-      >
-        <div>🔄 Carregando...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated) {
@@ -51,13 +151,11 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-layout">
-      {/* 💡 Uso do novo componente importado */}
       <Header user={user} onLogout={handleLogout} />
-      <Sidebar currentPage={currentPage} onPageChange={showPage} />
+      <Sidebar currentPage="dashboard" onPageChange={() => {}} />
 
       <main className="main-content">
-        {/* DASHBOARD PAGE */}
-        <div className={`page ${currentPage === 'dashboard' ? 'active' : ''}`}>
+        <div className="page active">
           <div className="page-header">
             <h1 className="page-title">Dashboard</h1>
             <p className="page-subtitle">
@@ -65,97 +163,49 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-value">27</div>
-              <div className="stat-label">Salas Ativas</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">1,245</div>
-              <div className="stat-label">Total de Alunos</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">15</div>
-              <div className="stat-label">Cursos Ativos</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">85%</div>
-              <div className="stat-label">Taxa de Ocupação</div>
-            </div>
-          </div>
+          {isLoading ? (
+            <LoadingData />
+          ) : (
+            <>
+              <StatsCards stats={stats} />
 
-          <div className="charts-section">
-            <div className="chart-card">
-              <h3 className="chart-title">Distribuição de Salas por Tamanho</h3>
-              <div className="chart-placeholder">
-                <p>Gráfico será implementado com Chart.js</p>
+              <div className="forecast-section">
+                <div className="forecast-header">
+                  <div className="forecast-title-area">
+                    <h2 className="forecast-title">Previsão de Salas</h2>
+                    <p className="forecast-subtitle">
+                      Análise de demanda por período acadêmico
+                    </p>
+                  </div>
+
+                  <PeriodSelector
+                    selectedYear={selectedYear}
+                    selectedSemester={selectedSemester}
+                    canGoPrevious={canGoPrevious}
+                    isProjection={isProjection}
+                    onPreviousPeriod={handlePreviousPeriod}
+                    onNextPeriod={handleNextPeriod}
+                    onGoToCurrentPeriod={handleGoToCurrentPeriod}
+                  />
+                </div>
+
+                <ForecastSection
+                  isLoadingCalculation={isLoadingCalculation}
+                  roomCalculation={roomCalculation}
+                  stats={stats}
+                  isProjection={isProjection}
+                />
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* CURSOS PAGE */}
-        <div className={`page ${currentPage === 'cursos' ? 'active' : ''}`}>
-          <div className="page-header">
-            <h1 className="page-title">Gerenciamento de Cursos</h1>
-            <p className="page-subtitle">Controle de cursos e suas turmas</p>
-          </div>
+              <DashboardCharts
+                roomSizeData={roomSizeData}
+                coursesByAreaData={coursesByAreaData}
+                roomsByBlockData={roomsByBlockData}
+              />
 
-          <div className="content-placeholder">
-            <h3>🔗 Abrindo página de Cursos...</h3>
-          </div>
-        </div>
-
-        {/* SALAS PAGE */}
-        <div className={`page ${currentPage === 'salas' ? 'active' : ''}`}>
-          <div className="page-header">
-            <h1 className="page-title">Controle de Salas</h1>
-            <p className="page-subtitle">
-              Gerenciamento de salas por tamanho e ocupação
-            </p>
-          </div>
-
-          <div className="content-placeholder">
-            <h3>🔗 Abrindo página de Salas...</h3>
-          </div>
-        </div>
-
-        {/* CONFIGURAÇÕES PAGE */}
-        <div
-          className={`page ${currentPage === 'configuracoes' ? 'active' : ''}`}
-        >
-          <div className="page-header">
-            <h1 className="page-title">Configurações</h1>
-            <p className="page-subtitle">Valores configuráveis do sistema</p>
-          </div>
-
-          <div className="content-placeholder">
-            <h3>🔗 Abrindo página de Configurações...</h3>
-          </div>
-        </div>
-
-        {/* RELATÓRIOS PAGE */}
-        <div className={`page ${currentPage === 'relatorios' ? 'active' : ''}`}>
-          <div className="page-header">
-            <h1 className="page-title">Relatórios</h1>
-            <p className="page-subtitle">Relatórios e previsões semestrais</p>
-          </div>
-
-          <div className="content-placeholder">
-            <h3>🔗 Abrindo página de Relatórios...</h3>
-          </div>
-        </div>
-
-        {/* USUÁRIOS PAGE */}
-        <div className={`page ${currentPage === 'usuarios' ? 'active' : ''}`}>
-          <div className="page-header">
-            <h1 className="page-title">Gerenciamento de Usuários</h1>
-            <p className="page-subtitle">Abra a página completa de usuários</p>
-          </div>
-
-          <div className="content-placeholder">
-            <h3>🔗 Abrindo página de Usuários...</h3>
-          </div>
+              <CourseSummary courses={courses} />
+            </>
+          )}
         </div>
       </main>
     </div>
