@@ -4,6 +4,10 @@ import { CreateCourseDto } from '../../presentation/dtos/create-course.dto';
 import { Course } from '../../domain/entities/course.entity';
 import { DuplicateCourseNameException } from '../../domain/exceptions/duplicate-course-name.exception';
 
+/**
+ * Interface representing PostgreSQL errors.
+ * Used to identify unique constraint violations.
+ */
 interface PostgresError {
   code: string;
   detail: string;
@@ -20,10 +24,34 @@ function isPostgresError(error: unknown): error is PostgresError {
   );
 }
 
+/**
+ * Use case responsible for creating new courses in the system.
+ *
+ * @description This use case implements the business logic for course creation,
+ * including unique name validation and database persistence.
+ *
+ * @example
+ * ```typescript
+ * const course = await createCourseUseCase.execute({
+ *   name: 'Computer Science',
+ *   knowledgeArea: 'Computing',
+ *   vacancies: 40,
+ *   periodQuantities: 8,
+ *   openingYear: 2025
+ * });
+ * ```
+ */
 @Injectable()
 export class CreateCourseUseCase {
   constructor(private readonly courseRepository: CourseRepository) {}
 
+  /**
+   * Executes the creation of a new course.
+   *
+   * @param data - Course data to be created
+   * @returns Promise<Course> - The created course with generated ID
+   * @throws DuplicateCourseNameException - When a course with the same name already exists
+   */
   async execute(data: CreateCourseDto): Promise<Course> {
     // Check if course name already exists
     const existingCourse = await this.courseRepository.findByName(data.name);
