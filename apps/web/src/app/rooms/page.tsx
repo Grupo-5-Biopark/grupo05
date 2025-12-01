@@ -13,9 +13,8 @@ interface Room {
   block: string;
   number: number;
   size: string;
-  classId: number;
+  classId: number | null;
   class?: {
-    id: number;
     courseName: string;
     period: number;
   };
@@ -25,6 +24,22 @@ interface RoomStats {
   total: number;
   totalBySize: Record<string, number>;
   totalByBlock: Record<string, number>;
+}
+
+interface Course {
+  id: number;
+  name: string;
+  knowledgeArea: string;
+  vacancies: number;
+  periodQuantities: number;
+  openingYear: number;
+}
+
+interface ClassItem {
+  id: number;
+  courseId?: number; // se API fornecer
+  courseName?: string; // fallback se não houver courseId
+  period?: number;
 }
 
 function RoomsDataPanel() {
@@ -44,6 +59,9 @@ function RoomsDataPanel() {
     totalBySize: {},
     totalByBlock: {},
   });
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [classes, setClasses] = useState<ClassItem[]>([]);
+  const [filteredClasses, setFilteredClasses] = useState<ClassItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showNewRoomModal, setShowNewRoomModal] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
@@ -52,12 +70,12 @@ function RoomsDataPanel() {
     number: '',
     size: '',
     classId: '',
-    courseName: '',
-    period: '',
+    courseName: '', // mantido para exibição durante edição
   });
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
   useEffect(() => {
-    void loadRooms();
+    void Promise.all([loadRooms(), loadCourses(), loadClasses()]);
   }, []);
 
   useEffect(() => {
@@ -73,6 +91,42 @@ function RoomsDataPanel() {
       console.error('Erro ao buscar salas:', err);
     }
   }
+
+  async function loadCourses() {
+    try {
+      const response = await get<Course[]>('/api/courses');
+      setCourses(response.data);
+    } catch (err) {
+      console.error('Erro ao buscar cursos:', err);
+    }
+  }
+
+  async function loadClasses() {
+    try {
+      const response = await get<ClassItem[]>('/api/classes');
+      setClasses(response.data);
+    } catch (err) {
+      console.error('Erro ao buscar turmas (classes):', err);
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedCourseId) {
+      setFilteredClasses([]);
+      return;
+    }
+    const selectedCourse = courses.find((c) => c.id === selectedCourseId);
+    if (!selectedCourse) {
+      setFilteredClasses([]);
+      return;
+    }
+    const fc = classes.filter((cl) => {
+      if (cl.courseId) return cl.courseId === selectedCourseId;
+      if (cl.courseName) return cl.courseName === selectedCourse.name;
+      return false;
+    });
+    setFilteredClasses(fc);
+  }, [selectedCourseId, classes, courses]);
 
   const calculateStats = (roomsList: Room[]) => {
     const stats: RoomStats = {
@@ -109,30 +163,30 @@ function RoomsDataPanel() {
   };
 
   const formatClassName = (room: Room) => {
-    if (!room.class || !room.class.courseName) {
-      return room.classId ? `Turma ${room.classId}` : '-';
-    }
-
-    // Abreviar nome do curso se muito longo
-    let courseName = room.class.courseName;
-    if (courseName.toLowerCase().includes('engenharia de software')) {
-      courseName = 'Eng. Software';
-    } else if (courseName.toLowerCase().includes('ciência da computação')) {
-      courseName = 'Ciência Comp.';
-    } else if (courseName.toLowerCase().includes('sistemas de informação')) {
-      courseName = 'Sist. Informação';
-    } else if (courseName.length > 20) {
-      // Abreviar cursos muito longos
-      courseName = courseName.substring(0, 15) + '...';
-    }
-
-    return `${courseName} ${room.class.period}º período`;
+    if (!room.classId) return '-';
+    const cls = classes.find((c) => c.id === room.classId);
+    if (!cls) return '-';
+    const course = courses.find((crs) => crs.id === cls.courseId);
+    return course ? course.name : '-';
   };
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
+    // Seleção de curso: definir ID, nome e limpar turma
+    if (name === 'courseName') {
+      const courseId = value ? parseInt(value) : NaN;
+      const selected = courses.find((c) => c.id === courseId) || null;
+      setSelectedCourseId(selected ? selected.id : null);
+      setFormData((prev) => ({
+        ...prev,
+        courseName: selected ? selected.name : '',
+        classId: '',
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -145,28 +199,20 @@ function RoomsDataPanel() {
       return;
     }
 
-    // Validar se selecionou curso mas não selecionou período
-    if (formData.courseName && !formData.period) {
-      showToast(
-        'error',
-        'Por favor, selecione o período para o curso escolhido.',
-      );
-      return;
-    }
+    // Mapear tipos para código curto exigido pela API
+    const sizeCodeMap: Record<string, string> = {
+      PEQUENA: 'P',
+      MÉDIA: 'M',
+      GRANDE: 'G',
+      LABORATÓRIO: 'L',
+    };
 
     try {
       const roomData = {
         block: formData.block,
         number: parseInt(formData.number),
-        size: formData.size,
-        classId: parseInt(formData.classId) || null,
-        class:
-          formData.courseName && formData.period
-            ? {
-                courseName: formData.courseName,
-                period: parseInt(formData.period),
-              }
-            : null,
+        size: sizeCodeMap[formData.size] || formData.size,
+        classId: formData.classId ? parseInt(formData.classId) : null,
       };
 
       if (editingRoomId !== null) {
@@ -185,7 +231,6 @@ function RoomsDataPanel() {
         size: '',
         classId: '',
         courseName: '',
-        period: '',
       });
       await loadRooms();
     } catch (err) {
@@ -217,9 +262,21 @@ function RoomsDataPanel() {
       number: room.number.toString(),
       size: room.size,
       classId: room.classId?.toString() || '',
-      courseName: room.class?.courseName || '',
-      period: room.class?.period?.toString() || '',
+      courseName: '',
     });
+    // Derivar curso pela turma
+    if (room.classId) {
+      const cls = classes.find((c) => c.id === room.classId);
+      if (cls && cls.courseId) {
+        setSelectedCourseId(cls.courseId);
+        const crs = courses.find((c) => c.id === cls.courseId);
+        setFormData((prev) => ({ ...prev, courseName: crs?.name ?? '' }));
+      } else {
+        setSelectedCourseId(null);
+      }
+    } else {
+      setSelectedCourseId(null);
+    }
     setShowNewRoomModal(true);
   };
 
@@ -295,6 +352,7 @@ function RoomsDataPanel() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
+            style={{ width: '360px' }}
           />
         </div>
         <button
@@ -380,7 +438,6 @@ function RoomsDataPanel() {
                     size: '',
                     classId: '',
                     courseName: '',
-                    period: '',
                   });
                 }}
               >
@@ -427,41 +484,31 @@ function RoomsDataPanel() {
                 <label>Curso</label>
                 <select
                   name="courseName"
-                  value={formData.courseName}
+                  value={selectedCourseId ?? ''}
                   onChange={handleFormChange}
                 >
                   <option value="">Selecione o curso (opcional)</option>
-                  <option value="Engenharia de Software">
-                    Engenharia de Software
-                  </option>
-                  <option value="Ciência da Computação">
-                    Ciência da Computação
-                  </option>
-                  <option value="Sistemas de Informação">
-                    Sistemas de Informação
-                  </option>
-                  <option value="Análise e Desenvolvimento de Sistemas">
-                    Análise e Desenvolvimento de Sistemas
-                  </option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="form-group">
-                <label>Período</label>
+                <label>Turma</label>
                 <select
-                  name="period"
-                  value={formData.period}
+                  name="classId"
+                  value={formData.classId}
                   onChange={handleFormChange}
-                  disabled={!formData.courseName}
+                  disabled={!selectedCourseId}
                 >
-                  <option value="">Selecione o período</option>
-                  <option value="1">1º Período</option>
-                  <option value="2">2º Período</option>
-                  <option value="3">3º Período</option>
-                  <option value="4">4º Período</option>
-                  <option value="5">5º Período</option>
-                  <option value="6">6º Período</option>
-                  <option value="7">7º Período</option>
-                  <option value="8">8º Período</option>
+                  <option value="">Selecione a turma</option>
+                  {filteredClasses.map((cl) => (
+                    <option key={cl.id} value={cl.id}>
+                      {`Turma ${cl.id}${cl.period ? ' - ' + cl.period + 'º período' : ''}`}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -484,7 +531,6 @@ function RoomsDataPanel() {
                     size: '',
                     classId: '',
                     courseName: '',
-                    period: '',
                   });
                 }}
               >
