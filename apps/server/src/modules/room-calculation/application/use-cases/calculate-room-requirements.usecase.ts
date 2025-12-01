@@ -160,6 +160,11 @@ export class CalculateRoomRequirementsUseCase {
       };
     });
 
+    // Conta turmas simuladas (isAssumed = true) que estão ativas no período
+    const simulatedClassesCount = classesSummary.filter(
+      (cls) => cls.isAssumed,
+    ).length;
+
     return {
       exceededLimits,
       totalRoomsRequired: {
@@ -175,7 +180,7 @@ export class CalculateRoomRequirementsUseCase {
         requestedYear,
         requestedSemester,
         isProjection: requestedYear > new Date().getFullYear(),
-        simulatedClassesCount: allClasses.length - realClasses.length,
+        simulatedClassesCount,
       },
     };
   }
