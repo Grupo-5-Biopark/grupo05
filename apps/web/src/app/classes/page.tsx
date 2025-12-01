@@ -102,11 +102,24 @@ export default function ClassesPage() {
   };
 
   const filteredClasses = useMemo(() => {
-    if (!searchTerm) return classes;
+    // 1. FILTRAGEM
+    const filtered = classes.filter((c) => {
+      if (!searchTerm) return true;
 
-    return classes.filter((c) => {
       const courseName = courses.find((x) => x.id === c.courseId)?.name || '';
       return courseName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    // 2. ORDENAÇÃO
+    // Criamos uma cópia do array para ordenar (.sort() modifica o array original)
+    return filtered.slice().sort((a, b) => {
+      // Ordenação Principal: por ANO (Ascendente)
+      if (a.year !== b.year) {
+        return a.year - b.year;
+      }
+
+      // Ordenação Secundária: por SEMESTRE (Ascendente)
+      return a.semester - b.semester;
     });
   }, [classes, courses, searchTerm]);
 
@@ -353,8 +366,8 @@ export default function ClassesPage() {
                         })
                       }
                     >
-                      <option value="false">EXISTENTE (Status: False)</option>
-                      <option value="true">PLANEJADA (Status: True)</option>
+                      <option value="false">EXISTENTE</option>
+                      <option value="true">PLANEJADA</option>
                     </select>
                   </div>
                   <div className="form-group">

@@ -35,6 +35,13 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       adminOnly: false,
     },
     {
+      id: 'turmas',
+      label: 'Turmas',
+      icon: '🏫',
+      route: '/classes',
+      adminOnly: false,
+    },
+    {
       id: 'salas',
       label: 'Salas',
       icon: '🏢',
@@ -60,13 +67,6 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       label: 'Configurações',
       icon: '⚙️',
       route: '/settings',
-      adminOnly: false,
-    },
-    {
-      id: 'turmas',
-      label: 'Turmas',
-      icon: '🏫',
-      route: '/classes',
       adminOnly: false,
     },
   ];
