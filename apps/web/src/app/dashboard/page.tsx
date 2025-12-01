@@ -207,18 +207,6 @@ export default function DashboardPage() {
             </>
           )}
         </div>
-
-        {/* TURMAS PAGE */}
-        <div className={`page ${currentPage === 'turmas' ? 'active' : ''}`}>
-          <div className="page-header">
-            <h1 className="page-title">Gerenciamento de Turmas</h1>
-            <p className="page-subtitle">Abra a página completa de turmas</p>
-          </div>
-
-          <div className="content-placeholder">
-            <h3>🔗 Abrindo página de Turmas...</h3>
-          </div>
-        </div>
       </main>
     </div>
   );
