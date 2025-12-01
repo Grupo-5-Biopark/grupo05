@@ -19,6 +19,7 @@ interface ClassItem {
   year: number;
   semester: number;
   currentStudents: number;
+  isAssumed: boolean;
 }
 
 export default function ClassesPage() {
@@ -92,6 +93,10 @@ export default function ClassesPage() {
     }
   }
 
+  const getAssumedStatus = (isAssumed: boolean) => {
+    return isAssumed ? 'PLANEJADA' : 'EXISTENTE';
+  };
+
   const filteredClasses = useMemo(() => {
     if (!searchTerm) return classes;
 
@@ -108,6 +113,7 @@ export default function ClassesPage() {
         courseId: courses.length > 0 ? courses[0].id : 0,
         year: new Date().getFullYear(),
         semester: 1,
+        isAssumed: false,
         currentStudents: 0,
       },
     );
@@ -139,6 +145,7 @@ export default function ClassesPage() {
       courseId: selectedClass.courseId,
       year: selectedClass.year,
       semester: selectedClass.semester,
+      isAssumed: selectedClass.isAssumed,
       currentStudents: selectedClass.currentStudents,
     };
 
@@ -225,7 +232,9 @@ export default function ClassesPage() {
                   <tr>
                     <th>CURSO</th>
                     <th>ANO</th>
+                    <th>SEMESTRE</th>
                     <th>ALUNOS</th>
+                    <th>STATUS</th>
                     <th>AÇÕES</th>
                   </tr>
                 </thead>
@@ -234,7 +243,9 @@ export default function ClassesPage() {
                     <tr key={c.id}>
                       <td>{getCourseName(c.courseId)}</td>
                       <td>{c.year}</td>
+                      <td>{c.semester}</td>
                       <td>{c.currentStudents}</td>
+                      <td>{getAssumedStatus(c.isAssumed)}</td>
                       <td>
                         <div className="actions-cell">
                           <button
@@ -305,6 +316,36 @@ export default function ClassesPage() {
                         })
                       }
                     />
+                  </div>
+                  <div className="form-group">
+                    <label>Semestre:</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="2"
+                      value={selectedClass.semester}
+                      onChange={(e) =>
+                        setSelectedClass({
+                          ...selectedClass,
+                          semester: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Status da Turma:</label>
+                    <select
+                      value={selectedClass.isAssumed ? 'true' : 'false'}
+                      onChange={(e) =>
+                        setSelectedClass({
+                          ...selectedClass,
+                          isAssumed: e.target.value === 'true',
+                        })
+                      }
+                    >
+                      <option value="false">EXISTENTE (Status: False)</option>
+                      <option value="true">PLANEJADA (Status: True)</option>
+                    </select>
                   </div>
                   <div className="form-group">
                     <label>Alunos atuais:</label>
