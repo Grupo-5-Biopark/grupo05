@@ -58,7 +58,7 @@ export class AuthService {
       // if it's pure number (seconds)
       if (/^\d+$/.test(str)) return Number(str);
       // support formats like '30s', '15m', '1h', '7d'
-      const m = str.match(/^(\d+)(s|m|h|d)$/i);
+      const m = /^(\d+)([smhd])$/i.exec(str);
       if (m) {
         const n = Number(m[1]);
         const unit = m[2].toLowerCase();

@@ -12,7 +12,7 @@ export class CreateRoomsUseCase {
     roomsEntity.block = data.block;
     roomsEntity.number = data.number;
     roomsEntity.size = data.size;
-    if (typeof data.classId !== 'undefined') {
+    if (data.classId !== undefined) {
       roomsEntity.classId = data.classId;
     }
 
