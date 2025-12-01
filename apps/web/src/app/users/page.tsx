@@ -399,7 +399,7 @@ export default function UsersPage() {
           </div>
 
           <div className="users-table-container">
-            <h2 className="table-title">Lista de Usuários do Sistema</h2>
+            <h2 className="table-title">Lista de Usuários</h2>
 
             {users.length === 0 ? (
               <div className="no-results">Nenhum usuário encontrado</div>
