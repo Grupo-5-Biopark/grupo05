@@ -170,6 +170,21 @@ function RoomsDataPanel() {
     return course ? course.name : '-';
   };
 
+  const formatClassLabel = (room: Room) => {
+    if (!room.classId) return '-';
+    const cls = classes.find((c) => c.id === room.classId);
+    if (cls) {
+      return `Turma ${cls.id}${cls.period ? ' - ' + cls.period + 'º período' : ''}`;
+    }
+    // fallback: if room has embedded class info
+    if (room.class && typeof room.class === 'object') {
+      const period = (room.class as any).period;
+      const id = room.classId;
+      return `Turma ${id}${period ? ' - ' + period + 'º período' : ''}`;
+    }
+    return '-';
+  };
+
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -375,6 +390,7 @@ function RoomsDataPanel() {
                 <th>BLOCO</th>
                 <th>NÚMERO</th>
                 <th>TIPO</th>
+                <th>CURSO</th>
                 <th>TURMA</th>
                 <th>AÇÕES</th>
               </tr>
@@ -390,6 +406,7 @@ function RoomsDataPanel() {
                   <td className="room-number-cell">{room.number}</td>
                   <td className="room-size-cell">{room.size}</td>
                   <td className="room-class-cell">{formatClassName(room)}</td>
+                  <td className="room-class-cell">{formatClassLabel(room)}</td>
                   <td>
                     <div className="actions-cell">
                       <button
