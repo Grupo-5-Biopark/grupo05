@@ -241,7 +241,7 @@
 }
 
 /* Role Badges */
-.role-badge {
+.status-badge {
   display: inline-block;
   padding: 0.4rem 0.9rem;
   border-radius: 20px;
@@ -251,12 +251,12 @@
   align-items: center;
 }
 
-.badge-admin {
+.badge-false {
   background-color: #ffd93d;
   color: #2c3e50;
 }
 
-.badge-usuario {
+.badge-true {
   background-color: #34495e;
   color: white;
 }

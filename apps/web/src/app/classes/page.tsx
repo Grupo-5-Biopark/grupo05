@@ -93,8 +93,12 @@ export default function ClassesPage() {
     }
   }
 
-  const getAssumedStatus = (isAssumed: boolean) => {
+  const getAssumedText = (isAssumed: boolean) => {
     return isAssumed ? 'PLANEJADA' : 'EXISTENTE';
+  };
+
+  const getAssumedBadgeClass = (isAssumed: boolean) => {
+    return isAssumed ? 'badge-true' : 'badge-false';
   };
 
   const filteredClasses = useMemo(() => {
@@ -245,7 +249,13 @@ export default function ClassesPage() {
                       <td>{c.year}</td>
                       <td>{c.semester}</td>
                       <td>{c.currentStudents}</td>
-                      <td>{getAssumedStatus(c.isAssumed)}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${getAssumedBadgeClass(c.isAssumed)}`}
+                        >
+                          {getAssumedText(c.isAssumed)}
+                        </span>
+                      </td>
                       <td>
                         <div className="actions-cell">
                           <button
