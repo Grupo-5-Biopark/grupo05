@@ -247,6 +247,7 @@ export default function ClassesPage() {
               <table className="users-table">
                 <thead>
                   <tr>
+                    <th>TURMA</th>
                     <th>CURSO</th>
                     <th>ANO</th>
                     <th>SEMESTRE</th>
@@ -258,6 +259,7 @@ export default function ClassesPage() {
                 <tbody>
                   {filteredClasses.map((c) => (
                     <tr key={c.id}>
+                      <td>Turma {c.id}</td>
                       <td>{getCourseName(c.courseId)}</td>
                       <td>{c.year}</td>
                       <td>{c.semester}</td>
