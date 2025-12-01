@@ -34,10 +34,29 @@ npm run dev:server
 
 A API estará disponível em `http://localhost:3001`.
 
-## 🧪 Como Executar os Testes
+## 🧪 Testes
 
-Para rodar todos os testes (unitários e e2e) específicos do backend, execute o seguinte comando a partir do **diretório raiz do monorepo**:
+### Executar Testes
 
 ```bash
+# Testes unitários
 npm test --workspace=server
+
+# Testes unitários com coverage
+npm test --workspace=server -- --coverage
+
+# Testes e2e
+npm run test:e2e --workspace=server
+
+# Testes em modo watch
+npm test --workspace=server -- --watch
 ```
+
+### Estrutura de Testes
+
+- **Unitários**: Localizados junto aos arquivos fonte (`*.spec.ts`)
+- **E2E**: Localizados em `test/*.e2e-spec.ts`
+
+### Cobertura
+
+Os relatórios de cobertura são gerados em `coverage/` após executar com `--coverage`.

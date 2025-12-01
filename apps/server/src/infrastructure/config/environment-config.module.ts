@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 @Module({
   imports: [
