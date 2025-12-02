@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from '../../application/services/auth.service';
 import { LoginDto } from '../dtos/login.dto';
+import { Response } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -9,6 +10,18 @@ describe('AuthController', () => {
 
   const mockAuthService = {
     login: jest.fn(),
+    refreshAccessToken: jest.fn(),
+    logout: jest.fn(),
+  };
+
+  const mockResponse = () => {
+    const res: Partial<Response> = {
+      cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+      status: jest.fn().mockReturnThis(),
+    };
+    return res as Response;
   };
 
   beforeEach(async () => {
@@ -34,20 +47,34 @@ describe('AuthController', () => {
         password: 'password123',
       };
 
-      const mockResponse = {
+      const mockLoginResponse = {
         access_token: 'mock.jwt.token',
+        refresh_token: 'mock.refresh.token',
         expires_in: 3600,
+        refresh_expires_in: 604800,
       };
 
-      mockAuthService.login.mockResolvedValue(mockResponse);
+      mockAuthService.login.mockResolvedValue(mockLoginResponse);
+      const res = mockResponse();
 
-      const result = await controller.login(loginDto);
+      await controller.login(loginDto, res);
 
-      expect(result).toEqual(mockResponse);
       expect(authService.login).toHaveBeenCalledWith(
         loginDto.email,
         loginDto.password,
       );
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refresh_token',
+        mockLoginResponse.refresh_token,
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: 'lax',
+        }),
+      );
+      expect(res.json).toHaveBeenCalledWith({
+        access_token: mockLoginResponse.access_token,
+        expires_in: mockLoginResponse.expires_in,
+      });
     });
 
     it('should throw error when login fails', async () => {
@@ -57,8 +84,9 @@ describe('AuthController', () => {
       };
 
       mockAuthService.login.mockRejectedValue(new Error('Invalid credentials'));
+      const res = mockResponse();
 
-      await expect(controller.login(loginDto)).rejects.toThrow(
+      await expect(controller.login(loginDto, res)).rejects.toThrow(
         'Invalid credentials',
       );
     });
