@@ -12,3 +12,9 @@ RUN npm ci --ignore-scripts
 
 # Copy the rest of the source code
 COPY . .
+
+# Set working directory to web app
+WORKDIR /usr/src/app/apps/web
+
+# Start the Next.js dev server
+CMD ["npm", "run", "dev"]

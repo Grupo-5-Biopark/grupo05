@@ -4,34 +4,57 @@
   grid-template-columns: 28% 36% 36%;
   grid-template-rows: auto 1fr;
   grid-template-areas:
-  'header stats search'
-  'list list list';
+    'header stats search'
+    'list list list';
   gap: 1.5rem;
 }
-.page-header { grid-area: header; align-self: start }
-.stats-container { grid-area: stats; display:flex; flex-direction:column; gap:1rem }
-.actions-bar { grid-area: search; display:flex; flex-direction:column; gap:1rem; height:100% }
-.courses-list { grid-area: list; display:flex; flex-wrap:wrap; gap:1.5rem }
+.page-header {
+  grid-area: header;
+  align-self: start;
+}
+.stats-container {
+  grid-area: stats;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.actions-bar {
+  grid-area: search;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+.courses-list {
+  grid-area: list;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
 @media (max-width: 1200px) {
   .courses-page {
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-  'header header'
-  'stats search'
-  'list list';
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'header header'
+      'stats search'
+      'list list';
   }
 }
 @media (max-width: 768px) {
   .courses-page {
-  grid-template-columns: 1fr;
-  grid-template-areas:
-  'header'
-  'stats'
-  'search'
-  'list';
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'header'
+      'stats'
+      'search'
+      'list';
   }
-  .courses-list { flex-direction: column }
-  .course-card { flex-basis: 100% }
+  .courses-list {
+    flex-direction: column;
+  }
+  .course-card {
+    flex-basis: 100%;
+  }
 }
 /* Layout do Dashboard */
 .dashboard-layout {
@@ -71,95 +94,139 @@
   font-weight: bold;
 }
 
-  /* Courses table styles (modeled after users table) */
-  .courses-table-container {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    margin-top: 1rem;
-  }
+/* Courses table styles (modeled after users table) */
+.courses-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-top: 1rem;
+}
 
-  .table-title {
-    background-color: #2c3e50;
-    color: white;
-    padding: 1rem 1.5rem;
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
+.table-title {
+  background-color: #2c3e50;
+  color: white;
+  padding: 1rem 1.5rem;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
 
-  .courses-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.courses-table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  .courses-table thead { color: white }
+.courses-table thead {
+  color: white;
+}
 
-  .courses-table th {
-    background: linear-gradient(to right, #eb0644, #ce053b);
-    padding: 1rem 1.5rem;
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
-    color: #ffffff;
-  }
+.courses-table th {
+  background: linear-gradient(to right, #eb0644, #ce053b);
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
 
-  .courses-table tbody tr { border-bottom: 1px solid #ecf0f1; }
-  .courses-table tbody tr:hover { background-color: #f8f9fa; }
-  .courses-table td { padding: 1.25rem 1.5rem; }
+.courses-table tbody tr {
+  border-bottom: 1px solid #ecf0f1;
+}
+.courses-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+.courses-table td {
+  padding: 1.25rem 1.5rem;
+}
 
-  /* Center the Actions header and cells so the column matches users layout */
-  .courses-table th:last-child { text-align: center; }
-  .courses-table td:last-child { text-align: center; }
-  .actions-cell { display:flex; gap:0.5rem; align-items:center; justify-content:center }
+/* Center the Actions header and cells so the column matches users layout */
+.courses-table th:last-child {
+  text-align: center;
+}
+.courses-table td:last-child {
+  text-align: center;
+}
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
 
-  .course-cell { display:flex; align-items:center; gap:0.75rem }
-  .course-name-cell { font-weight: 400; color: #2c3e50 }
-  .area-cell { color:#7f8c8d }
-  .numeric-cell { font-weight:400; color:#d60f3a }
+.course-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.course-name-cell {
+  font-weight: 400;
+  color: #2c3e50;
+}
+.area-cell {
+  color: #7f8c8d;
+}
+.numeric-cell {
+  font-weight: 400;
+  color: #d60f3a;
+}
 
-  .actions-cell { display:flex; gap:0.5rem; align-items:center }
-  .btn-small { padding: 0.5rem 1rem; font-size: 0.8rem; border-radius: 4px; font-weight:600 }
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
 
-  /* Action buttons match users page: dark blue background, white text */
-  .actions-cell .btn.btn-primary,
-  .actions-cell .btn-edit {
-    background-color: #34495e;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border-radius: 4px;
-  }
-  .actions-cell .btn.btn-primary:hover,
-  .actions-cell .btn-edit:hover {
-    background-color: #2c3e50;
-  }
-  .actions-cell .btn.btn-danger,
-  .actions-cell .btn-delete {
-    background-color: #34495e;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border-radius: 4px;
-  }
- 
-  .actions-cell .btn-delete:hover {
-    background-color: #eb0644; /* danger red on hover */
-    color: #fff;
-  }
-  .actions-cell .btn.btn-danger:hover {
-    background-color: #eb0644;
-  }
+/* Action buttons match users page: dark blue background, white text */
+.actions-cell .btn.btn-primary,
+.actions-cell .btn-edit {
+  background-color: #34495e;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+.actions-cell .btn.btn-primary:hover,
+.actions-cell .btn-edit:hover {
+  background-color: #2c3e50;
+}
+.actions-cell .btn.btn-danger,
+.actions-cell .btn-delete {
+  background-color: #34495e;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
 
-  /* Table body text muted like screenshot */
-  .courses-table td { color: #7f8c8d; font-weight:400 }
-  .courses-table td .course-name-cell { color: #2c3e50; font-weight:bold }
+.actions-cell .btn-delete:hover {
+  background-color: #eb0644; /* danger red on hover */
+  color: #fff;
+}
+.actions-cell .btn.btn-danger:hover {
+  background-color: #eb0644;
+}
+
+/* Table body text muted like screenshot */
+.courses-table td {
+  color: #7f8c8d;
+  font-weight: 400;
+}
+.courses-table td .course-name-cell {
+  color: #2c3e50;
+  font-weight: bold;
+}
 .page-title {
   font-size: 2rem;
   color: #2c3e50;
@@ -167,11 +234,10 @@
   font-weight: bold;
 }
 
-.page-subtitle{
+.page-subtitle {
   color: #7f8c8d;
   font-size: 0.95rem;
 }
-
 
 /* Stats Cards */
 .stats-container {
@@ -767,7 +833,7 @@
   padding: 0.75rem 1rem;
   border-radius: 10px;
   color: #fff;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   z-index: 1100;
   display: flex;
   gap: 0.75rem;
@@ -776,14 +842,29 @@
   animation: toastIn 0.28s ease;
 }
 
-.toast.success { background: linear-gradient(90deg,#2ecc71,#27ae60); }
-.toast.error { background: linear-gradient(90deg,#e74c3c,#c0392b); }
-
-.toast .toast-icon { font-size: 1.05rem; opacity: 0.95 }
-.toast .toast-message { font-size: 0.95rem; line-height: 1.2 }
-
-@keyframes toastIn {
-  from { transform: translateY(-8px); opacity: 0 }
-  to { transform: translateY(0); opacity: 1 }
+.toast.success {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+.toast.error {
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
 }
 
+.toast .toast-icon {
+  font-size: 1.05rem;
+  opacity: 0.95;
+}
+.toast .toast-message {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+@keyframes toastIn {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

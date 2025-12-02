@@ -14,5 +14,8 @@ export class RoomsResponseDto {
   size: string;
 
   @ApiProperty({ example: 1, required: false })
+  courseId?: number;
+
+  @ApiProperty({ example: 1, required: false })
   classId?: number;
 }

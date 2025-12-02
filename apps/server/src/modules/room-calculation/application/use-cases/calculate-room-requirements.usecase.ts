@@ -3,7 +3,37 @@ import { CourseRepository } from '../../../courses/infrastructure/repositories/c
 import { ClassRepository } from '../../../classes/infrastructure/repositories/class.repository';
 import { CalculationParametersRepository } from '../../../calculation-parameters/infrastructure/repositories/calculation-parameters.repository';
 import { ClassProjectionService } from '../services/ClassProjectionService';
+import { Class } from '../../../classes/domain/entities/class.entity';
 
+/**
+ * Extended Class interface that includes projected classes.
+ * Used to distinguish real classes from simulated ones.
+ */
+interface ClassWithProjection extends Class {
+  isAssumed?: boolean;
+}
+
+/**
+ * Main system use case: Calculates classroom requirements.
+ *
+ * @description This use case implements the core business of the system, calculating
+ * how many rooms of each size (S, M, L) are needed for a given year/semester,
+ * considering:
+ * - Dropout rate configured in parameters
+ * - Capacity of each room type
+ * - Projection of future classes when necessary
+ *
+ * @example
+ * ```typescript
+ * // Calculate requirements for 2025, 1st semester
+ * const result = await calculateRoomRequirementsUseCase.execute(2025, 1);
+ *
+ * // Result includes:
+ * // - totalRoomsRequired: { small: 5, medium: 10, big: 3 }
+ * // - exceededLimits: classes exceeding maximum capacity
+ * // - details: detailed information per class
+ * ```
+ */
 @Injectable()
 export class CalculateRoomRequirementsUseCase {
   constructor(
@@ -13,6 +43,14 @@ export class CalculateRoomRequirementsUseCase {
     private readonly classRepository?: ClassRepository,
   ) {}
 
+  /**
+   * Executes the room requirements calculation.
+   *
+   * @param requestedYear - Year for calculation (optional, uses current year if not provided)
+   * @param requestedSemester - Semester for calculation (1 or 2, optional)
+   * @returns Object containing total rooms required, exceeded limits, and details
+   * @throws NotFoundException - When calculation parameters are not configured
+   */
   async execute(requestedYear?: number, requestedSemester?: number) {
     const courses = await this.courseRepository.findAll();
     const paramsList = await this.calculationParametersRepository.findAll();
@@ -31,7 +69,7 @@ export class CalculateRoomRequirementsUseCase {
       ? await this.classRepository.findAll()
       : [];
 
-    let allClasses = [...realClasses];
+    let allClasses: ClassWithProjection[] = [...realClasses];
 
     // 1. Aplica a projeção se houver ano solicitado
     if (requestedYear) {
@@ -43,7 +81,7 @@ export class CalculateRoomRequirementsUseCase {
         );
 
       // Une turmas reais com virtuais
-      allClasses = [...realClasses, ...projectedClasses] as any;
+      allClasses = [...realClasses, ...projectedClasses];
     }
 
     // 2. Inicializa contadores
@@ -64,7 +102,7 @@ export class CalculateRoomRequirementsUseCase {
       if (!requestedYear) return true;
 
       const course = cls.course;
-      if (!course || course.periodQuantities == null) return true;
+      if (!course?.periodQuantities) return true;
 
       const periods = Number(course.periodQuantities) || 0;
       const durationYears = Math.ceil(periods / 2);
@@ -97,7 +135,7 @@ export class CalculateRoomRequirementsUseCase {
     // 4. Processa APENAS as turmas (Reais + Projetadas)
     const classesSummary = classesFiltered.map((cls) => {
       // Se for projetada, usa vacancies do curso. Se real, usa currentStudents.
-      const expected = (cls as any).isAssumed
+      const expected = cls.isAssumed
         ? (cls.course?.vacancies ?? 0)
         : (cls.currentStudents ?? 0);
 
@@ -111,7 +149,7 @@ export class CalculateRoomRequirementsUseCase {
           1;
         currentSemester = academicSemester;
 
-        const semestersPassed = academicSemester > 0 ? academicSemester - 1 : 0;
+        const semestersPassed = academicSemester - 1;
         for (let i = 0; i < semestersPassed; i++) {
           afterDropout *= 1 - dropout / 100;
         }
@@ -123,7 +161,7 @@ export class CalculateRoomRequirementsUseCase {
         ? `${cls.course.name} (Turma ${cls.id})`
         : `Turma ${cls.id}`;
 
-      if ((cls as any).isAssumed) {
+      if (cls.isAssumed) {
         identifier += ' [PROJEÇÃO]';
       }
 
@@ -135,7 +173,7 @@ export class CalculateRoomRequirementsUseCase {
             name: identifier,
             studentCount: afterDropout,
             maxLimit: bigCap,
-            isProjected: (cls as any).isAssumed,
+            isProjected: cls.isAssumed,
           });
         } else if (afterDropout > medCap) {
           sizeCode = 'G';
@@ -154,11 +192,16 @@ export class CalculateRoomRequirementsUseCase {
         courseName: cls.course?.name ?? null,
         studentCount: afterDropout,
         roomSize: sizeCode,
-        isAssumed: (cls as any).isAssumed || false,
+        isAssumed: cls.isAssumed || false,
         startYear: cls.year,
         semester: currentSemester,
       };
     });
+
+    // Conta turmas simuladas (isAssumed = true) que estão ativas no período
+    const simulatedClassesCount = classesSummary.filter(
+      (cls) => cls.isAssumed,
+    ).length;
 
     return {
       exceededLimits,
@@ -175,7 +218,7 @@ export class CalculateRoomRequirementsUseCase {
         requestedYear,
         requestedSemester,
         isProjection: requestedYear > new Date().getFullYear(),
-        simulatedClassesCount: allClasses.length - realClasses.length,
+        simulatedClassesCount,
       },
     };
   }

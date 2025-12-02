@@ -7,6 +7,20 @@ import * as crypto from 'node:crypto';
 import { createHash } from 'node:crypto';
 import { UserPasswordService } from '../../../users/domain/services/user-password.service';
 
+/**
+ * Authentication service responsible for login and JWT token generation.
+ *
+ * @description This service implements the system's authentication logic,
+ * validating user credentials and generating JWT tokens for API access.
+ *
+ * @example
+ * ```typescript
+ * const { access_token, expires_in } = await authService.login(
+ *   'user@email.com',
+ *   'password123'
+ * );
+ * ```
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,6 +31,13 @@ export class AuthService {
     private readonly refreshTokenRepository: RefreshTokenRepository,
   ) {}
 
+  /**
+   * Parses duration strings like '30s', '15m', '1h', '7d' into seconds.
+   * Returns undefined for invalid inputs.
+   *
+   * @param v - Duration string or number
+   * @returns number of seconds or undefined
+   */
   parseDurationToSeconds(v: string | number | undefined): number | undefined {
     if (!v && v !== 0) return undefined;
     if (typeof v === 'number') return v;
@@ -43,6 +64,14 @@ export class AuthService {
     return undefined;
   }
 
+  /**
+   * Validates user credentials.
+   *
+   * @param email - User's email
+   * @param password - Plain text password
+   * @returns Promise<User> - Validated user
+   * @throws UnauthorizedException - When credentials are invalid
+   */
   async validateUser(email: string, password: string) {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
@@ -61,6 +90,14 @@ export class AuthService {
     return user;
   }
 
+  /**
+   * Performs user login and generates a JWT token.
+   *
+   * @param email - User's email
+   * @param password - Plain text password
+   * @returns Promise<{ access_token: string; expires_in?: number }> - Access token and expiration time
+   * @throws UnauthorizedException - When credentials are invalid
+   */
   async login(
     email: string,
     password: string,

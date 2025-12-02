@@ -10,12 +10,14 @@ export default [
       '**/node_modules',
       '**/dist',
       '**/.next',
+      '**/coverage',
       'apps/web/next-env.d.ts',
       'apps/web/next.config.js',
       'scripts/',
       '*.log',
       'package-lock.json',
       'commitlint.config.js',
+      `apps/server/jest.config.js`,
     ],
   },
   {
@@ -44,6 +46,12 @@ export default [
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'warn',
       '@typescript-eslint/no-unsafe-member-access': 'warn',
+    },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
     },
   },
 ];

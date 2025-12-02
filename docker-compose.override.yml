@@ -18,8 +18,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile.dev
 
-    command: npx next dev apps/web
-
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/web/node_modules
