@@ -9,6 +9,7 @@ import { CreateRoomsDto } from '../dtos/create-rooms.dto';
 import { UpdateRoomsDto } from '../dtos/update-rooms.dto';
 import { Rooms } from '../../domain/entities/rooms.entity';
 import { Class } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
 
 describe('RoomsController', () => {
   let controller: RoomsController;
@@ -23,6 +24,8 @@ describe('RoomsController', () => {
     block: 'Bloco A',
     number: 101,
     size: 'G',
+    courseId: 1,
+    course: undefined as unknown as Course,
     classId: 1,
     class: undefined as unknown as Class,
   };
@@ -93,6 +96,7 @@ describe('RoomsController', () => {
         block: mockRoom.block,
         number: mockRoom.number,
         size: mockRoom.size,
+        courseId: mockRoom.courseId,
         classId: mockRoom.classId,
       });
     });
@@ -107,6 +111,8 @@ describe('RoomsController', () => {
           block: 'Bloco B',
           number: 202,
           size: 'M',
+          courseId: 2,
+          course: undefined as unknown as Course,
           classId: 2,
           class: undefined as unknown as Class,
         },
@@ -123,6 +129,7 @@ describe('RoomsController', () => {
         block: 'Bloco A',
         number: 101,
         size: 'G',
+        courseId: 1,
         classId: 1,
       });
     });
@@ -148,6 +155,7 @@ describe('RoomsController', () => {
         block: mockRoom.block,
         number: mockRoom.number,
         size: mockRoom.size,
+        courseId: mockRoom.courseId,
         classId: mockRoom.classId,
       });
     });
