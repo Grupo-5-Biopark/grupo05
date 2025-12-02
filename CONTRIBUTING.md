@@ -41,9 +41,9 @@ Obrigado por contribuir com o projeto Controle de Salas Biopark! Este guia irá 
 
 Todas as novas funcionalidades de negócio devem ser criadas como módulos independentes dentro do diretório `/apps/server/src/modules`. Cada novo módulo deve seguir nossa estrutura de Clean Architecture:
 
-* **/domain**: Contém a lógica de negócio principal, agregados e interfaces de repositório.
-* **/application**: Contém os controllers e casos de uso que orquestram a lógica de domínio.
-* **/infrastructure**: Contém as implementações concretas, como repositórios TypeORM.
+- **/domain**: Contém a lógica de negócio principal, agregados e interfaces de repositório.
+- **/application**: Contém os controllers e casos de uso que orquestram a lógica de domínio.
+- **/infrastructure**: Contém as implementações concretas, como repositórios TypeORM.
 
 ### Usando o Gerador de Features
 
@@ -90,18 +90,18 @@ git commit -m "tipo(escopo): descrição"
 
 ### Tipos de Commit Disponíveis
 
-| Tipo | Quando Usar | Exemplo |
-|------|-------------|---------|
-| `feat` | Nova funcionalidade | `feat: adicionar endpoint de autenticação` |
-| `fix` | Correção de bug | `fix: corrigir validação de email` |
-| `docs` | Apenas documentação | `docs: atualizar README` |
-| `style` | Formatação de código | `style: aplicar prettier` |
-| `refactor` | Refatoração de código | `refactor: reorganizar estrutura de pastas` |
-| `perf` | Melhoria de performance | `perf: otimizar query do banco` |
-| `test` | Adição/correção de testes | `test: adicionar testes para UserService` |
-| `build` | Mudanças em dependências | `build: atualizar typescript para v5.9` |
-| `ci` | Mudanças no CI/CD | `ci: adicionar workflow de deploy` |
-| `chore` | Tarefas de manutenção | `chore: configurar husky` |
+| Tipo       | Quando Usar               | Exemplo                                     |
+| ---------- | ------------------------- | ------------------------------------------- |
+| `feat`     | Nova funcionalidade       | `feat: adicionar endpoint de autenticação`  |
+| `fix`      | Correção de bug           | `fix: corrigir validação de email`          |
+| `docs`     | Apenas documentação       | `docs: atualizar README`                    |
+| `style`    | Formatação de código      | `style: aplicar prettier`                   |
+| `refactor` | Refatoração de código     | `refactor: reorganizar estrutura de pastas` |
+| `perf`     | Melhoria de performance   | `perf: otimizar query do banco`             |
+| `test`     | Adição/correção de testes | `test: adicionar testes para UserService`   |
+| `build`    | Mudanças em dependências  | `build: atualizar typescript para v5.9`     |
+| `ci`       | Mudanças no CI/CD         | `ci: adicionar workflow de deploy`          |
+| `chore`    | Tarefas de manutenção     | `chore: configurar husky`                   |
 
 ### ✅ Exemplos Corretos
 

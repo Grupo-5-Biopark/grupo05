@@ -1,7 +1,6 @@
 // /apps/server/src/main.ts
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { JwtAuthGuard } from './modules/auth/infrastructure/guards/jwt-auth.guard';
