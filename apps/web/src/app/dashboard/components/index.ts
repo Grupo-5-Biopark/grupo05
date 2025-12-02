@@ -7,3 +7,4 @@ export {
 } from './ForecastContent';
 export { DashboardCharts } from './DashboardCharts';
 export { CourseSummary } from './CourseSummary';
+export { default as ExportModal } from './ExportModal';
