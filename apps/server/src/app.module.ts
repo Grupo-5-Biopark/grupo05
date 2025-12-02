@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { EnvironmentConfigModule } from '@/infrastructure/config/environment-config.module';
 import { DatabaseModule } from '@/infrastructure/database/database.module';
 import { HealthModule } from '@/modules/health/health.module';
@@ -16,6 +17,7 @@ import { AppBootstrap } from './app.bootstrap';
   imports: [
     EnvironmentConfigModule,
     DatabaseModule,
+    ScheduleModule.forRoot(),
     HealthModule,
     AuthModule,
     UsersModule,

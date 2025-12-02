@@ -5,16 +5,15 @@ import {
   useContext,
   useState,
   useEffect,
+  useMemo,
+  useCallback,
   ReactNode,
 } from 'react';
 import { useApi } from '@/hooks/useApi';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'user';
-}
+import { API_ENDPOINTS, STORAGE_KEYS } from '@/constants';
+import type { User, LoginResponse, JWTPayload } from '@/types';
+import { normalizeRole, decodeJwt } from '@/utils/helpers';
+import { logger } from '@/utils/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -27,171 +26,241 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Função auxiliar para normalizar o role
-function normalizeRole(role: string): 'admin' | 'user' {
-  const normalizedRole = role.toLowerCase();
-  return normalizedRole === 'admin' ? 'admin' : 'user';
-}
-
-function decodeJwt(token: string): {
-  email: string;
-  sub: number;
-  name: string;
-  role: 'admin' | 'user';
-} | null {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(function (c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join(''),
-    );
-    const rawParsed = JSON.parse(jsonPayload) as {
-      email: string;
-      sub: number;
-      name: string;
-      role: string;
-    };
-
-    // Normaliza o role antes de retornar
-    const parsed = {
-      ...rawParsed,
-      role: normalizeRole(rawParsed.role),
-    };
-    return parsed;
-  } catch (e) {
-    console.error('Erro ao decodificar JWT:', e);
-    return null;
-  }
-}
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Pegando apenas o 'post' do seu hook
   const { post } = useApi({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   });
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('auth_token');
-      const userData = localStorage.getItem('user_data');
+      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+      const tokenExpiry = localStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRY);
 
       if (token && userData) {
+        // Check if token is expired
+        if (tokenExpiry) {
+          const expiryTime = Number.parseInt(tokenExpiry, 10);
+          const currentTime = Date.now();
+
+          if (currentTime >= expiryTime) {
+            logger.auth('Token expired, clearing auth data');
+            localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+            localStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
+            localStorage.removeItem(STORAGE_KEYS.AUTHENTICATED);
+            setUser(null);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         try {
           const parsedUser = JSON.parse(userData) as User;
           setUser(parsedUser);
+          logger.auth('User restored from localStorage', {
+            userId: parsedUser.id,
+          });
         } catch (error) {
-          console.error('Erro ao parsear dados do usuário:', error);
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('user_data');
+          logger.error('Error parsing user data:', error);
+          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+          localStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
+          localStorage.removeItem(STORAGE_KEYS.AUTHENTICATED);
+          setUser(null);
         }
+      } else {
+        // No auth data, ensure user is null
+        setUser(null);
       }
 
       setIsLoading(false);
     };
 
     checkAuth();
+
+    // Listen for storage changes (e.g., when another tab logs out or token is cleared)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (
+        e.key === STORAGE_KEYS.AUTH_TOKEN ||
+        e.key === STORAGE_KEYS.USER_DATA
+      ) {
+        if (e.newValue) {
+          // Auth data was added/updated, re-check
+          checkAuth();
+        } else {
+          // Auth data was removed
+          logger.auth('Auth data removed, logging out');
+          setUser(null);
+        }
+      }
+    };
+
+    // Listen for custom event when auth is cleared by 401 handler
+    const handleAuthCleared = () => {
+      logger.auth('Auth cleared event received - redirecting to login');
+      setUser(null);
+
+      // Redirect to login page after clearing auth
+      if (globalThis.window !== undefined) {
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          globalThis.window.location.href = '/login';
+        }, 100);
+      }
+    };
+
+    globalThis.window.addEventListener('storage', handleStorageChange);
+    globalThis.window.addEventListener('auth-cleared', handleAuthCleared);
+
+    return () => {
+      globalThis.window.removeEventListener('storage', handleStorageChange);
+      globalThis.window.removeEventListener('auth-cleared', handleAuthCleared);
+    };
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
+    logger.auth('Login attempt', { email });
 
     try {
-      // ETAPA 1: Obter o token
-      const loginResponse = await post<{ access_token: string }>(
-        '/api/auth/login',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${API_ENDPOINTS.AUTH.LOGIN}`,
         {
-          email,
-          password,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+          credentials: 'include', // Include HttpOnly cookies
         },
       );
-      const { access_token } = loginResponse.data;
+
+      if (!response.ok) {
+        logger.error('Login API returned error');
+        return false;
+      }
+
+      const { access_token, expires_in } =
+        (await response.json()) as LoginResponse;
 
       if (!access_token) {
-        console.error('API de login não retornou um access_token');
+        logger.error('Login API did not return access token');
         return false;
       }
 
-      // Salva o token imediatamente
-      localStorage.setItem('auth_token', access_token);
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, access_token);
 
-      // ETAPA 2: Decodificar o token para obter dados do usuário
-      const decodedPayload = decodeJwt(access_token);
+      // Store token expiration time (current time + expires_in seconds)
+      // Default to 1 hour (3600 seconds) if not provided
+      const expiresInSeconds = expires_in || 3600;
+      const expiryTime = Date.now() + expiresInSeconds * 1000;
+      localStorage.setItem(STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+
+      logger.info('Token will expire at', {
+        expiryTime: new Date(expiryTime).toISOString(),
+        expiresInSeconds,
+      });
+
+      const decodedPayload = decodeJwt<JWTPayload>(access_token);
 
       if (
-        !decodedPayload ||
-        !decodedPayload.sub ||
-        !decodedPayload.email ||
-        !decodedPayload.name ||
-        !decodedPayload.role
+        !decodedPayload?.sub ||
+        !decodedPayload?.email ||
+        !decodedPayload?.name ||
+        !decodedPayload?.role
       ) {
-        console.error(
-          'Payload do JWT inválido ou não contém as informações necessárias',
-        );
-        localStorage.removeItem('auth_token'); // Limpa token inválido
+        logger.error('Invalid JWT payload or missing required information');
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
         return false;
       }
-      const partialUser: User = {
+
+      const authenticatedUser: User = {
         id: decodedPayload.sub.toString(),
         email: decodedPayload.email,
         name: decodedPayload.name,
-        role: decodedPayload.role,
+        role: normalizeRole(decodedPayload.role),
       };
 
-      setUser(partialUser);
-      localStorage.setItem('user_data', JSON.stringify(partialUser));
-      localStorage.setItem('authenticated', 'true');
+      setUser(authenticatedUser);
+      localStorage.setItem(
+        STORAGE_KEYS.USER_DATA,
+        JSON.stringify(authenticatedUser),
+      );
+      localStorage.setItem(STORAGE_KEYS.AUTHENTICATED, 'true');
+
+      logger.auth('Login successful', {
+        userId: authenticatedUser.id,
+        role: authenticatedUser.role,
+      });
 
       return true;
     } catch (error) {
-      console.error('Erro no login:', error);
-      // Limpa o token se qualquer etapa falhar
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_data');
+      logger.error('Login error:', error);
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+      localStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
       return false;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const forgotPassword = async (email: string) => {
-    setIsLoading(true);
+  const forgotPassword = useCallback(
+    async (email: string) => {
+      setIsLoading(true);
+      logger.auth('Forgot password request', { email });
 
-    try {
-      // Endpoint suposto: /api/auth/forgot-password
-      await post('/api/auth/forgot-password', { email });
-      console.log('Solicitação de recuperação enviada para:', email);
+      try {
+        await post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
+        logger.auth('Password recovery request sent', { email });
+      } catch (error) {
+        logger.error('Forgot password error:', error);
+      } finally {
+        setIsLoading(false);
+      }
       return true;
+    },
+    [post],
+  );
+
+  const logout = useCallback(async () => {
+    logger.auth('User logout', { userId: user?.id });
+
+    // Call backend to revoke refresh token
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${API_ENDPOINTS.AUTH.LOGOUT}`,
+        {
+          method: 'POST',
+          credentials: 'include', // Send HttpOnly cookie
+        },
+      );
     } catch (error) {
-      console.error('Erro na recuperação de senha:', error);
-      return true; // Mantendo a lógica de segurança
-    } finally {
-      setIsLoading(false);
+      logger.error('Logout API error (non-critical):', error);
+      // Continue with local cleanup even if API fails
     }
-  };
 
-  const logout = () => {
     setUser(null);
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
-    localStorage.removeItem('authenticated');
-  };
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRY);
+    localStorage.removeItem(STORAGE_KEYS.AUTHENTICATED);
+  }, [user?.id]);
 
-  const value: AuthContextType = {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-    login,
-    forgotPassword,
-    logout,
-  };
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      isLoading,
+      isAuthenticated: !!user,
+      login,
+      forgotPassword,
+      logout,
+    }),
+    [user, isLoading, login, forgotPassword, logout],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -199,7 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

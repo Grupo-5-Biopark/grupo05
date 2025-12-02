@@ -1,9 +1,28 @@
 @startuml
 ' Combined Domain Model
-' Generated: 2025-12-02T05:22:32.008Z
-' Modules: calculation-parameters, classes, courses, rooms, shifts, users
+' Generated: 2025-12-02T15:03:01.006Z
+' Modules: auth, calculation-parameters, classes, courses, rooms, shifts, users
 
 
+class User {
+    +id: number
+    +name: string
+    +email: string
+    -password: string
+    +role: string
+    +phone: string
+    +createdAt: Date
+    +setPassword(hashedPassword: string): void
+    +getPassword(): string
+}
+class RefreshToken {
+    +id: number
+    +tokenHash: string
+    +user: User
+    +expiresAt: number
+    +createdAt: Date
+    +revoked: boolean
+}
 class CalculationParameters {
     +id: number
     +dropoutPercentage: number
@@ -47,19 +66,9 @@ class Rooms {
     +classId: number
     +class: Class
 }
-class User {
-    +id: number
-    +name: string
-    +email: string
-    -password: string
-    +role: string
-    +phone: string
-    +createdAt: Date
-    +setPassword(hashedPassword: string): void
-    +getPassword(): string
-}
 
 ' Relationships
+RefreshToken "*" }o-- "1" User
 Class "*" }o-- "1" Course
 Class "*" }o-- "1" Shift
 Rooms "*" }o-- "1" Course

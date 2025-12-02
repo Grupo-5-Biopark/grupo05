@@ -4,28 +4,35 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './application/services/auth.service';
+import { TokenCleanupService } from './application/services/token-cleanup.service';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { AuthController } from './presentation/controllers/auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshToken } from './domain/entities/refresh-token.entity';
+import { RefreshTokenRepository } from './infrastructure/repositories/refresh-token.repository';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    TypeOrmModule.forFeature([RefreshToken]),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET') || 'your-secret-key',
-        // Support an env variable that defines token expiry. Common formats are:
-        // - a string like '1h', '30m', '7d' (compatible with jsonwebtoken)
-        // - a numeric seconds value in JWT_TTL_SECONDS
         signOptions: {
-          expiresIn: configService.get<number>('JWT_EXPIRES_IN') || 3600,
+          expiresIn: configService.get('JWT_ACCESS_TOKEN_EXPIRY') || '1h',
         },
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    RefreshTokenRepository,
+    TokenCleanupService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
