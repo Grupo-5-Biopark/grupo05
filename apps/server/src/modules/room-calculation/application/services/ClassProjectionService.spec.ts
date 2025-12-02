@@ -87,16 +87,17 @@ describe('ClassProjectionService', () => {
       expect(result).toHaveLength(0);
     });
 
-    it('should create multiple classes for multiple missing years', async () => {
-      const targetYear = 2025;
+    it('should create multiple classes for multiple missing years up to current year', async () => {
+      const currentYear = new Date().getFullYear();
+      const targetYear = currentYear + 2;
       const courses = [{ id: 1, shiftId: 1, semester: 1, vacancies: 40 }];
-      const existingClasses = [{ year: 2022 }];
+      const existingClasses = [{ year: currentYear - 1 }]; // One year before current
 
       const mockCreatedClass: ClassEntity = {
         id: 1,
         courseId: 1,
         shiftId: 1,
-        year: 2025,
+        year: targetYear,
         semester: 1,
         currentStudents: 40,
         isAssumed: true,
@@ -112,7 +113,8 @@ describe('ClassProjectionService', () => {
         existingClasses,
       );
 
-      // Should create classes for 2025, 2024, 2023 (stopping at 2022 which exists)
+      // Should create classes for targetYear, targetYear-1, targetYear-2 (currentYear)
+      // and stop at currentYear (not going below it)
       expect(createClassUseCase.execute).toHaveBeenCalledTimes(3);
       expect(result).toHaveLength(3);
     });
@@ -190,8 +192,9 @@ describe('ClassProjectionService', () => {
       expect(result).toEqual([]);
     });
 
-    it('should stop after LOOKBACK_LIMIT of 10 years', async () => {
-      const targetYear = 2025;
+    it('should stop after LOOKBACK_LIMIT of 10 years when all years are in the future', async () => {
+      const currentYear = new Date().getFullYear();
+      const targetYear = currentYear + 15; // Far in the future
       const courses = [{ id: 1 }];
       const existingClasses: Array<{ year: number }> = []; // No existing classes
 
@@ -199,7 +202,7 @@ describe('ClassProjectionService', () => {
         id: 1,
         courseId: 1,
         shiftId: 1,
-        year: 2025,
+        year: targetYear,
         semester: 1,
         currentStudents: 0,
         isAssumed: true,
@@ -211,8 +214,35 @@ describe('ClassProjectionService', () => {
 
       await service.projectMissingClasses(targetYear, courses, existingClasses);
 
-      // Should stop at LOOKBACK_LIMIT (10 years)
+      // Should stop at LOOKBACK_LIMIT (10 years) when all years are >= currentYear
       expect(createClassUseCase.execute).toHaveBeenCalledTimes(11); // targetYear + 10 more years back
+    });
+
+    it('should not create classes for years before current year', async () => {
+      const currentYear = new Date().getFullYear();
+      const targetYear = currentYear + 2;
+      const courses = [{ id: 1 }];
+      const existingClasses: Array<{ year: number }> = []; // No existing classes
+
+      const mockCreatedClass: ClassEntity = {
+        id: 1,
+        courseId: 1,
+        shiftId: 1,
+        year: targetYear,
+        semester: 1,
+        currentStudents: 0,
+        isAssumed: true,
+        course: undefined as unknown as Course,
+        shift: undefined as unknown as Shift,
+      };
+
+      mockCreateClassUseCase.execute.mockResolvedValue(mockCreatedClass);
+
+      await service.projectMissingClasses(targetYear, courses, existingClasses);
+
+      // Should create classes only for targetYear, targetYear-1, targetYear-2 (currentYear)
+      // and stop before currentYear - 1
+      expect(createClassUseCase.execute).toHaveBeenCalledTimes(3);
     });
 
     it('should handle multiple courses', async () => {

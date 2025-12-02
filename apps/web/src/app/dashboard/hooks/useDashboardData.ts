@@ -25,7 +25,14 @@ function calculateStats(
   roomsData: Room[],
 ): DashboardStats {
   // Filtrar apenas turmas reais (não projetadas) para as estatísticas
-  const realClasses = classesData.filter((cls) => !cls.isAssumed);
+  const actualSemester = new Date().getMonth() < 6 ? 1 : 2;
+  const actualYear = new Date().getFullYear();
+  const realClasses = classesData.filter(
+    (cls) =>
+      !cls.isAssumed &&
+      cls.year === actualYear &&
+      cls.semester === actualSemester,
+  );
 
   const totalStudents = realClasses.reduce(
     (sum, cls) => sum + (cls.currentStudents || 0),

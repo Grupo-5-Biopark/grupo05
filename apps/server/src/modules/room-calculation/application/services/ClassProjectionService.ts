@@ -26,10 +26,15 @@ export class ClassProjectionService {
     const existingYears = new Set(existingClasses.map((c) => Number(c.year)));
 
     const LOOKBACK_LIMIT = 10;
+    const currentYear = new Date().getFullYear();
     let currentYearCheck = targetYear;
 
     while (true) {
       if (existingYears.has(currentYearCheck)) {
+        break;
+      }
+
+      if (currentYearCheck < currentYear) {
         break;
       }
 
