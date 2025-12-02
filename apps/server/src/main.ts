@@ -1,10 +1,9 @@
-// /apps/server/src/main.ts
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { JwtAuthGuard } from './modules/auth/infrastructure/guards/jwt-auth.guard';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -40,6 +39,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.use(cookieParser());
   await app.listen(process.env.SERVER_PORT ?? 3000);
   console.log(
     `Server is running on http://localhost:${process.env.SERVER_PORT ?? 3000}`,
