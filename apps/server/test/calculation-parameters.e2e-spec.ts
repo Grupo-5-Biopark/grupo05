@@ -34,20 +34,20 @@ describe('Calculation Parameters (e2e)', () => {
     // Clean up calculation parameters if any
     if (authToken) {
       await request(app.getHttpServer() as Server)
-        .delete('/calculationParameters')
+        .delete('/calculation-parameters')
         .set('Authorization', `Bearer ${authToken}`);
     }
     await app.close();
   });
 
-  describe('/calculationParameters (POST)', () => {
+  describe('/calculation-parameters (POST)', () => {
     it('should create new calculation parameters', () => {
       if (!authToken) {
         return expect(true).toBe(true);
       }
 
       return request(app.getHttpServer() as Server)
-        .post('/calculationParameters')
+        .post('/calculation-parameters')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           dropoutPercentage: 10,
@@ -71,7 +71,7 @@ describe('Calculation Parameters (e2e)', () => {
       }
 
       return request(app.getHttpServer() as Server)
-        .post('/calculationParameters')
+        .post('/calculation-parameters')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           numberOfProfessorsPerClass: 2,
@@ -81,7 +81,7 @@ describe('Calculation Parameters (e2e)', () => {
 
     it('should return 401 without authentication', async () => {
       const response = await request(app.getHttpServer() as Server)
-        .post('/calculationParameters')
+        .post('/calculation-parameters')
         .send({
           numberOfProfessorsPerClass: 2,
           numberOfStudentsPerClass: 30,
@@ -92,10 +92,10 @@ describe('Calculation Parameters (e2e)', () => {
     });
   });
 
-  describe('/calculationParameters (GET)', () => {
+  describe('/calculation-parameters (GET)', () => {
     it('should return 401 without authentication', async () => {
       const response = await request(app.getHttpServer() as Server).get(
-        '/calculationParameters',
+        '/calculation-parameters',
       );
 
       expect(response.status).toBe(401);
@@ -107,7 +107,7 @@ describe('Calculation Parameters (e2e)', () => {
       }
 
       return request(app.getHttpServer() as Server)
-        .get('/calculationParameters')
+        .get('/calculation-parameters')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
         .expect((res) => {
@@ -116,10 +116,10 @@ describe('Calculation Parameters (e2e)', () => {
     });
   });
 
-  describe('/calculationParameters (PUT)', () => {
+  describe('/calculation-parameters (PUT)', () => {
     it('should return 401 without authentication', async () => {
       const response = await request(app.getHttpServer() as Server)
-        .put('/calculationParameters')
+        .put('/calculation-parameters')
         .send({
           dropoutPercentage: 15,
           studentsPerSmallRoom: 30,
@@ -136,7 +136,7 @@ describe('Calculation Parameters (e2e)', () => {
       }
 
       return request(app.getHttpServer() as Server)
-        .put('/calculationParameters')
+        .put('/calculation-parameters')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           dropoutPercentage: 15,
@@ -148,10 +148,10 @@ describe('Calculation Parameters (e2e)', () => {
     });
   });
 
-  describe('/calculationParameters (DELETE)', () => {
+  describe('/calculation-parameters (DELETE)', () => {
     it('should return 401 without authentication', async () => {
       const response = await request(app.getHttpServer() as Server).delete(
-        '/calculationParameters',
+        '/calculation-parameters',
       );
 
       expect(response.status).toBe(401);
