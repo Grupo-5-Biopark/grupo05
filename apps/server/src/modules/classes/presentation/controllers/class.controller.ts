@@ -62,6 +62,10 @@ export class ClassController {
       semester: classEntity.semester,
       currentStudents: classEntity.currentStudents,
       isAssumed: classEntity.isAssumed,
+      course: classEntity.course
+        ? { name: classEntity.course.name }
+        : undefined,
+      shift: classEntity.shift ? { name: classEntity.shift.name } : undefined,
     }));
   }
 
@@ -79,6 +83,10 @@ export class ClassController {
       semester: classEntity.semester,
       currentStudents: classEntity.currentStudents,
       isAssumed: classEntity.isAssumed,
+      course: classEntity.course
+        ? { name: classEntity.course.name }
+        : undefined,
+      shift: classEntity.shift ? { name: classEntity.shift.name } : undefined,
     };
   }
 

@@ -1,5 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+class CourseInfo {
+  @ApiProperty({ example: 'Engenharia de Software' })
+  name: string;
+}
+
+class ShiftInfo {
+  @ApiProperty({ example: 'Matutino' })
+  name: string;
+}
+
 export class ClassResponseDto {
   @ApiProperty({ example: 1 })
   id: number;
@@ -21,4 +31,10 @@ export class ClassResponseDto {
 
   @ApiPropertyOptional({ example: false })
   isAssumed?: boolean;
+
+  @ApiPropertyOptional({ type: CourseInfo })
+  course?: CourseInfo;
+
+  @ApiPropertyOptional({ type: ShiftInfo })
+  shift?: ShiftInfo;
 }
