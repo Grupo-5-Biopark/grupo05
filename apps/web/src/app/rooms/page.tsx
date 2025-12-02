@@ -38,9 +38,19 @@ interface Course {
 
 interface ClassItem {
   id: number;
-  courseId?: number; // se API fornecer
+  courseId?: number;
+  shiftId?: number;
+  year?: number;
+  semester?: number;
+  currentStudents?: number;
+  isAssumed?: boolean;
   courseName?: string; // fallback se não houver courseId
   period?: number;
+}
+
+interface Shift {
+  id: number;
+  name: string;
 }
 
 function RoomsDataPanel() {
@@ -62,6 +72,7 @@ function RoomsDataPanel() {
   });
   const [courses, setCourses] = useState<Course[]>([]);
   const [classes, setClasses] = useState<ClassItem[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>([]);
   const [filteredClasses, setFilteredClasses] = useState<ClassItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showNewRoomModal, setShowNewRoomModal] = useState(false);
@@ -76,7 +87,7 @@ function RoomsDataPanel() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
   useEffect(() => {
-    void Promise.all([loadRooms(), loadCourses(), loadClasses()]);
+    void Promise.all([loadRooms(), loadCourses(), loadClasses(), loadShifts()]);
   }, []);
 
   useEffect(() => {
@@ -110,6 +121,31 @@ function RoomsDataPanel() {
       console.error('Erro ao buscar turmas (classes):', err);
     }
   }
+
+  async function loadShifts() {
+    try {
+      const response = await get<Shift[]>('/api/shifts');
+      setShifts(response.data);
+    } catch (err) {
+      console.error('Erro ao buscar turnos:', err);
+    }
+  }
+
+  // Mapa de tradução de turnos (inglês -> português)
+  const shiftTranslations: Record<string, string> = {
+    Morning: 'Matutino',
+    Afternoon: 'Vespertino',
+    Night: 'Noturno',
+    Matutino: 'Matutino',
+    Vespertino: 'Vespertino',
+    Noturno: 'Noturno',
+  };
+
+  const getShiftName = (shiftId: number) => {
+    const shift = shifts.find((s) => s.id === shiftId);
+    if (!shift) return '';
+    return shiftTranslations[shift.name] || shift.name;
+  };
 
   useEffect(() => {
     if (!selectedCourseId) {
@@ -180,13 +216,19 @@ function RoomsDataPanel() {
     if (!room.classId) return '-';
     const cls = classes.find((c) => c.id === room.classId);
     if (cls) {
-      return `Turma ${cls.id}${cls.period ? ' - ' + cls.period + 'º período' : ''}`;
+      const shiftName = cls.shiftId ? getShiftName(cls.shiftId) : '';
+      const periodInfo =
+        cls.year && cls.semester ? `${cls.year}/${cls.semester}º` : '';
+      const parts = [`#${cls.id}`];
+      if (periodInfo) parts.push(periodInfo);
+      if (shiftName) parts.push(shiftName);
+      return parts.join(' - ');
     }
     // fallback: if room has embedded class info
     if (room.class && typeof room.class === 'object') {
       const period = (room.class as any).period;
       const id = room.classId;
-      return `Turma ${id}${period ? ' - ' + period + 'º período' : ''}`;
+      return `#${id}${period ? ' - ' + period + 'º período' : ''}`;
     }
     return '-';
   };
@@ -532,7 +574,7 @@ function RoomsDataPanel() {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className="form-group form-group-full">
                 <label>Turma</label>
                 <select
                   name="classId"
@@ -540,13 +582,29 @@ function RoomsDataPanel() {
                   onChange={handleFormChange}
                   disabled={!selectedCourseId}
                 >
-                  <option value="">Selecione a turma</option>
-                  {filteredClasses.map((cl) => (
-                    <option key={cl.id} value={cl.id}>
-                      {`Turma ${cl.id}${cl.period ? ' - ' + cl.period + 'º período' : ''}`}
-                    </option>
-                  ))}
+                  <option value="">
+                    {selectedCourseId
+                      ? 'Selecione a turma'
+                      : 'Primeiro selecione um curso'}
+                  </option>
+                  {filteredClasses.map((cl) => {
+                    const course = courses.find((c) => c.id === cl.courseId);
+                    const shiftName = cl.shiftId
+                      ? getShiftName(cl.shiftId)
+                      : '';
+                    const statusText = cl.isAssumed ? 'Planejada' : 'Existente';
+                    return (
+                      <option key={cl.id} value={cl.id}>
+                        {`#${cl.id} - ${course?.name || 'Curso'} - ${cl.year}/${cl.semester}º sem - ${shiftName} - ${statusText} (${cl.currentStudents} alunos)`}
+                      </option>
+                    );
+                  })}
                 </select>
+                {selectedCourseId && filteredClasses.length === 0 && (
+                  <span className="help-text">
+                    Nenhuma turma cadastrada para este curso
+                  </span>
+                )}
               </div>
             </div>
 

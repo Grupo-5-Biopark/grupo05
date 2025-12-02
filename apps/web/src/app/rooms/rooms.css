@@ -301,8 +301,8 @@
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  max-width: 500px;
-  width: 90%;
+  max-width: 650px;
+  width: 95%;
   max-height: 90%;
   overflow-y: auto;
   transform: scale(0.9);
@@ -352,7 +352,27 @@
 
 .form-grid-rooms {
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.25rem;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-group-full select {
+  width: 100%;
+  min-height: 42px;
+}
+
+.form-group-full select option {
+  padding: 0.5rem;
+}
+
+.help-text {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+  font-style: italic;
 }
 
 .form-group {

@@ -13,13 +13,26 @@ interface Course {
   name: string;
 }
 
+interface Shift {
+  id: number;
+  name: string;
+}
+
 interface ClassItem {
   id: number;
   courseId: number;
+  shiftId: number;
   year: number;
   semester: number;
   currentStudents: number;
   isAssumed: boolean;
+}
+
+interface ClassStats {
+  total: number;
+  totalStudents: number;
+  existingClasses: number;
+  plannedClasses: number;
 }
 
 export default function ClassesPage() {
@@ -42,15 +55,26 @@ export default function ClassesPage() {
 
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>([]);
+  const [stats, setStats] = useState<ClassStats>({
+    total: 0,
+    totalStudents: 0,
+    existingClasses: 0,
+    plannedClasses: 0,
+  });
 
   const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'existing' | 'planned'
+  >('all');
   const [toast, setToast] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
@@ -60,13 +84,16 @@ export default function ClassesPage() {
   useEffect(() => {
     void loadClasses();
     void loadCourses();
+    void loadShifts();
   }, [user]);
+
+  useEffect(() => {
+    calculateStats(classes);
+  }, [classes]);
 
   async function loadClasses() {
     try {
       const response = await get('/api/classes');
-
-      console.log('Load Classes Response:', response);
 
       if (response && Array.isArray(response.data)) {
         setClasses(response.data);
@@ -93,6 +120,46 @@ export default function ClassesPage() {
     }
   }
 
+  async function loadShifts() {
+    try {
+      const response = await get('/api/shifts');
+
+      if (response && Array.isArray(response.data)) {
+        setShifts(response.data);
+      } else if (Array.isArray(response)) {
+        setShifts(response);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar turnos:', error);
+    }
+  }
+
+  // Get current year and semester
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1; // 1-12
+  const currentSemester = currentMonth <= 6 ? 1 : 2;
+
+  const calculateStats = (classesList: ClassItem[]) => {
+    // Turmas existentes do semestre atual para contagem de alunos
+    const currentExistingClasses = classesList.filter(
+      (c) =>
+        !c.isAssumed &&
+        c.year === currentYear &&
+        c.semester === currentSemester,
+    );
+
+    const newStats = {
+      total: classesList.length,
+      totalStudents: currentExistingClasses.reduce(
+        (sum, c) => sum + (c.currentStudents || 0),
+        0,
+      ),
+      existingClasses: classesList.filter((c) => !c.isAssumed).length,
+      plannedClasses: classesList.filter((c) => c.isAssumed).length,
+    };
+    setStats(newStats);
+  };
+
   const getAssumedText = (isAssumed: boolean) => {
     return isAssumed ? 'PLANEJADA' : 'EXISTENTE';
   };
@@ -102,34 +169,115 @@ export default function ClassesPage() {
   };
 
   const filteredClasses = useMemo(() => {
-    // 1. FILTRAGEM
-    const filtered = classes.filter((c) => {
+    // 1. FILTRAGEM por busca
+    let filtered = classes.filter((c) => {
       if (!searchTerm) return true;
 
       const courseName = courses.find((x) => x.id === c.courseId)?.name || '';
-      return courseName.toLowerCase().includes(searchTerm.toLowerCase());
+      const shiftName = shifts.find((x) => x.id === c.shiftId)?.name || '';
+      const searchLower = searchTerm.toLowerCase();
+
+      return (
+        courseName.toLowerCase().includes(searchLower) ||
+        shiftName.toLowerCase().includes(searchLower) ||
+        c.year.toString().includes(searchLower)
+      );
     });
 
-    // 2. ORDENAÇÃO
-    // Criamos uma cópia do array para ordenar (.sort() modifica o array original)
+    // 2. FILTRAGEM por status
+    if (filterStatus === 'existing') {
+      filtered = filtered.filter((c) => !c.isAssumed);
+    } else if (filterStatus === 'planned') {
+      filtered = filtered.filter((c) => c.isAssumed);
+    }
+
+    // 3. ORDENAÇÃO MELHORADA
+    // Prioridade:
+    // 1. Ano e semestre atual primeiro
+    // 2. Dentro do mesmo ano/semestre: "Existente" antes de "Planejada"
+    // 3. Depois: ordem crescente por ano/semestre
+    // 4. Dentro do mesmo ano/semestre: "Existente" antes de "Planejada"
     return filtered.slice().sort((a, b) => {
-      // Ordenação Principal: por ANO (Ascendente)
+      const aIsCurrentPeriod =
+        a.year === currentYear && a.semester === currentSemester;
+      const bIsCurrentPeriod =
+        b.year === currentYear && b.semester === currentSemester;
+
+      // Classes do período atual vêm primeiro
+      if (aIsCurrentPeriod && !bIsCurrentPeriod) return -1;
+      if (!aIsCurrentPeriod && bIsCurrentPeriod) return 1;
+
+      // Se ambos são do mesmo período (atual ou não), ordenar por ano e semestre
       if (a.year !== b.year) {
         return a.year - b.year;
       }
 
-      // Ordenação Secundária: por SEMESTRE (Ascendente)
-      return a.semester - b.semester;
+      if (a.semester !== b.semester) {
+        return a.semester - b.semester;
+      }
+
+      // No mesmo ano e semestre: "Existente" (isAssumed=false) vem antes de "Planejada" (isAssumed=true)
+      if (a.isAssumed !== b.isAssumed) {
+        return a.isAssumed ? 1 : -1;
+      }
+
+      // Por último, ordenar por nome do curso
+      const courseA = courses.find((x) => x.id === a.courseId)?.name || '';
+      const courseB = courses.find((x) => x.id === b.courseId)?.name || '';
+      return courseA.localeCompare(courseB);
     });
-  }, [classes, courses, searchTerm]);
+  }, [
+    classes,
+    courses,
+    shifts,
+    searchTerm,
+    filterStatus,
+    currentYear,
+    currentSemester,
+  ]);
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!selectedClass) return false;
+
+    if (!selectedClass.courseId || selectedClass.courseId === 0) {
+      errors.courseId = 'Selecione um curso';
+    }
+
+    if (!selectedClass.shiftId || selectedClass.shiftId === 0) {
+      errors.shiftId = 'Selecione um turno';
+    }
+
+    if (!selectedClass.year || selectedClass.year < 2000) {
+      errors.year = 'Ano deve ser maior ou igual a 2000';
+    }
+
+    if (
+      !selectedClass.semester ||
+      selectedClass.semester < 1 ||
+      selectedClass.semester > 2
+    ) {
+      errors.semester = 'Semestre deve ser 1 ou 2';
+    }
+
+    if (selectedClass.currentStudents < 0) {
+      errors.currentStudents = 'Número de alunos não pode ser negativo';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const openModal = (classItem: ClassItem | null = null) => {
+    setFormErrors({});
     setSelectedClass(
       classItem ?? {
         id: 0,
         courseId: courses.length > 0 ? courses[0].id : 0,
-        year: new Date().getFullYear(),
-        semester: 1,
+        shiftId: shifts.length > 0 ? shifts[0].id : 0,
+        year: currentYear,
+        semester: currentSemester,
         isAssumed: false,
         currentStudents: 0,
       },
@@ -140,6 +288,7 @@ export default function ClassesPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedClass(null);
+    setFormErrors({});
   };
 
   const openDeleteModal = (classItem: ClassItem) => {
@@ -153,13 +302,16 @@ export default function ClassesPage() {
   };
 
   const saveClass = async () => {
-    if (!selectedClass || selectedClass.courseId === 0) {
-      showToast('error', 'Por favor, selecione um curso.');
+    if (!selectedClass || !validateForm()) {
+      if (!selectedClass) {
+        showToast('error', 'Erro interno. Tente novamente.');
+      }
       return;
     }
 
     const payload = {
       courseId: selectedClass.courseId,
+      shiftId: selectedClass.shiftId,
       year: selectedClass.year,
       semester: selectedClass.semester,
       isAssumed: selectedClass.isAssumed,
@@ -182,7 +334,21 @@ export default function ClassesPage() {
       }
     } catch (error) {
       console.error('Erro ao salvar turma:', error);
-      showToast('error', 'Erro ao salvar turma.');
+      let serverMessage = 'Erro ao salvar turma. Tente novamente.';
+      if (error instanceof Error) serverMessage = error.message;
+      else if (error && typeof error === 'object') {
+        const anyErr = error as {
+          response?: { data?: { message?: string } | string };
+        };
+        if (
+          typeof anyErr.response?.data === 'object' &&
+          anyErr.response?.data?.message
+        )
+          serverMessage = anyErr.response.data.message;
+        else if (typeof anyErr.response?.data === 'string')
+          serverMessage = anyErr.response.data;
+      }
+      showToast('error', serverMessage);
     }
   };
 
@@ -205,6 +371,29 @@ export default function ClassesPage() {
     return courses.find((x) => x.id === courseId)?.name || 'Curso Desconhecido';
   };
 
+  // Mapa de tradução de turnos (inglês -> português)
+  const shiftTranslations: Record<string, string> = {
+    Morning: 'Matutino',
+    Afternoon: 'Vespertino',
+    Night: 'Noturno',
+    Matutino: 'Matutino',
+    Vespertino: 'Vespertino',
+    Noturno: 'Noturno',
+  };
+
+  const getShiftName = (shiftId: number) => {
+    const shift = shifts.find((x) => x.id === shiftId);
+    if (!shift) return 'Turno Desconhecido';
+    return shiftTranslations[shift.name] || shift.name;
+  };
+
+  // Helper to highlight current period rows
+  const isCurrentPeriod = (classItem: ClassItem) => {
+    return (
+      classItem.year === currentYear && classItem.semester === currentSemester
+    );
+  };
+
   return (
     <div className="user-layout">
       <Header user={user} onLogout={handleLogout} />
@@ -218,37 +407,88 @@ export default function ClassesPage() {
             </p>
           </div>
 
+          {/* Stats Cards */}
+          <div className="stats-container">
+            <div className="stat-card">
+              <div className="stat-number">{stats.total}</div>
+              <div className="stat-label">Total de Turmas</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{stats.totalStudents}</div>
+              <div className="stat-label">
+                Alunos ({currentYear}/{currentSemester}º)
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{stats.existingClasses}</div>
+              <div className="stat-label">Turmas Existentes</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{stats.plannedClasses}</div>
+              <div className="stat-label">Turmas Planejadas</div>
+            </div>
+          </div>
+
           <div className="filters-container">
             <div className="filter-group">
-              <label>Buscar por curso:</label>
+              <label>Buscar:</label>
               <input
                 type="text"
-                placeholder="Nome do curso..."
+                placeholder="Curso, turno ou ano..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
               />
             </div>
+            <div className="filter-group">
+              <label>Status:</label>
+              <select
+                value={filterStatus}
+                onChange={(e) =>
+                  setFilterStatus(
+                    e.target.value as 'all' | 'existing' | 'planned',
+                  )
+                }
+                className="filter-select"
+              >
+                <option value="all">Todos</option>
+                <option value="existing">Existentes</option>
+                <option value="planned">Planejadas</option>
+              </select>
+            </div>
+            <button className="btn-new-user" onClick={() => openModal(null)}>
+              <span className="btn-plus">+</span> Nova Turma
+            </button>
           </div>
 
           <div className="users-table-container">
-            <h2 className="table-title">Lista de Turmas</h2>
+            <h2 className="table-title">
+              Lista de Turmas
+              {filteredClasses.length > 0 && (
+                <span className="table-subtitle">
+                  {' '}
+                  — Período atual: {currentYear}/{currentSemester}º semestre
+                </span>
+              )}
+            </h2>
 
             {/* Lógica de exibição ajustada */}
             {classes.length === 0 ? (
               <div className="no-results">
-                Nenhuma turma cadastrada (Lista Vazia).
+                Nenhuma turma cadastrada. Clique em &quot;Nova Turma&quot; para
+                adicionar.
               </div>
             ) : filteredClasses.length === 0 ? (
               <div className="no-results">
-                Nenhuma turma encontrada com o termo de busca.
+                Nenhuma turma encontrada com os filtros aplicados.
               </div>
             ) : (
               <table className="users-table">
                 <thead>
                   <tr>
-                    <th>TURMA</th>
+                    <th>ID</th>
                     <th>CURSO</th>
+                    <th>TURNO</th>
                     <th>ANO</th>
                     <th>SEMESTRE</th>
                     <th>ALUNOS</th>
@@ -258,11 +498,26 @@ export default function ClassesPage() {
                 </thead>
                 <tbody>
                   {filteredClasses.map((c) => (
-                    <tr key={c.id}>
-                      <td>Turma {c.id}</td>
-                      <td>{getCourseName(c.courseId)}</td>
+                    <tr
+                      key={c.id}
+                      className={isCurrentPeriod(c) ? 'current-period-row' : ''}
+                    >
+                      <td>
+                        <span className="class-id-badge">#{c.id}</span>
+                      </td>
+                      <td>
+                        <div className="course-cell">
+                          <span className="course-name">
+                            {getCourseName(c.courseId)}
+                          </span>
+                          {isCurrentPeriod(c) && (
+                            <span className="current-badge">ATUAL</span>
+                          )}
+                        </div>
+                      </td>
+                      <td>{getShiftName(c.shiftId)}</td>
                       <td>{c.year}</td>
-                      <td>{c.semester}</td>
+                      <td>{c.semester}º</td>
                       <td>{c.currentStudents}</td>
                       <td>
                         <span
@@ -294,11 +549,10 @@ export default function ClassesPage() {
             )}
           </div>
 
-          {/* Modais e Toast permanecem iguais... */}
+          {/* Modal Nova/Editar Turma */}
           {isModalOpen && selectedClass && (
             <div className="modal active">
               <div className="modal-content">
-                {/* Conteúdo do Modal (igual ao anterior) */}
                 <div className="modal-header">
                   <h3 className="modal-title">
                     {selectedClass.id === 0
@@ -311,7 +565,7 @@ export default function ClassesPage() {
                 </div>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label>Curso:</label>
+                    <label>Curso: *</label>
                     <select
                       value={selectedClass.courseId}
                       onChange={(e) =>
@@ -320,6 +574,7 @@ export default function ClassesPage() {
                           courseId: Number(e.target.value),
                         })
                       }
+                      className={formErrors.courseId ? 'input-error' : ''}
                     >
                       <option value={0}>Selecione...</option>
                       {courses.map((c) => (
@@ -328,11 +583,38 @@ export default function ClassesPage() {
                         </option>
                       ))}
                     </select>
+                    {formErrors.courseId && (
+                      <span className="error-text">{formErrors.courseId}</span>
+                    )}
                   </div>
                   <div className="form-group">
-                    <label>Ano:</label>
+                    <label>Turno: *</label>
+                    <select
+                      value={selectedClass.shiftId}
+                      onChange={(e) =>
+                        setSelectedClass({
+                          ...selectedClass,
+                          shiftId: Number(e.target.value),
+                        })
+                      }
+                      className={formErrors.shiftId ? 'input-error' : ''}
+                    >
+                      <option value={0}>Selecione...</option>
+                      {shifts.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                    {formErrors.shiftId && (
+                      <span className="error-text">{formErrors.shiftId}</span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Ano: *</label>
                     <input
                       type="number"
+                      min="2000"
                       value={selectedClass.year}
                       onChange={(e) =>
                         setSelectedClass({
@@ -340,14 +622,15 @@ export default function ClassesPage() {
                           year: Number(e.target.value),
                         })
                       }
+                      className={formErrors.year ? 'input-error' : ''}
                     />
+                    {formErrors.year && (
+                      <span className="error-text">{formErrors.year}</span>
+                    )}
                   </div>
                   <div className="form-group">
-                    <label>Semestre:</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="2"
+                    <label>Semestre: *</label>
+                    <select
                       value={selectedClass.semester}
                       onChange={(e) =>
                         setSelectedClass({
@@ -355,7 +638,36 @@ export default function ClassesPage() {
                           semester: Number(e.target.value),
                         })
                       }
+                      className={formErrors.semester ? 'input-error' : ''}
+                    >
+                      <option value={1}>1º Semestre</option>
+                      <option value={2}>2º Semestre</option>
+                    </select>
+                    {formErrors.semester && (
+                      <span className="error-text">{formErrors.semester}</span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Alunos atuais: *</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={selectedClass.currentStudents}
+                      onChange={(e) =>
+                        setSelectedClass({
+                          ...selectedClass,
+                          currentStudents: Number(e.target.value),
+                        })
+                      }
+                      className={
+                        formErrors.currentStudents ? 'input-error' : ''
+                      }
                     />
+                    {formErrors.currentStudents && (
+                      <span className="error-text">
+                        {formErrors.currentStudents}
+                      </span>
+                    )}
                   </div>
                   <div className="form-group">
                     <label>Status da Turma:</label>
@@ -372,19 +684,6 @@ export default function ClassesPage() {
                       <option value="true">PLANEJADA</option>
                     </select>
                   </div>
-                  <div className="form-group">
-                    <label>Alunos atuais:</label>
-                    <input
-                      type="number"
-                      value={selectedClass.currentStudents}
-                      onChange={(e) =>
-                        setSelectedClass({
-                          ...selectedClass,
-                          currentStudents: Number(e.target.value),
-                        })
-                      }
-                    />
-                  </div>
                 </div>
                 <div className="modal-actions">
                   <button className="btn btn-secondary" onClick={closeModal}>
@@ -394,7 +693,10 @@ export default function ClassesPage() {
                     className="btn btn-primary"
                     onClick={() => void saveClass()}
                   >
-                    💾 Salvar
+                    💾{' '}
+                    {selectedClass.id === 0
+                      ? 'Criar Turma'
+                      : 'Salvar Alterações'}
                   </button>
                 </div>
               </div>
@@ -413,7 +715,8 @@ export default function ClassesPage() {
                 <div style={{ padding: '0.5rem 0 1.25rem' }}>
                   <p>
                     Tem certeza que deseja excluir a turma do curso{' '}
-                    <strong>{getCourseName(selectedClass.courseId)}</strong>?
+                    <strong>{getCourseName(selectedClass.courseId)}</strong> (
+                    {selectedClass.year}/{selectedClass.semester}º)?
                   </p>
                 </div>
                 <div className="modal-actions">
