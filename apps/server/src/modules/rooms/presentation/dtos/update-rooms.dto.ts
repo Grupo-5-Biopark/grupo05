@@ -18,5 +18,10 @@ export class UpdateRoomsDto {
   @ApiPropertyOptional({ example: 1 })
   @IsNumber({}, { message: 'must be a number' })
   @IsOptional()
+  courseId?: number;
+
+  @ApiPropertyOptional({ example: 1 })
+  @IsNumber({}, { message: 'must be a number' })
+  @IsOptional()
   classId?: number;
 }

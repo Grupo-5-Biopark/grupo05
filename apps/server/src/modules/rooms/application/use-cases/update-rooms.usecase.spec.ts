@@ -5,6 +5,7 @@ import { Rooms } from '../../domain/entities/rooms.entity';
 import { UpdateRoomsDto } from '../../presentation/dtos/update-rooms.dto';
 import { RoomsNotFoundException } from '../../domain/exceptions/room-not-found.exception';
 import { Class } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
 
 describe('UpdateRoomsUseCase', () => {
   let useCase: UpdateRoomsUseCase;
@@ -39,6 +40,8 @@ describe('UpdateRoomsUseCase', () => {
       block: 'Bloco A',
       number: 101,
       size: 'G',
+      courseId: 1,
+      course: undefined as unknown as Course,
       classId: 1,
       class: undefined as unknown as Class,
     };
@@ -56,7 +59,13 @@ describe('UpdateRoomsUseCase', () => {
       await useCase.execute(1, updateDto);
 
       expect(repository.findById).toHaveBeenCalledWith(1);
-      expect(repository.update).toHaveBeenCalledWith(1, updateDto);
+      expect(repository.update).toHaveBeenCalledWith(1, {
+        block: 'Bloco B',
+        number: 202,
+        size: 'M',
+        courseId: null,
+        classId: null,
+      });
     });
 
     it('should throw RoomsNotFoundException when room is not found', async () => {
@@ -86,7 +95,13 @@ describe('UpdateRoomsUseCase', () => {
 
       await useCase.execute(1, updateDto);
 
-      expect(repository.update).toHaveBeenCalledWith(1, updateDto);
+      expect(repository.update).toHaveBeenCalledWith(1, {
+        block: 'Bloco A',
+        number: 101,
+        size: 'P',
+        courseId: null,
+        classId: null,
+      });
     });
 
     it('should throw an error when repository fails', async () => {

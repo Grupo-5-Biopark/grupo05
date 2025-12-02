@@ -30,10 +30,13 @@ class Rooms {
     +block: string
     +number: number
     +size: string
+    +courseId: number
+    +course: Course
     +classId: number
     +class: Class
 }
 
 ' Relationships
+Rooms "*" }o-- "1" Course
 Rooms "*" }o-- "1" Class
 @enduml

@@ -4,6 +4,7 @@ import { RoomsRepository } from '../../infrastructure/repositories/rooms.reposit
 import { CreateRoomsDto } from '../../presentation/dtos/create-rooms.dto';
 import { Rooms } from '../../domain/entities/rooms.entity';
 import { Class } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
 
 describe('CreateRoomsUseCase', () => {
   let useCase: CreateRoomsUseCase;
@@ -44,6 +45,8 @@ describe('CreateRoomsUseCase', () => {
         block: dto.block,
         number: dto.number,
         size: dto.size,
+        courseId: undefined as unknown as number,
+        course: undefined as unknown as Course,
         classId: undefined as unknown as number,
         class: undefined as unknown as Class,
       };
@@ -69,6 +72,8 @@ describe('CreateRoomsUseCase', () => {
         block: dtoWithClassId.block,
         number: dtoWithClassId.number,
         size: dtoWithClassId.size,
+        courseId: undefined as unknown as number,
+        course: undefined as unknown as Course,
         classId: 5,
         class: undefined as unknown as Class,
       };

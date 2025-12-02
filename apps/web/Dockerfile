@@ -2,29 +2,35 @@
 FROM node:24.7.0-alpine AS base
 WORKDIR /usr/src/app
 
-
-# ---- Production Dependencies Stage ----
-FROM base AS prod-deps
+# ---- Dependencies Stage ----
+FROM base AS deps
 COPY package*.json ./
 COPY apps/server/package.json ./apps/server/
 COPY apps/web/package.json ./apps/web/
-RUN npm ci --omit=dev --ignore-scripts
-
+RUN npm ci --ignore-scripts
 
 # ---- Build Stage ----
 FROM base AS builder
-COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
-RUN npm run build --workspace=web
+WORKDIR /usr/src/app/apps/web
+RUN npm run build
 
+# ---- Production Stage ----
+FROM node:24.7.0-alpine AS production
+WORKDIR /app
 
-# ---- Final Production Stage ----
-FROM base AS production
-ENV NODE_ENV production
-COPY --from=builder /usr/src/app/apps/web/.next ./apps/web/.next
-COPY --from=builder /usr/src/app/apps/web/public ./apps/web/public
-COPY --from=builder /usr/src/app/apps/web/package.json ./apps/web/
-COPY --from=builder /usr/src/app/package.json ./
-COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+# Install production dependencies
+COPY --from=builder /usr/src/app/apps/web/package.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+# Copy built application
+COPY --from=builder /usr/src/app/apps/web/.next ./.next
+COPY --from=builder /usr/src/app/apps/web/public ./public
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
 EXPOSE 3000
-CMD ["npm", "start", "--workspace=web"]
+
+CMD ["npm", "start"]
