@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/ui/Header';
@@ -18,6 +18,7 @@ import {
   ForecastEmpty,
   DashboardCharts,
   CourseSummary,
+  ExportModal,
 } from './components';
 import { COLORS, RoomCalculationResponse, DashboardStats } from './types';
 import './dashboard.css';
@@ -117,6 +118,8 @@ export default function DashboardPage() {
     handleGoToCurrentPeriod,
   } = usePeriodSelector();
 
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
   const { roomCalculation, isLoadingCalculation } = useRoomCalculation(
     isAuthenticated,
     dataLoaded,
@@ -187,6 +190,60 @@ export default function DashboardPage() {
                     onNextPeriod={handleNextPeriod}
                     onGoToCurrentPeriod={handleGoToCurrentPeriod}
                   />
+                  <button
+                    className="export-btn"
+                    onClick={() => setIsExportOpen(true)}
+                    title="Exportar dados do dashboard"
+                    aria-label="Exportar dados do dashboard"
+                    style={{
+                      marginLeft: 12,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '10px 16px',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      transition: 'all 0.2s ease-in-out',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#2563eb';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 8px rgba(0, 0, 0, 0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#3b82f6';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow =
+                        '0 2px 4px rgba(0, 0, 0, 0.1)';
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flexShrink: 0 }}
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span>Exportar</span>
+                  </button>
                 </div>
 
                 <ForecastSection
@@ -194,6 +251,12 @@ export default function DashboardPage() {
                   roomCalculation={roomCalculation}
                   stats={stats}
                   isProjection={isProjection}
+                />
+                <ExportModal
+                  isOpen={isExportOpen}
+                  onClose={() => setIsExportOpen(false)}
+                  defaultYear={selectedYear}
+                  defaultSemester={selectedSemester}
                 />
               </div>
 
