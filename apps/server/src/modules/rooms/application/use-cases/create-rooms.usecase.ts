@@ -14,6 +14,9 @@ export class CreateRoomsUseCase {
     roomsEntity.size = data.size;
     roomsEntity.courseId = data.courseId ?? null;
     roomsEntity.classId = data.classId ?? null;
+    if (data.classId !== undefined) {
+      roomsEntity.classId = data.classId;
+    }
 
     return await this.roomsRepository.create(roomsEntity);
   }

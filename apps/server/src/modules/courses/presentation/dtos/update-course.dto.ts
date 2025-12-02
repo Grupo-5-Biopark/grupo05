@@ -2,7 +2,7 @@ import { IsString, IsOptional, IsNumber, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 
-interface UpdateCourseInput {
+interface CourseDto {
   knowledge_area?: string;
   knowledgeArea?: string;
   period_quantities?: number;
@@ -19,8 +19,8 @@ export class UpdateCourseDto {
 
   @ApiPropertyOptional({ example: 'Computação' })
   @Transform(({ obj }: TransformFnParams) => {
-    const input = obj as UpdateCourseInput;
-    return input?.knowledge_area ?? input?.knowledgeArea;
+    const data = obj as CourseDto;
+    return data.knowledge_area ?? data.knowledgeArea;
   })
   @IsString({ message: 'must be a string' })
   @IsOptional()
@@ -34,8 +34,8 @@ export class UpdateCourseDto {
 
   @ApiPropertyOptional({ example: 4 })
   @Transform(({ obj }: TransformFnParams) => {
-    const input = obj as UpdateCourseInput;
-    return input?.period_quantities ?? input?.periodQuantities;
+    const data = obj as CourseDto;
+    return data.period_quantities ?? data.periodQuantities;
   })
   @IsNumber({}, { message: 'must be a number' })
   @Min(1, { message: 'must be at least 1' })
@@ -44,8 +44,8 @@ export class UpdateCourseDto {
 
   @ApiPropertyOptional({ example: 2025 })
   @Transform(({ obj }: TransformFnParams) => {
-    const input = obj as UpdateCourseInput;
-    return input?.opening_year ?? input?.openingYear;
+    const data = obj as CourseDto;
+    return data.opening_year ?? data.openingYear;
   })
   @IsNumber({}, { message: 'must be a number' })
   @Min(1990, { message: 'must be at least 1990' })

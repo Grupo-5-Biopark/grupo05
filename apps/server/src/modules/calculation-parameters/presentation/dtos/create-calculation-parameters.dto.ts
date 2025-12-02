@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, Min, IsInt, Max } from 'class-validator';
-import { registerDecorator, ValidationOptions } from 'class-validator';
+import {
+  IsNumber,
+  Min,
+  IsInt,
+  Max,
+  registerDecorator,
+  ValidationOptions,
+} from 'class-validator';
 
 function IsTwoDecimalPlaces(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
@@ -10,10 +16,10 @@ function IsTwoDecimalPlaces(validationOptions?: ValidationOptions) {
       propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any) {
+        validate(value: unknown) {
           if (value === null || value === undefined) return true;
           if (typeof value !== 'number') return false;
-          return Math.round(value * 100) === Math.round(value * 100);
+          return Math.round(value * 100) / 100 === value;
         },
       },
     });

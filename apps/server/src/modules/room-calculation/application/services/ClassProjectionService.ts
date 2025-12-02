@@ -2,6 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateClassUseCase } from '../../../classes/application/use-cases/create-class.usecase';
 import { CreateClassDto } from '../../../classes/presentation/dtos/create-class.dto';
 import { Class as ClassEntity } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
+
+interface CourseForProjection {
+  id: number;
+  shiftId?: number;
+  semester?: number;
+  vacancies?: number;
+  name?: string;
+}
 
 @Injectable()
 export class ClassProjectionService {
@@ -10,13 +19,7 @@ export class ClassProjectionService {
   constructor(private readonly createClassUseCase: CreateClassUseCase) {}
   async projectMissingClasses(
     targetYear: number,
-    courses: Array<{
-      id: number;
-      shiftId?: number;
-      semester?: number;
-      vacancies?: number;
-      name?: string;
-    }>,
+    courses: CourseForProjection[],
     existingClasses: Array<{ year: number }>,
   ): Promise<ClassEntity[]> {
     const createdClasses: ClassEntity[] = [];
@@ -42,7 +45,8 @@ export class ClassProjectionService {
 
         try {
           const created = await this.createClassUseCase.execute(createDto);
-          (created as any).course = course;
+          // Attach course data to the created class entity for projection purposes
+          created.course = course as unknown as Course;
           createdClasses.push(created);
         } catch (err) {
           this.logger.error(

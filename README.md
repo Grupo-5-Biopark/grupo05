@@ -23,6 +23,105 @@ Este projeto utiliza uma arquitetura de monorepo para abrigar tanto o backend qu
 
 ---
 
+## 🏗️ Princípios SOLID Aplicados
+
+O projeto segue rigorosamente os princípios SOLID para garantir código manutenível, testável e extensível:
+
+<details>
+<summary><strong>S - Single Responsibility Principle (Princípio da Responsabilidade Única)</strong></summary>
+
+Cada classe tem uma única responsabilidade. Os Use Cases são um exemplo claro:
+
+```typescript
+// Cada Use Case tem apenas uma responsabilidade
+CreateUserUseCase    → Apenas criar usuários
+DeleteUserUseCase    → Apenas deletar usuários
+FindUserByIdUseCase  → Apenas buscar usuário por ID
+```
+
+**Localização**: `apps/server/src/modules/*/application/use-cases/`
+
+</details>
+
+<details>
+<summary><strong>O - Open/Closed Principle (Princípio Aberto/Fechado)</strong></summary>
+
+Classes abertas para extensão, fechadas para modificação. Utilizamos interfaces que permitem novas implementações sem alterar código existente:
+
+```typescript
+// Interface define o contrato
+interface IHashingService {
+  hash(value: string): Promise<string>;
+  compare(value: string, hashedValue: string): Promise<boolean>;
+}
+
+// Implementação pode ser substituída sem modificar quem usa
+class BcryptHashingService implements IHashingService { ... }
+// Futuro: class ArgonHashingService implements IHashingService { ... }
+```
+
+**Localização**: `apps/server/src/modules/users/domain/services/`
+
+</details>
+
+<details>
+<summary><strong>L - Liskov Substitution Principle (Princípio da Substituição de Liskov)</strong></summary>
+
+Subtipos podem substituir seus tipos base. Qualquer implementação de `IHashingService` funciona onde a interface é esperada:
+
+```typescript
+// O UserRepository aceita qualquer implementação de IHashingService
+constructor(
+  @Inject(HASHING_SERVICE)
+  private readonly hashingService: IHashingService,
+) {}
+```
+
+</details>
+
+<details>
+<summary><strong>I - Interface Segregation Principle (Princípio da Segregação de Interfaces)</strong></summary>
+
+Interfaces pequenas e específicas ao invés de uma interface "god object":
+
+```typescript
+// ✅ Interfaces segregadas e focadas
+interface IHashingService {
+  hash(value: string): Promise<string>;
+  compare(value: string, hashedValue: string): Promise<boolean>;
+}
+
+// Cada repositório expõe apenas os métodos necessários para seu domínio
+```
+
+</details>
+
+<details>
+<summary><strong>D - Dependency Inversion Principle (Princípio da Inversão de Dependência)</strong></summary>
+
+Módulos de alto nível não dependem de módulos de baixo nível. Ambos dependem de abstrações:
+
+```typescript
+// Token de injeção (abstração)
+export const HASHING_SERVICE = 'HASHING_SERVICE';
+
+// Configuração no módulo - a implementação concreta é injetada
+@Module({
+  providers: [
+    {
+      provide: HASHING_SERVICE,
+      useClass: BcryptHashingService, // Pode trocar sem alterar os consumidores
+    },
+  ],
+})
+```
+
+**Localização**: `apps/server/src/modules/users/users.module.ts`
+
+</details>
+
+---
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **Monorepo**: `npm Workspaces`
@@ -135,21 +234,27 @@ Este monorepo está organizado da seguinte forma:
 
 O SonarQube analisa a qualidade do código, cobertura de testes e vulnerabilidades de segurança. Ele usa **Docker Compose profiles** para rodar apenas quando necessário.
 
-#### Primeiro uso:
+**Primeiro uso:**
 
-1. Inicie o servidor SonarQube:
+```bash
+npm run sonar:start        # Aguarde ~90 segundos
+# Acesse http://localhost:9000 (login: admin/admin)
+# Gere um token em: My Account → Security → Generate Tokens
+# Adicione ao .env: SONAR_TOKEN=seu_token_aqui
+```
 
-   ```bash
-   npm run sonar:start
-   ```
+**Analisar código:**
 
-   - Aguarde aproximadamente 90 segundos para inicialização completa
+```bash
+npm run sonar:scan         # Roda testes + análise
+# Veja resultados em http://localhost:9000
+```
 
-2. Configure o acesso:
-   - Acesse http://localhost:9000
-   - Login padrão: `admin` / `admin`
-   - Navegue até: **My Account** → **Security** → **Generate Tokens**
-   - Adicione o token gerado ao arquivo `.env`: `SONAR_TOKEN=seu_token_aqui`
+**Parar SonarQube:**
+
+```bash
+npm run sonar:stop         # Libera ~2GB de RAM
+```
 
 #### Analisar código:
 
