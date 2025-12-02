@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApi } from '@/hooks/useApi';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -27,6 +27,39 @@ export default function ExportModal({
 
   if (!isOpen) return null;
 
+  const addSheetFromArray = (
+    wb: ExcelJS.Workbook,
+    name: string,
+    data: any[],
+  ) => {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    const headerSet = new Set<string>();
+    for (const item of data) {
+      if (item && typeof item === 'object' && !Array.isArray(item)) {
+        Object.keys(item).forEach((k) => headerSet.add(k));
+      }
+    }
+    const headers = Array.from(headerSet);
+
+    const ws = wb.addWorksheet(name);
+    ws.columns = headers.map((h) => ({ header: h, key: h }));
+
+    const toCell = (v: any): string => {
+      if (v === null || v === undefined) return '';
+      if (typeof v === 'object') return JSON.stringify(v);
+      return String(v); // Garantir que o retorno final seja uma string
+    };
+
+    for (const item of data) {
+      const row: Record<string, any> = {};
+      for (const h of headers) {
+        row[h] = toCell(item?.[h]);
+      }
+      ws.addRow(row);
+    }
+  };
+
   const handleExport = async () => {
     setIsExporting(true);
     setError(null);
@@ -47,7 +80,7 @@ export default function ExportModal({
       const roomCalculation = roomCalcRes.data || null;
 
       // Prepare workbook
-      const wb = XLSX.utils.book_new();
+      const wb = new ExcelJS.Workbook();
 
       // Stats sheet: minimal computed stats
       type ClassType = { isAssumed?: boolean; currentStudents?: number };
@@ -72,59 +105,47 @@ export default function ExportModal({
         { key: 'totalCourses', value: (courses as any[]).length },
       ];
 
-      XLSX.utils.book_append_sheet(
-        wb,
-        XLSX.utils.json_to_sheet(statsRows, { header: ['key', 'value'] }),
-        'Stats',
-      );
+      const statsSheet = wb.addWorksheet('Stats');
+      statsSheet.columns = [
+        { header: 'key', key: 'key' },
+        { header: 'value', key: 'value' },
+      ];
+      statsRows.forEach((r) => statsSheet.addRow(r));
 
       // Append Courses, Classes, Rooms sheets
-      if ((courses as any[]).length > 0) {
-        XLSX.utils.book_append_sheet(
-          wb,
-          XLSX.utils.json_to_sheet(courses as any[]),
-          'Courses',
-        );
-      }
-
-      if ((classes as any[]).length > 0) {
-        XLSX.utils.book_append_sheet(
-          wb,
-          XLSX.utils.json_to_sheet(classes as any[]),
-          'Classes',
-        );
-      }
-
-      if ((rooms as any[]).length > 0) {
-        XLSX.utils.book_append_sheet(
-          wb,
-          XLSX.utils.json_to_sheet(rooms as any[]),
-          'Rooms',
-        );
-      }
+      addSheetFromArray(wb, 'Courses', courses as any[]);
+      addSheetFromArray(wb, 'Classes', classes as any[]);
+      addSheetFromArray(wb, 'Rooms', rooms as any[]);
 
       if (roomCalculation) {
-        // Room calculation may contain nested structures; handle details.classes if present
-        if (roomCalculation.details?.classes) {
-          XLSX.utils.book_append_sheet(
+        if (Array.isArray(roomCalculation.details?.classes)) {
+          addSheetFromArray(
             wb,
-            XLSX.utils.json_to_sheet(roomCalculation.details.classes),
             'RoomCalculation_Details',
+            roomCalculation.details.classes,
           );
         }
 
-        // exceededLimits
-        if (roomCalculation.exceededLimits) {
-          XLSX.utils.book_append_sheet(
+        if (Array.isArray(roomCalculation.exceededLimits)) {
+          addSheetFromArray(
             wb,
-            XLSX.utils.json_to_sheet(roomCalculation.exceededLimits),
             'ExceededLimits',
+            roomCalculation.exceededLimits,
           );
         }
       }
 
       const filename = `dashboard-export-${year}-${semester}.xlsx`;
-      XLSX.writeFile(wb, filename);
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
       onClose();
     } catch (err: any) {
       console.error('Export error', err);
