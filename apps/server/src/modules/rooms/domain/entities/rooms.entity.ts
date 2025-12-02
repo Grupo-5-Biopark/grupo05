@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Class } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
 
 @Entity('rooms')
 export class Rooms {
@@ -20,6 +21,13 @@ export class Rooms {
 
   @Column()
   size: string;
+
+  @Column({ nullable: true })
+  courseId: number;
+
+  @ManyToOne(() => Course, { nullable: true })
+  @JoinColumn({ name: 'courseId' })
+  course: Course;
 
   @Column({ nullable: true })
   classId: number;

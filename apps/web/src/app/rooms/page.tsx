@@ -13,6 +13,7 @@ interface Room {
   block: string;
   number: number;
   size: string;
+  courseId: number | null;
   classId: number | null;
   class?: {
     courseName: string;
@@ -163,6 +164,11 @@ function RoomsDataPanel() {
   };
 
   const formatClassName = (room: Room) => {
+    if (room.courseId) {
+      const course = courses.find((c) => c.id === room.courseId);
+      if (course) return course.name;
+    }
+
     if (!room.classId) return '-';
     const cls = classes.find((c) => c.id === room.classId);
     if (!cls) return '-';
@@ -227,6 +233,7 @@ function RoomsDataPanel() {
         block: formData.block,
         number: parseInt(formData.number),
         size: sizeCodeMap[formData.size] || formData.size,
+        courseId: selectedCourseId || null,
         classId: formData.classId ? parseInt(formData.classId) : null,
       };
 
@@ -272,15 +279,28 @@ function RoomsDataPanel() {
     const room = rooms.find((r) => r.id === roomId);
     if (!room) return;
     setEditingRoomId(room.id);
+
+    const sizeDisplayMap: Record<string, string> = {
+      P: 'PEQUENA',
+      M: 'MÉDIA',
+      G: 'GRANDE',
+      L: 'LABORATÓRIO',
+    };
+    const sizeValue = sizeDisplayMap[room.size] || room.size;
+
     setFormData({
       block: room.block,
       number: room.number.toString(),
-      size: room.size,
+      size: sizeValue,
       classId: room.classId?.toString() || '',
       courseName: '',
     });
-    // Derivar curso pela turma
-    if (room.classId) {
+
+    if (room.courseId) {
+      setSelectedCourseId(room.courseId);
+      const crs = courses.find((c) => c.id === room.courseId);
+      setFormData((prev) => ({ ...prev, courseName: crs?.name ?? '' }));
+    } else if (room.classId) {
       const cls = classes.find((c) => c.id === room.classId);
       if (cls && cls.courseId) {
         setSelectedCourseId(cls.courseId);

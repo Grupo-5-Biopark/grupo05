@@ -18,5 +18,10 @@ export class CreateRoomsDto {
   @ApiProperty({ example: 1, required: false })
   @IsNumber({}, { message: 'must be a number' })
   @IsOptional()
+  courseId?: number;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsNumber({}, { message: 'must be a number' })
+  @IsOptional()
   classId?: number;
 }

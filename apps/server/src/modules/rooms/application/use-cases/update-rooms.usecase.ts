@@ -13,8 +13,15 @@ export class UpdateRoomsUseCase {
       throw new RoomsNotFoundException(id);
     }
 
-    // Allow updating classId when provided
-    const updateData: Partial<typeof existingRooms> = { ...data };
+    // Build update data, explicitly handling courseId and classId
+    const updateData: Partial<typeof existingRooms> = {
+      block: data.block,
+      number: data.number,
+      size: data.size,
+      courseId: data.courseId ?? null,
+      classId: data.classId ?? null,
+    };
+
     await this.roomsRepository.update(id, updateData);
   }
 }
