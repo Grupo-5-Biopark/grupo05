@@ -44,6 +44,7 @@ export class RoomsController {
       block: roomsEntity.block,
       number: roomsEntity.number,
       size: roomsEntity.size,
+      courseId: roomsEntity.courseId,
       classId: roomsEntity.classId,
     };
   }
@@ -57,6 +58,7 @@ export class RoomsController {
       block: roomsEntity.block,
       number: roomsEntity.number,
       size: roomsEntity.size,
+      courseId: roomsEntity.courseId,
       classId: roomsEntity.classId,
     }));
   }
@@ -72,6 +74,7 @@ export class RoomsController {
       block: roomsEntity.block,
       number: roomsEntity.number,
       size: roomsEntity.size,
+      courseId: roomsEntity.courseId,
       classId: roomsEntity.classId,
     };
   }

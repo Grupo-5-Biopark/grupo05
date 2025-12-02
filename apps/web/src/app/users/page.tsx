@@ -176,7 +176,13 @@ export default function UsersPage() {
     }
 
     try {
-      const userData: any = {
+      const userData: {
+        name: string;
+        email: string;
+        role: string;
+        phone: string;
+        password?: string;
+      } = {
         name: formData.name,
         email: formData.email,
         role: formData.role,
@@ -205,18 +211,26 @@ export default function UsersPage() {
         phone: '',
       });
       await loadUsers();
-    } catch (err: any) {
+    } catch (err) {
       console.error('Erro ao salvar usuário:', err);
       let serverMessage = 'Erro ao salvar usuário. Tente novamente.';
       if (err instanceof Error)
         serverMessage = translateErrorMessage(err.message);
       else if (err && typeof err === 'object') {
-        const anyErr = err;
-        if (anyErr.response?.data?.message)
+        const anyErr = err as {
+          response?: { data?: { message?: string; error?: string } | string };
+        };
+        if (
+          typeof anyErr.response?.data === 'object' &&
+          anyErr.response?.data?.message
+        )
           serverMessage = translateErrorMessage(anyErr.response.data.message);
-        else if (anyErr.response?.data?.error)
+        else if (
+          typeof anyErr.response?.data === 'object' &&
+          anyErr.response?.data?.error
+        )
           serverMessage = translateErrorMessage(anyErr.response.data.error);
-        else if (anyErr.response?.data)
+        else if (typeof anyErr.response?.data === 'string')
           serverMessage = translateErrorMessage(anyErr.response.data);
       }
       showToast('error', serverMessage);

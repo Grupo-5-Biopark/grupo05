@@ -3,6 +3,7 @@ import { FindAllRoomsUseCase } from './find-all-rooms.usecase';
 import { RoomsRepository } from '../../infrastructure/repositories/rooms.repository';
 import { Rooms } from '../../domain/entities/rooms.entity';
 import { Class } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
 
 describe('FindAllRoomsUseCase', () => {
   let useCase: FindAllRoomsUseCase;
@@ -38,6 +39,8 @@ describe('FindAllRoomsUseCase', () => {
           block: 'Bloco A',
           number: 101,
           size: 'G',
+          courseId: 1,
+          course: undefined as unknown as Course,
           classId: 1,
           class: undefined as unknown as Class,
         },
@@ -46,6 +49,8 @@ describe('FindAllRoomsUseCase', () => {
           block: 'Bloco B',
           number: 202,
           size: 'M',
+          courseId: 2,
+          course: undefined as unknown as Course,
           classId: 2,
           class: undefined as unknown as Class,
         },

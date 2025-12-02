@@ -4,6 +4,7 @@ import { RoomsRepository } from '../../infrastructure/repositories/rooms.reposit
 import { Rooms } from '../../domain/entities/rooms.entity';
 import { RoomsNotFoundException } from '../../domain/exceptions/room-not-found.exception';
 import { Class } from '../../../classes/domain/entities/class.entity';
+import { Course } from '../../../courses/domain/entities/course.entity';
 
 describe('DeleteRoomsUseCase', () => {
   let useCase: DeleteRoomsUseCase;
@@ -39,6 +40,8 @@ describe('DeleteRoomsUseCase', () => {
         block: 'Bloco A',
         number: 101,
         size: 'G',
+        courseId: 1,
+        course: undefined as unknown as Course,
         classId: 1,
         class: undefined as unknown as Class,
       };
@@ -67,6 +70,8 @@ describe('DeleteRoomsUseCase', () => {
         block: 'Bloco A',
         number: 101,
         size: 'G',
+        courseId: 1,
+        course: undefined as unknown as Course,
         classId: 1,
         class: undefined as unknown as Class,
       };

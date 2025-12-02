@@ -261,6 +261,7 @@ npm run sonar:stop         # Libera ~2GB de RAM
 ```bash
 npm run sonar:scan
 ```
+
 - Executa todos os testes com cobertura
 - Envia a análise para o SonarQube
 - Visualize os resultados em http://localhost:9000
@@ -270,6 +271,7 @@ npm run sonar:scan
 ```bash
 npm run sonar:stop
 ```
+
 - Para o servidor e libera aproximadamente 2GB de RAM
 
 > **⚠️ Importante:** O SonarQube NÃO inicia automaticamente com `npm run dev` e NÃO roda em produção. Ele só é executado quando você solicita explicitamente através dos comandos acima.

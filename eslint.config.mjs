@@ -10,6 +10,7 @@ export default [
       '**/node_modules',
       '**/dist',
       '**/.next',
+      '**/coverage',
       'apps/web/next-env.d.ts',
       'apps/web/next.config.js',
       'scripts/',
