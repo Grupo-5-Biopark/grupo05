@@ -4,6 +4,20 @@ import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '../../../users/infrastructure/repositories/user.repository';
 import { UserPasswordService } from '../../../users/domain/services/user-password.service';
 
+/**
+ * Authentication service responsible for login and JWT token generation.
+ *
+ * @description This service implements the system's authentication logic,
+ * validating user credentials and generating JWT tokens for API access.
+ *
+ * @example
+ * ```typescript
+ * const { access_token, expires_in } = await authService.login(
+ *   'user@email.com',
+ *   'password123'
+ * );
+ * ```
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -13,6 +27,14 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
+  /**
+   * Validates user credentials.
+   *
+   * @param email - User's email
+   * @param password - Plain text password
+   * @returns Promise<User> - Validated user
+   * @throws UnauthorizedException - When credentials are invalid
+   */
   async validateUser(email: string, password: string) {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
@@ -31,6 +53,14 @@ export class AuthService {
     return user;
   }
 
+  /**
+   * Performs user login and generates a JWT token.
+   *
+   * @param email - User's email
+   * @param password - Plain text password
+   * @returns Promise<{ access_token: string; expires_in?: number }> - Access token and expiration time
+   * @throws UnauthorizedException - When credentials are invalid
+   */
   async login(
     email: string,
     password: string,

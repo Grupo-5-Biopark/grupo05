@@ -6,12 +6,34 @@ import { ClassProjectionService } from '../services/ClassProjectionService';
 import { Class } from '../../../classes/domain/entities/class.entity';
 
 /**
- * Extended class interface that includes projected classes
+ * Extended Class interface that includes projected classes.
+ * Used to distinguish real classes from simulated ones.
  */
 interface ClassWithProjection extends Class {
   isAssumed?: boolean;
 }
 
+/**
+ * Main system use case: Calculates classroom requirements.
+ *
+ * @description This use case implements the core business of the system, calculating
+ * how many rooms of each size (S, M, L) are needed for a given year/semester,
+ * considering:
+ * - Dropout rate configured in parameters
+ * - Capacity of each room type
+ * - Projection of future classes when necessary
+ *
+ * @example
+ * ```typescript
+ * // Calculate requirements for 2025, 1st semester
+ * const result = await calculateRoomRequirementsUseCase.execute(2025, 1);
+ *
+ * // Result includes:
+ * // - totalRoomsRequired: { small: 5, medium: 10, big: 3 }
+ * // - exceededLimits: classes exceeding maximum capacity
+ * // - details: detailed information per class
+ * ```
+ */
 @Injectable()
 export class CalculateRoomRequirementsUseCase {
   constructor(
@@ -21,6 +43,14 @@ export class CalculateRoomRequirementsUseCase {
     private readonly classRepository?: ClassRepository,
   ) {}
 
+  /**
+   * Executes the room requirements calculation.
+   *
+   * @param requestedYear - Year for calculation (optional, uses current year if not provided)
+   * @param requestedSemester - Semester for calculation (1 or 2, optional)
+   * @returns Object containing total rooms required, exceeded limits, and details
+   * @throws NotFoundException - When calculation parameters are not configured
+   */
   async execute(requestedYear?: number, requestedSemester?: number) {
     const courses = await this.courseRepository.findAll();
     const paramsList = await this.calculationParametersRepository.findAll();
