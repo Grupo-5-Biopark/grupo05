@@ -158,39 +158,9 @@ function ForecastAlerts({ exceededLimits }: Readonly<ForecastAlertsProps>) {
   );
 }
 
-interface ProjectionInfoProps {
-  readonly isProjection: boolean;
-  readonly simulatedCount: number;
-}
-
-function ProjectionInfo({
-  isProjection,
-  simulatedCount,
-}: Readonly<ProjectionInfoProps>) {
-  // Mostra a mensagem se houver turmas simuladas, independente de ser projeção futura
-  if (simulatedCount === 0) {
-    return null;
-  }
-
-  const message = isProjection
-    ? `Esta projeção inclui <strong>${simulatedCount} turmas simuladas</strong> baseadas nas vagas dos cursos cadastrados.`
-    : `Este período inclui <strong>${simulatedCount} turmas projetadas</strong> que foram criadas automaticamente para preencher anos sem turmas cadastradas.`;
-
-  return (
-    <div className="projection-info">
-      <span className="info-icon">ℹ️</span>
-      <span
-        className="info-text"
-        dangerouslySetInnerHTML={{ __html: message }}
-      />
-    </div>
-  );
-}
-
 export function ForecastContent({
   roomCalculation,
   stats,
-  isProjection,
 }: Readonly<ForecastContentProps>) {
   const totalRequired =
     roomCalculation.totalRoomsRequired.small +
@@ -213,11 +183,6 @@ export function ForecastContent({
       <RoomBreakdown roomCalculation={roomCalculation} stats={stats} />
 
       <ForecastAlerts exceededLimits={roomCalculation.exceededLimits} />
-
-      <ProjectionInfo
-        isProjection={isProjection}
-        simulatedCount={roomCalculation.metadata.simulatedClassesCount}
-      />
     </div>
   );
 }

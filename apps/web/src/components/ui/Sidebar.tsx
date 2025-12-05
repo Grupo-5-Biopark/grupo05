@@ -56,13 +56,6 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       adminOnly: true,
     },
     {
-      id: 'relatorios',
-      label: 'Relatórios',
-      icon: '📈',
-      route: '/reports',
-      adminOnly: false,
-    },
-    {
       id: 'configuracoes',
       label: 'Configurações',
       icon: '⚙️',

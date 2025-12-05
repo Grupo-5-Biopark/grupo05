@@ -17,7 +17,7 @@ import { CreateCalculationParametersDto } from '../dtos/create-calculation-param
 import { UpdateCalculationParametersDto } from '../dtos/update-calculation-parameters.dto';
 import { CalculationParametersResponseDto } from '../dtos/calculation-parameters-response.dto';
 
-@Controller('calculationParameters')
+@Controller('calculation-parameters')
 @UseGuards(JwtAuthGuard)
 @ApiTags('CalculationParameters')
 @ApiBearerAuth()

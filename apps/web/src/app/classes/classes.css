@@ -597,3 +597,67 @@
     width: 100%;
   }
 }
+
+/* Current period row highlight */
+.current-period-row {
+  background-color: rgba(235, 6, 68, 0.04) !important;
+}
+
+.current-period-row:hover {
+  background-color: rgba(235, 6, 68, 0.08) !important;
+}
+
+/* Course cell with badge */
+.course-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.course-name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.current-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background-color: #eb0644;
+  color: white;
+}
+
+/* Class ID badge */
+.class-id-badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #34495e;
+  color: white;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+/* Table subtitle */
+.table-subtitle {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* Form validation styles */
+.input-error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}

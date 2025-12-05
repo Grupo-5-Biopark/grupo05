@@ -53,7 +53,7 @@ export default function SettingsPage() {
     setIsLoading(true);
     try {
       const response = await get<CalculationParameters[]>(
-        '/api/calculationParameters',
+        '/api/calculation-parameters',
       );
 
       // Get the first (and should be only) parameter set
@@ -152,7 +152,7 @@ export default function SettingsPage() {
         studentsPerMediumRoom,
         studentsPerBigRoom,
       };
-      await put('/api/calculationParameters', dataToSend);
+      await put('/api/calculation-parameters', dataToSend);
       setSuccessMessage('Parâmetros salvos com sucesso! ✅');
       await loadParameters(); // Reload to confirm changes
     } catch (err) {

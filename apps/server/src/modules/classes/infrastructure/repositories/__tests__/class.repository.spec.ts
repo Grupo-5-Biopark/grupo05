@@ -92,7 +92,7 @@ describe('ClassRepository', () => {
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
-        relations: ['course'],
+        relations: ['course', 'shift'],
       });
       expect(result).toEqual(mockClass);
     });
