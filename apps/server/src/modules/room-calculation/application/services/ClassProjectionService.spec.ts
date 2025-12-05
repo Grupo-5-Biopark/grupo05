@@ -32,12 +32,19 @@ describe('ClassProjectionService', () => {
   });
 
   describe('projectMissingClasses', () => {
-    it('should create classes for missing years', async () => {
+    it('should create class for course without existing class in target year', async () => {
       const targetYear = 2025;
       const courses = [
-        { id: 1, shiftId: 1, semester: 1, vacancies: 40, name: 'Course 1' },
+        {
+          id: 1,
+          shiftId: 1,
+          semester: 1,
+          vacancies: 40,
+          name: 'Course 1',
+          openingYear: 2020,
+        },
       ];
-      const existingClasses = [{ year: 2024 }];
+      const existingClasses = [{ year: 2024, courseId: 1 }];
 
       const mockCreatedClass: ClassEntity = {
         id: 1,
@@ -70,12 +77,19 @@ describe('ClassProjectionService', () => {
       expect(result).toHaveLength(1);
     });
 
-    it('should not create classes if target year already exists', async () => {
-      const targetYear = 2024;
+    it('should not create class if course already has class in target year', async () => {
+      const targetYear = 2025;
       const courses = [
-        { id: 1, shiftId: 1, semester: 1, vacancies: 40, name: 'Course 1' },
+        {
+          id: 1,
+          shiftId: 1,
+          semester: 1,
+          vacancies: 40,
+          name: 'Course 1',
+          openingYear: 2020,
+        },
       ];
-      const existingClasses = [{ year: 2024 }];
+      const existingClasses = [{ year: 2025, courseId: 1 }];
 
       const result = await service.projectMissingClasses(
         targetYear,
@@ -87,17 +101,49 @@ describe('ClassProjectionService', () => {
       expect(result).toHaveLength(0);
     });
 
-    it('should create multiple classes for multiple missing years up to current year', async () => {
-      const currentYear = new Date().getFullYear();
-      const targetYear = currentYear + 2;
-      const courses = [{ id: 1, shiftId: 1, semester: 1, vacancies: 40 }];
-      const existingClasses = [{ year: currentYear - 1 }]; // One year before current
+    it('should not create class if course openingYear is after target year', async () => {
+      const targetYear = 2025;
+      const courses = [
+        {
+          id: 1,
+          shiftId: 1,
+          semester: 1,
+          vacancies: 40,
+          name: 'Course 1',
+          openingYear: 2026,
+        },
+      ];
+      const existingClasses: Array<{ year: number; courseId: number }> = [];
+
+      const result = await service.projectMissingClasses(
+        targetYear,
+        courses,
+        existingClasses,
+      );
+
+      expect(createClassUseCase.execute).not.toHaveBeenCalled();
+      expect(result).toHaveLength(0);
+    });
+
+    it('should create class for course starting in target year', async () => {
+      const targetYear = 2025;
+      const courses = [
+        {
+          id: 1,
+          shiftId: 1,
+          semester: 1,
+          vacancies: 40,
+          name: 'Course 1',
+          openingYear: 2025,
+        },
+      ];
+      const existingClasses: Array<{ year: number; courseId: number }> = [];
 
       const mockCreatedClass: ClassEntity = {
         id: 1,
         courseId: 1,
         shiftId: 1,
-        year: targetYear,
+        year: 2025,
         semester: 1,
         currentStudents: 40,
         isAssumed: true,
@@ -113,16 +159,14 @@ describe('ClassProjectionService', () => {
         existingClasses,
       );
 
-      // Should create classes for targetYear, targetYear-1, targetYear-2 (currentYear)
-      // and stop at currentYear (not going below it)
-      expect(createClassUseCase.execute).toHaveBeenCalledTimes(3);
-      expect(result).toHaveLength(3);
+      expect(createClassUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(result).toHaveLength(1);
     });
 
     it('should use default values when optional fields are missing', async () => {
       const targetYear = 2025;
       const courses = [{ id: 1 }]; // minimal course data
-      const existingClasses = [{ year: 2024 }];
+      const existingClasses: Array<{ year: number; courseId: number }> = [];
 
       const mockCreatedClass: ClassEntity = {
         id: 1,
@@ -153,9 +197,16 @@ describe('ClassProjectionService', () => {
     it('should handle errors when creating classes', async () => {
       const targetYear = 2025;
       const courses = [
-        { id: 1, shiftId: 1, semester: 1, vacancies: 40, name: 'Course 1' },
+        {
+          id: 1,
+          shiftId: 1,
+          semester: 1,
+          vacancies: 40,
+          name: 'Course 1',
+          openingYear: 2020,
+        },
       ];
-      const existingClasses = [{ year: 2024 }];
+      const existingClasses: Array<{ year: number; courseId: number }> = [];
 
       mockCreateClassUseCase.execute.mockRejectedValue(
         new Error('Creation failed'),
@@ -168,18 +219,23 @@ describe('ClassProjectionService', () => {
       );
 
       expect(createClassUseCase.execute).toHaveBeenCalled();
-      // Should still return array (possibly empty) even on error
       expect(result).toEqual([]);
     });
 
     it('should handle errors without message property', async () => {
       const targetYear = 2025;
       const courses = [
-        { id: 1, shiftId: 1, semester: 1, vacancies: 40, name: 'Course 1' },
+        {
+          id: 1,
+          shiftId: 1,
+          semester: 1,
+          vacancies: 40,
+          name: 'Course 1',
+          openingYear: 2020,
+        },
       ];
-      const existingClasses = [{ year: 2024 }];
+      const existingClasses: Array<{ year: number; courseId: number }> = [];
 
-      // Throw a non-Error object (string)
       mockCreateClassUseCase.execute.mockRejectedValue('String error');
 
       const result = await service.projectMissingClasses(
@@ -192,66 +248,51 @@ describe('ClassProjectionService', () => {
       expect(result).toEqual([]);
     });
 
-    it('should stop after LOOKBACK_LIMIT of 10 years when all years are in the future', async () => {
-      const currentYear = new Date().getFullYear();
-      const targetYear = currentYear + 15; // Far in the future
-      const courses = [{ id: 1 }];
-      const existingClasses: Array<{ year: number }> = []; // No existing classes
-
-      const mockCreatedClass: ClassEntity = {
-        id: 1,
-        courseId: 1,
-        shiftId: 1,
-        year: targetYear,
-        semester: 1,
-        currentStudents: 0,
-        isAssumed: true,
-        course: undefined as unknown as Course,
-        shift: undefined as unknown as Shift,
-      };
-
-      mockCreateClassUseCase.execute.mockResolvedValue(mockCreatedClass);
-
-      await service.projectMissingClasses(targetYear, courses, existingClasses);
-
-      // Should stop at LOOKBACK_LIMIT (10 years) when all years are >= currentYear
-      expect(createClassUseCase.execute).toHaveBeenCalledTimes(11); // targetYear + 10 more years back
-    });
-
-    it('should not create classes for years before current year', async () => {
-      const currentYear = new Date().getFullYear();
-      const targetYear = currentYear + 2;
-      const courses = [{ id: 1 }];
-      const existingClasses: Array<{ year: number }> = []; // No existing classes
-
-      const mockCreatedClass: ClassEntity = {
-        id: 1,
-        courseId: 1,
-        shiftId: 1,
-        year: targetYear,
-        semester: 1,
-        currentStudents: 0,
-        isAssumed: true,
-        course: undefined as unknown as Course,
-        shift: undefined as unknown as Shift,
-      };
-
-      mockCreateClassUseCase.execute.mockResolvedValue(mockCreatedClass);
-
-      await service.projectMissingClasses(targetYear, courses, existingClasses);
-
-      // Should create classes only for targetYear, targetYear-1, targetYear-2 (currentYear)
-      // and stop before currentYear - 1
-      expect(createClassUseCase.execute).toHaveBeenCalledTimes(3);
-    });
-
-    it('should handle multiple courses', async () => {
+    it('should handle multiple courses independently', async () => {
       const targetYear = 2025;
       const courses = [
-        { id: 1, shiftId: 1, semester: 1, vacancies: 40 },
-        { id: 2, shiftId: 2, semester: 1, vacancies: 30 },
+        { id: 1, shiftId: 1, semester: 1, vacancies: 40, openingYear: 2020 },
+        { id: 2, shiftId: 2, semester: 1, vacancies: 30, openingYear: 2020 },
       ];
-      const existingClasses = [{ year: 2024 }];
+      // Course 1 already has class in 2025, Course 2 does not
+      const existingClasses = [{ year: 2025, courseId: 1 }];
+
+      const mockCreatedClass: ClassEntity = {
+        id: 2,
+        courseId: 2,
+        shiftId: 2,
+        year: 2025,
+        semester: 1,
+        currentStudents: 30,
+        isAssumed: true,
+        course: undefined as unknown as Course,
+        shift: undefined as unknown as Shift,
+      };
+
+      mockCreateClassUseCase.execute.mockResolvedValue(mockCreatedClass);
+
+      const result = await service.projectMissingClasses(
+        targetYear,
+        courses,
+        existingClasses,
+      );
+
+      // Only course 2 should have class created
+      expect(createClassUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(createClassUseCase.execute).toHaveBeenCalledWith(
+        expect.objectContaining({ courseId: 2 }),
+      );
+      expect(result).toHaveLength(1);
+    });
+
+    it('should create classes for all courses without existing classes', async () => {
+      const targetYear = 2025;
+      const courses = [
+        { id: 1, shiftId: 1, semester: 1, vacancies: 40, openingYear: 2020 },
+        { id: 2, shiftId: 2, semester: 1, vacancies: 30, openingYear: 2020 },
+        { id: 3, shiftId: 1, semester: 2, vacancies: 25, openingYear: 2020 },
+      ];
+      const existingClasses: Array<{ year: number; courseId: number }> = [];
 
       const mockCreatedClass: ClassEntity = {
         id: 1,
@@ -273,9 +314,8 @@ describe('ClassProjectionService', () => {
         existingClasses,
       );
 
-      // 2 courses for 1 missing year
-      expect(createClassUseCase.execute).toHaveBeenCalledTimes(2);
-      expect(result).toHaveLength(2);
+      expect(createClassUseCase.execute).toHaveBeenCalledTimes(3);
+      expect(result).toHaveLength(3);
     });
   });
 });

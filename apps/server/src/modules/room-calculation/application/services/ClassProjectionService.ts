@@ -10,6 +10,12 @@ interface CourseForProjection {
   semester?: number;
   vacancies?: number;
   name?: string;
+  openingYear?: number;
+}
+
+interface ExistingClass {
+  year: number;
+  courseId: number;
 }
 
 @Injectable()
@@ -17,57 +23,68 @@ export class ClassProjectionService {
   private readonly logger = new Logger(ClassProjectionService.name);
 
   constructor(private readonly createClassUseCase: CreateClassUseCase) {}
+
   async projectMissingClasses(
     targetYear: number,
     courses: CourseForProjection[],
-    existingClasses: Array<{ year: number }>,
+    existingClasses: ExistingClass[],
   ): Promise<ClassEntity[]> {
     const createdClasses: ClassEntity[] = [];
-    const existingYears = new Set(existingClasses.map((c) => Number(c.year)));
 
-    const LOOKBACK_LIMIT = 10;
+    // Mapa de cursos que já têm turma em cada ano: Map<courseId, Set<year>>
+    const existingClassesByCourse = new Map<number, Set<number>>();
+    for (const cls of existingClasses) {
+      if (!existingClassesByCourse.has(cls.courseId)) {
+        existingClassesByCourse.set(cls.courseId, new Set());
+      }
+      existingClassesByCourse.get(cls.courseId).add(Number(cls.year));
+    }
+
     const currentYear = new Date().getFullYear();
-    let currentYearCheck = targetYear;
 
-    while (true) {
-      if (existingYears.has(currentYearCheck)) {
-        break;
+    // Para cada curso, verifica se precisa criar turma projetada
+    for (const course of courses) {
+      const courseOpeningYear = course.openingYear ?? currentYear;
+
+      // Só projeta se o curso já deveria ter começado
+      if (courseOpeningYear > targetYear) {
+        continue;
       }
 
-      if (currentYearCheck < currentYear) {
-        break;
+      const courseExistingYears =
+        existingClassesByCourse.get(course.id) ?? new Set();
+
+      // Verifica se o curso já tem turma no ano alvo
+      if (courseExistingYears.has(targetYear)) {
+        continue;
       }
 
-      for (const course of courses) {
-        const createDto: CreateClassDto = {
-          courseId: course.id,
-          shiftId: course.shiftId ?? 1,
-          year: currentYearCheck,
-          semester: course.semester ?? 1,
-          currentStudents: course.vacancies ?? 0, // Note que você já passou o valor aqui
-          isAssumed: true,
-        };
+      // Cria turma projetada para o ano alvo
+      const createDto: CreateClassDto = {
+        courseId: course.id,
+        shiftId: course.shiftId ?? 1,
+        year: targetYear,
+        semester: course.semester ?? 1,
+        currentStudents: course.vacancies ?? 0,
+        isAssumed: true,
+      };
 
-        try {
-          const created = await this.createClassUseCase.execute(createDto);
-          // Attach course data to the created class entity for projection purposes
-          created.course = course as unknown as Course;
-          createdClasses.push(created);
-        } catch (err) {
-          this.logger.error(
-            `Failed to create projected class for course ${course.id} year ${currentYearCheck}: ${
-              (err as Error).message || err
-            }`,
-          );
-        }
-      }
-
-      currentYearCheck--;
-
-      if (targetYear - currentYearCheck > LOOKBACK_LIMIT) {
-        break;
+      try {
+        const created = await this.createClassUseCase.execute(createDto);
+        created.course = course as unknown as Course;
+        createdClasses.push(created);
+        this.logger.log(
+          `Projected class created for course ${course.name ?? course.id} year ${targetYear}`,
+        );
+      } catch (err) {
+        this.logger.error(
+          `Failed to create projected class for course ${course.id} year ${targetYear}: ${
+            (err as Error).message || err
+          }`,
+        );
       }
     }
+
     return createdClasses;
   }
 }
